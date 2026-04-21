@@ -1,7 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// This is your Prisma schema file
+// https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client"
@@ -10,4 +8,175 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ─── Single-row tables (upsert pattern) ───────────────────────────────────────
+
+model Profile {
+  id               Int      @id @default(autoincrement())
+  name             String
+  title            String
+  bio              String
+  avatarUrl        String?
+  location         String?
+  resumeUrl        String?
+  availableForWork Boolean  @default(true)
+  updatedAt        DateTime @updatedAt
+}
+
+model SocialLinks {
+  id        Int      @id @default(autoincrement())
+  github    String?
+  linkedin  String?
+  twitter   String?
+  email     String?
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Portfolio ─────────────────────────────────────────────────────────────────
+
+model Skill {
+  id       Int     @id @default(autoincrement())
+  name     String
+  category String
+  iconUrl  String?
+  order    Int     @default(0)
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  techStack   String[]
+  githubUrl   String?
+  liveUrl     String?
+  imageUrl    String?
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+}
+
+model Experience {
+  id          Int       @id @default(autoincrement())
+  company     String
+  role        String
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean   @default(false)
+  description String
+}
+
+model Education {
+  id          Int    @id @default(autoincrement())
+  institution String
+  degree      String
+  startYear   Int
+  endYear     Int?
+}
+
+// ─── Extended sections ─────────────────────────────────────────────────────────
+
+model Service {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String
+  icon        String?
+  price       Float?
+  currency    String  @default("USD")
+  featured    Boolean @default(false)
+  order       Int     @default(0)
+}
+
+model DeveloperTool {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  url         String?
+  category    String
+  imageUrl    String?
+  order       Int     @default(0)
+}
+
+model UsesItem {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  // "Hardware" | "Editor" | "Terminal" | "Apps" | "Extensions"
+  category    String
+  url         String?
+  order       Int    @default(0)
+}
+
+model GalleryPhoto {
+  id       Int       @id @default(autoincrement())
+  imageUrl String
+  caption  String?
+  location String?
+  takenAt  DateTime?
+  order    Int       @default(0)
+  featured Boolean   @default(false)
+}
+
+// ─── Blog ──────────────────────────────────────────────────────────────────────
+
+model Blog {
+  id         Int       @id @default(autoincrement())
+  title      String
+  slug       String    @unique
+  content    String
+  excerpt    String?
+  coverImage String?
+  published  Boolean   @default(false)
+  categoryId Int?
+  authorId   Int?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  category   Category? @relation(fields: [categoryId], references: [id])
+  author     User?     @relation(fields: [authorId], references: [id])
+  comments   Comment[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  slug  String @unique
+  blogs Blog[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  blogId    Int
+  userId    Int?
+  createdAt DateTime @default(now())
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+// ─── Contact ───────────────────────────────────────────────────────────────────
+
+model Contact {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  subject   String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ─── Auth / Users ──────────────────────────────────────────────────────────────
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  blogs     Blog[]
+  comments  Comment[]
+}
+
+enum Role {
+  ADMIN
+  USER
 }
