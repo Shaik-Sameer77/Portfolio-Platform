@@ -11,7 +11,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Visibility, VisibilityOff, LockOutlined } from '@mui/icons-material';
-import axios from 'axios';
+import api from '../api';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { loginSuccess } from '../features/authSlice';
@@ -32,7 +32,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:8001/auth/login', {
+      const response = await api.post('/auth/login', {
         email,
         password,
       });
@@ -89,10 +89,10 @@ export default function LoginPage() {
             >
               <LockOutlined sx={{ color: 'white' }} />
             </Box>
-            <Typography variant="h5" fontWeight="700">
+            <Typography variant="h5" sx={{ fontWeight: '700' }}>
               Admin Portal
             </Typography>
-            <Typography variant="body2" color="rgba(255,255,255,0.6)" align="center" mt={1}>
+            <Typography variant="body2" color="rgba(255,255,255,0.6)" align="center" sx={{ mt: 1 }}>
               Secure access to portfolio management structure.
             </Typography>
           </Box>
@@ -136,18 +136,20 @@ export default function LoginPage() {
                 '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.5)' },
                 '& .MuiInputLabel-root.Mui-focused': { color: '#a855f7' },
               }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                      sx={{ color: 'rgba(255,255,255,0.5)' }}
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        sx={{ color: 'rgba(255,255,255,0.5)' }}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
               required
             />
