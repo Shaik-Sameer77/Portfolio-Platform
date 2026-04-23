@@ -1,6 +1,7 @@
 # Portfolio Platform — Project Documentation
 
 > A full-stack, event-driven portfolio platform built with NestJS, Next.js, PostgreSQL, MongoDB, and Kafka.
+> Designed to feel like a SaaS product and personal brand — not a typical portfolio website.
 > This document reflects what is actually built and planned — nothing is inflated.
 
 ---
@@ -13,23 +14,26 @@
 4. [System Architecture](#4-system-architecture)
 5. [Database Design](#5-database-design)
 6. [Folder Structure](#6-folder-structure)
-7. [API Modules](#7-api-modules)
-8. [Data Flow](#8-data-flow)
-9. [Authentication](#9-authentication)
-10. [Build Phases](#10-build-phases)
-11. [Design Decisions](#11-design-decisions)
-12. [Testing Strategy](#12-testing-strategy)
-13. [Observability](#13-observability)
-14. [Deployment](#14-deployment)
-15. [Local Setup](#15-local-setup)
-16. [Challenges and Learnings](#16-challenges-and-learnings)
-17. [Interview Talking Points](#17-interview-talking-points)
+7. [Frontend — Pages and Navigation](#7-frontend--pages-and-navigation)
+8. [API Modules](#8-api-modules)
+9. [Data Flow](#9-data-flow)
+10. [Authentication](#10-authentication)
+11. [Build Phases](#11-build-phases)
+12. [Design Decisions](#12-design-decisions)
+13. [Testing Strategy](#13-testing-strategy)
+14. [Observability](#14-observability)
+15. [Deployment](#15-deployment)
+16. [Local Setup](#16-local-setup)
+17. [Challenges and Learnings](#17-challenges-and-learnings)
+18. [Interview Talking Points](#18-interview-talking-points)
 
 ---
 
 ## 1. Project Overview
 
-This is not a static portfolio website. It is a backend-driven platform where an admin controls everything displayed on the public portfolio — profile, skills, projects, experience — through a dedicated admin dashboard. It also includes a blog system, a contact system, a chatbot, and an event-driven microservices layer for analytics, notifications, and CRM.
+This is not a static portfolio website. It is a backend-driven platform designed to feel like a SaaS product and personal brand. An admin controls everything displayed — profile, skills, projects, experience, availability status — through a dedicated admin dashboard. It also includes a blog system, a services page, a developer tools section, a photography gallery, a chatbot, and an event-driven microservices layer for analytics, notifications, and CRM.
+
+The site is built around the idea that a portfolio should work like a product: data-driven, dynamic, and fully under the owner's control without touching code. Every piece of content on the public site — including the navbar availability status — is managed through the backend.
 
 The goal is to simulate a real production system, not just build a showcase site.
 
@@ -121,7 +125,7 @@ The frontend and admin dashboard both talk to the same NestJS API gateway. The g
 
 **Profile** (single row — admin updates, never creates new)
 
-- id, name, title, bio, avatarUrl, location, resumeUrl, updatedAt
+- id, name, title, bio, avatarUrl, location, resumeUrl, availableForWork, updatedAt
 
 **SocialLinks** (single row)
 
@@ -142,6 +146,23 @@ The frontend and admin dashboard both talk to the same NestJS API gateway. The g
 **Education**
 
 - id, institution, degree, startYear, endYear
+
+**Service**
+
+- id, title, description, icon, price, currency, featured, order
+
+**DeveloperTool**
+
+- id, name, description, url, category, imageUrl, order
+
+**UsesItem** (the "Uses" page — your personal setup)
+
+- id, name, description, category, url, order
+- category: "Hardware" | "Editor" | "Terminal" | "Apps" | "Extensions"
+
+**GalleryPhoto**
+
+- id, imageUrl, caption, location, takenAt, order, featured
 
 **Blog**
 
@@ -231,7 +252,77 @@ backend/
 
 ---
 
-## 7. API Modules
+## 7. Frontend — Pages and Navigation
+
+### Navbar structure
+
+The navbar is designed to feel like a SaaS product — clean, minimal top bar with a mega dropdown for portfolio sections, and a persistent CTA button. Five top-level items maximum so the bar never looks cluttered.
+
+```
+Logo (Sameer.dev)   |  Portfolio ▾  |  Blog  |  Services  |  Tools  |  Gallery  |  ● Available  |  Let's talk
+```
+
+**"Let's talk"** is always visible — on mobile it stays beside the hamburger icon, never buried in the drawer. It opens the contact page.
+
+**"● Available"** is a live green dot driven by the `availableForWork` boolean in the Profile table. Admin toggles it in the dashboard. When set to false it either disappears or shows "● Unavailable" in a muted colour.
+
+---
+
+### Portfolio mega dropdown
+
+When "Portfolio" is clicked or hovered, a three-column mega dropdown opens. This groups everything about Sameer into one organised panel — identical to how SaaS products group their product pages.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Me                  Work               Quick links      │
+│  ─────────────────   ──────────────     ───────────────  │
+│  Home                Projects           Resume (PDF ↓)   │
+│  About               Tech stack         GitHub           │
+│  Experience          Uses               LinkedIn         │
+│  Education                                               │
+└─────────────────────────────────────────────────────────┘
+```
+
+The "Quick links" column — resume download, GitHub, LinkedIn — means recruiters never have to scroll to the footer to find this information.
+
+---
+
+### All pages
+
+#### Portfolio section (inside dropdown)
+
+| Page       | Route       | Description                                                 |
+| ---------- | ----------- | ----------------------------------------------------------- |
+| Home       | /           | Hero, intro, featured projects, availability status         |
+| About      | /about      | Story, values, what drives me                               |
+| Experience | /experience | Work history timeline                                       |
+| Education  | /education  | Degrees and certifications                                  |
+| Projects   | /projects   | All projects with filter by tech                            |
+| Tech stack | /stack      | Skills grouped by category                                  |
+| Uses       | /uses       | My hardware, editor, apps, extensions — personal setup page |
+
+#### Main nav pages
+
+| Page            | Route        | Description                                       |
+| --------------- | ------------ | ------------------------------------------------- |
+| Blog            | /blog        | All published blog posts                          |
+| Blog detail     | /blog/[slug] | Single post with comments                         |
+| Services        | /services    | What I offer, how to hire me for freelance        |
+| Developer tools | /tools       | Tools I've built or curated for developers        |
+| Gallery         | /gallery     | Photography — personal hobby, humanises the brand |
+| Contact         | /contact     | Contact form — also opened by "Let's talk"        |
+
+---
+
+### Why this navigation structure
+
+Most portfolios have a flat nav: Home, About, Projects, Skills, Contact. This looks like a resume, not a product. The mega dropdown groups related information the same way Vercel, Linear, and Notion group their product pages. A recruiter or potential client lands and immediately understands the structure without reading anything.
+
+The "Uses" page is the most distinctive addition. It is a page where developers list their exact setup — laptop model, IDE, theme, fonts, extensions, apps. Other developers genuinely love reading these pages. It builds connection, shows personality, and gets repeat visitors that no typical portfolio section would attract.
+
+The Gallery section shows a side of you that no skills list can show. Hiring managers remember the candidate who had a photography hobby far more than the one who listed "strong communication skills."
+
+---
 
 ### Portfolio module — GET /portfolio/\*
 

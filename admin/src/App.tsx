@@ -1,51 +1,83 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
 import { useSelector } from 'react-redux';
+import { getTheme } from './theme';
 import type { RootState } from './store';
+
+// Layouts
+import AdminLayout from './layout/AdminLayout';
+
+// Pages
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
-import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
+import ProjectsPage from './pages/ProjectsPage';
+import SkillsPage from './pages/SkillsPage';
+import ComingSoonPage from './pages/ComingSoonPage';
 
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    background: {
-      default: '#09090b',
-      paper: '#171717',
-    },
-    primary: {
-      main: '#a855f7', // Purple shade
-    },
-  },
-  typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-  },
-});
-
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+// Protected Route Component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   return <>{children}</>;
-}
+};
 
-export default function App() {
+function App() {
+  const mode = useSelector((state: RootState) => state.theme.mode);
+  const theme = React.useMemo(() => getTheme(mode), [mode]);
+
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/dashboard/*"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        
+        <Route path="/" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <DashboardPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/dashboard/*" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <Routes>
+                <Route index element={<DashboardPage />} />
+                <Route path="*" element={<ComingSoonPage />} />
+              </Routes>
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/projects" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <ProjectsPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/skills" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <SkillsPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        {/* Catch-all for other Admin routes */}
+        <Route path="/:section/*" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <ComingSoonPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+      </Routes>
     </ThemeProvider>
   );
 }
+
+export default App;
