@@ -97,8 +97,8 @@ export default function DashboardPage() {
     dispatch(fetchProfile());
   }, [dispatch]);
 
-  const featuredProjects = projects.filter((p) => p.featured);
-  const skillCategories = [...new Set(skills.map((s) => s.category))];
+  const featuredProjects = Array.isArray(projects) ? projects.filter((p) => p.featured) : [];
+  const skillCategories = Array.isArray(skills) ? [...new Set(skills.map((s) => s.category))] : [];
 
   const quickActions = [
     { label: 'Add Project', path: '/projects', color: '#7c6af7' },
@@ -172,7 +172,7 @@ export default function DashboardPage() {
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Projects"
-            count={projects.length}
+            count={Array.isArray(projects) ? projects.length : 0}
             icon={<ProjectsIcon />}
             color="#7c6af7"
             bgColor="rgba(124,106,247,0.15)"
@@ -182,7 +182,7 @@ export default function DashboardPage() {
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Skills"
-            count={skills.length}
+                        count={Array.isArray(skills) ? skills.length : 0}
             icon={<SkillsIcon />}
             color="#22d3ee"
             bgColor="rgba(34,211,238,0.15)"
@@ -192,7 +192,7 @@ export default function DashboardPage() {
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Experience"
-            count={experience.length}
+            count={Array.isArray(experience) ? experience.length : 0}
             icon={<ExperienceIcon />}
             color="#10b981"
             bgColor="rgba(16,185,129,0.15)"
@@ -202,7 +202,7 @@ export default function DashboardPage() {
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Services"
-            count={services.length}
+            count={Array.isArray(services) ? services.length : 0}
             icon={<ServicesIcon />}
             color="#f59e0b"
             bgColor="rgba(245,158,11,0.15)"

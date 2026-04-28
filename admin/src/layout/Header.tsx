@@ -69,7 +69,6 @@ export default function Header({ onMenuClick, isCollapsed, onToggleSidebar }: He
         background: alpha(theme.palette.background.paper, 0.8),
         backdropFilter: 'blur(12px)',
         borderBottom: `1px solid ${theme.palette.divider}`,
-        zIndex: theme.zIndex.drawer + 1,
         transition: theme.transitions.create(['width', 'margin'], {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.enteringScreen,
@@ -101,25 +100,28 @@ export default function Header({ onMenuClick, isCollapsed, onToggleSidebar }: He
         {/* Search Bar */}
         <Box
           sx={{
-            flex: 1,
+            flex: { xs: 0, sm: 1 },
             display: 'flex',
             alignItems: 'center',
             maxWidth: 480,
+            minWidth: { xs: 40, sm: 200 },
             background: alpha(theme.palette.text.primary, 0.03),
             border: `1px solid ${theme.palette.divider}`,
             borderRadius: '12px',
-            px: 2,
+            px: { xs: 1, sm: 2 },
             py: 0.5,
-            ml: { xs: 0, md: 2 },
+            ml: { xs: 1, md: 2 },
+            cursor: 'pointer',
           }}
         >
-          <SearchIcon sx={{ color: theme.palette.text.secondary, fontSize: 20, mr: 1.5 }} />
+          <SearchIcon sx={{ color: theme.palette.text.secondary, fontSize: 20, mr: { xs: 0, sm: 1.5 } }} />
           <InputBase
             placeholder="Search or type command..."
             sx={{
               color: theme.palette.text.primary,
               fontSize: '0.875rem',
               width: '100%',
+              display: { xs: 'none', sm: 'block' },
               '& input::placeholder': { color: theme.palette.text.secondary, opacity: 1 },
             }}
           />

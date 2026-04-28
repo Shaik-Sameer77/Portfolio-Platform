@@ -1,31 +1,30 @@
 import axios from 'axios';
-import { encryptData, decryptData } from './utils/encryption';
+import { encryptData, decryptData } from '@/utils/encryption';
 
-const IS_ENCRYPTED = import.meta.env.VITE_ISENCRYPTED_PAYLOAD !== 'false';
+const IS_ENCRYPTED = process.env.NEXT_PUBLIC_ISENCRYPTED_PAYLOAD !== 'false';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001',
+const proxy = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8001',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor: add token and encrypt payload
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
+proxy.interceptors.request.use((config) => {
   if (IS_ENCRYPTED && config.data && config.headers['Content-Type'] !== 'multipart/form-data') {
     config.data = { payload: encryptData(config.data) };
   }
   
+  // Example of attaching an auth token (to be integrated properly later)
+  // const token = useAuthStore.getState().token;
+  // if (token) {
+  //   config.headers.Authorization = `Bearer ${token}`;
+  // }
+  
   return config;
 }, (error) => Promise.reject(error));
 
-// Response interceptor: decrypt payload
-api.interceptors.response.use((response) => {
+proxy.interceptors.response.use((response) => {
   if (IS_ENCRYPTED && response.data && typeof response.data.result === 'string') {
     response.data = decryptData(response.data.result);
   }
@@ -37,4 +36,4 @@ api.interceptors.response.use((response) => {
   return Promise.reject(error);
 });
 
-export default api;
+export default proxy;

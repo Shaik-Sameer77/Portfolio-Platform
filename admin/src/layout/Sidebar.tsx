@@ -46,6 +46,7 @@ import {
   ConfirmationNumber as SupportIcon,
   Description as ResumeIcon,
   Home as HeroIcon,
+  ChevronLeft as CloseIcon,
 } from '@mui/icons-material';
 import type { RootState } from '../store';
 import { logout } from '../features/authSlice';
@@ -125,6 +126,7 @@ export default function Sidebar({ mobileOpen, onClose, isCollapsed }: SidebarPro
   const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const token = localStorage.getItem('admin_token');
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -281,6 +283,13 @@ export default function Sidebar({ mobileOpen, onClose, isCollapsed }: SidebarPro
             </Typography>
           </Box>
         )}
+        <Box sx={{ flexGrow: 1 }} />
+        <IconButton 
+          onClick={onClose} 
+          sx={{ display: { xs: 'flex', md: 'none' }, color: theme.palette.text.secondary }}
+        >
+          <CloseIcon />
+        </IconButton>
       </Box>
 
       <Divider sx={{ mx: 2, mb: 2, borderColor: theme.palette.divider }} />
