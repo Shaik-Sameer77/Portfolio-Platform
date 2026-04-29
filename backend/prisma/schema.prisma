@@ -2,8 +2,7 @@
 // https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -14,9 +13,12 @@ datasource db {
 
 model Profile {
   id               Int      @id @default(autoincrement())
-  name             String
-  title            String
-  bio              String
+  name             String?
+  title            String?
+  bio              String?
+  headline         String?  // "I build systems, not just websites."
+  subHeadline      String?  // "not just websites."
+  heroDescription  String?  // Specialised pitch for the hero section
   avatarUrl        String?
   location         String?
   resumeUrl        String?
@@ -34,6 +36,14 @@ model SocialLinks {
 }
 
 // ─── Portfolio ─────────────────────────────────────────────────────────────────
+
+model Stat {
+  id        Int      @id @default(autoincrement())
+  label     String   // e.g., "projects shipped"
+  value     String   // e.g., "5+"
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
 
 model Skill {
   id       Int     @id @default(autoincrement())

@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectsPage from './pages/ProjectsPage';
 import SkillsPage from './pages/SkillsPage';
+import HeroPage from './pages/HeroPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 
 // Protected Route Component
@@ -47,6 +48,14 @@ function App() {
                 <Route index element={<DashboardPage />} />
                 <Route path="*" element={<ComingSoonPage />} />
               </Routes>
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/portfolio/hero" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <HeroPage />
             </AdminLayout>
           </ProtectedRoute>
         } />

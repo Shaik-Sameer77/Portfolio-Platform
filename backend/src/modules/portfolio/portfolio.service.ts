@@ -15,6 +15,8 @@ import { CreateUsesItemDto } from './dto/create-uses-item.dto.js';
 import { UpdateUsesItemDto } from './dto/update-uses-item.dto.js';
 import { CreateGalleryPhotoDto } from './dto/create-gallery-photo.dto.js';
 import { UpdateGalleryPhotoDto } from './dto/update-gallery-photo.dto.js';
+import { CreateStatDto } from './dto/create-stat.dto.js';
+import { UpdateStatDto } from './dto/update-stat.dto.js';
 
 @Injectable()
 export class PortfolioService {
@@ -56,6 +58,30 @@ export class PortfolioService {
     }
 
     return this.prisma.socialLinks.create({ data: dto });
+  }
+
+  // ─── Stats ───────────────────────────────────────────────────────────────
+
+  async getStats() {
+    return this.prisma.stat.findMany({
+      orderBy: { order: 'asc' },
+    });
+  }
+
+  async createStat(dto: CreateStatDto) {
+    return this.prisma.stat.create({ data: dto });
+  }
+
+  async updateStat(id: number, dto: UpdateStatDto) {
+    const existing = await this.prisma.stat.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Stat #${id} not found`);
+    return this.prisma.stat.update({ where: { id }, data: dto });
+  }
+
+  async deleteStat(id: number) {
+    const existing = await this.prisma.stat.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Stat #${id} not found`);
+    return this.prisma.stat.delete({ where: { id } });
   }
 
   // ─── Skills ───────────────────────────────────────────────────────────────

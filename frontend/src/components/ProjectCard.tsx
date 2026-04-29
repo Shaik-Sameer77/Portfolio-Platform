@@ -28,7 +28,7 @@ export const ProjectCard = ({ project }: { project: Project }) => (
       <h3 className="text-base font-semibold text-foreground">{project.title}</h3>
       <p className="mt-1.5 text-sm text-muted-foreground">{project.description}</p>
       <div className="mt-4 flex flex-wrap gap-1.5">
-        {project.stack.map((s) => (
+        {project.stack?.map((s) => (
           <span key={s} className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">
             {s}
           </span>

@@ -25,6 +25,8 @@ import { CreateUsesItemDto } from './dto/create-uses-item.dto.js';
 import { UpdateUsesItemDto } from './dto/update-uses-item.dto.js';
 import { CreateGalleryPhotoDto } from './dto/create-gallery-photo.dto.js';
 import { UpdateGalleryPhotoDto } from './dto/update-gallery-photo.dto.js';
+import { CreateStatDto } from './dto/create-stat.dto.js';
+import { UpdateStatDto } from './dto/update-stat.dto.js';
 
 @ApiTags('Portfolio')
 @Controller('portfolio')
@@ -57,6 +59,35 @@ export class PortfolioController {
   @ApiOperation({ summary: 'Update social links (admin)' })
   updateSocialLinks(@Body() dto: UpdateSocialLinksDto) {
     return this.portfolioService.updateSocialLinks(dto);
+  }
+
+  // ─── Stats ───────────────────────────────────────────────────────────────
+
+  @Get('stats')
+  @ApiOperation({ summary: 'List all stats (public)' })
+  getStats() {
+    return this.portfolioService.getStats();
+  }
+
+  @Post('stats')
+  @ApiOperation({ summary: 'Add a stat (admin)' })
+  createStat(@Body() dto: CreateStatDto) {
+    return this.portfolioService.createStat(dto);
+  }
+
+  @Patch('stats/:id')
+  @ApiOperation({ summary: 'Update a stat (admin)' })
+  updateStat(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateStatDto,
+  ) {
+    return this.portfolioService.updateStat(id, dto);
+  }
+
+  @Delete('stats/:id')
+  @ApiOperation({ summary: 'Remove a stat (admin)' })
+  deleteStat(@Param('id', ParseIntPipe) id: number) {
+    return this.portfolioService.deleteStat(id);
   }
 
   // ─── Skills ───────────────────────────────────────────────────────────────

@@ -5,10 +5,20 @@ export interface Profile {
   name?: string;
   title?: string;
   bio?: string;
+  headline?: string;
+  subHeadline?: string;
+  heroDescription?: string;
   avatarUrl?: string;
   location?: string;
   resumeUrl?: string;
   availableForWork?: boolean;
+}
+
+export interface Stat {
+  id: number;
+  label: string;
+  value: string;
+  order: number;
 }
 
 export interface SocialLinks {
@@ -21,6 +31,7 @@ export interface SocialLinks {
 interface ProfileState {
   profile: Profile;
   socialLinks: SocialLinks;
+  stats: Stat[];
   loading: boolean;
   error: string | null;
 }
@@ -28,16 +39,18 @@ interface ProfileState {
 const initialState: ProfileState = {
   profile: {},
   socialLinks: {},
+  stats: [],
   loading: false,
   error: null,
 };
 
 export const fetchProfile = createAsyncThunk('profile/fetch', async () => {
-  const [profileRes, socialRes] = await Promise.all([
+  const [profileRes, socialRes, statsRes] = await Promise.all([
     api.get('/portfolio/profile'),
     api.get('/portfolio/social-links'),
+    api.get('/portfolio/stats'),
   ]);
-  return { profile: profileRes.data, socialLinks: socialRes.data };
+  return { profile: profileRes.data, socialLinks: socialRes.data, stats: statsRes.data };
 });
 
 export const updateProfile = createAsyncThunk('profile/update', async (data: Profile) => {
@@ -48,6 +61,16 @@ export const updateProfile = createAsyncThunk('profile/update', async (data: Pro
 export const updateSocialLinks = createAsyncThunk('profile/updateSocial', async (data: SocialLinks) => {
   const res = await api.patch('/portfolio/social-links', data);
   return res.data as SocialLinks;
+});
+
+export const createStat = createAsyncThunk('stats/create', async (data: Omit<Stat, 'id'>) => {
+  const res = await api.post('/portfolio/stats', data);
+  return res.data as Stat;
+});
+
+export const deleteStat = createAsyncThunk('stats/delete', async (id: number) => {
+  await api.delete(`/portfolio/stats/${id}`);
+  return id;
 });
 
 const profileSlice = createSlice({
@@ -61,10 +84,13 @@ const profileSlice = createSlice({
         s.loading = false;
         s.profile = a.payload.profile;
         s.socialLinks = a.payload.socialLinks;
+        s.stats = a.payload.stats;
       })
       .addCase(fetchProfile.rejected, (s, a) => { s.loading = false; s.error = a.error.message ?? 'Error'; })
       .addCase(updateProfile.fulfilled, (s, a) => { s.profile = a.payload; })
-      .addCase(updateSocialLinks.fulfilled, (s, a) => { s.socialLinks = a.payload; });
+      .addCase(updateSocialLinks.fulfilled, (s, a) => { s.socialLinks = a.payload; })
+      .addCase(createStat.fulfilled, (s, a) => { s.stats.push(a.payload); })
+      .addCase(deleteStat.fulfilled, (s, a) => { s.stats = s.stats.filter(st => st.id !== a.payload); });
   },
 });
 

@@ -36,4 +36,19 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsBoolean()
   availableForWork?: boolean;
+
+  @ApiPropertyOptional({ example: 'I build systems, not just websites.' })
+  @IsOptional()
+  @IsString()
+  headline?: string;
+
+  @ApiPropertyOptional({ example: 'not just websites.' })
+  @IsOptional()
+  @IsString()
+  subHeadline?: string;
+
+  @ApiPropertyOptional({ example: 'Specialising in event-driven architecture...' })
+  @IsOptional()
+  @IsString()
+  heroDescription?: string;
 }

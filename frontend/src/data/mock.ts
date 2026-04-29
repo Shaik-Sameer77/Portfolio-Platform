@@ -12,6 +12,7 @@ export const profile = {
   github: "https://github.com/Shaik-Sameer77",
   linkedin: "https://linkedin.com/in/shaik-sameer",
   resumeUrl: "/resume.pdf",
+  avatarUrl: "/profile.png",
 };
 
 export const stats = [
