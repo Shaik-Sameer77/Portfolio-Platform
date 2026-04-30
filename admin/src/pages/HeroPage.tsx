@@ -14,7 +14,9 @@ import {
   Timeline as StatsIcon,
   Home as HeroIcon
 } from '@mui/icons-material';
+import ImageUpload from '../components/ImageUpload';
 import type { AppDispatch, RootState } from '../store';
+import api from '../api';
 import { 
   fetchProfile, updateProfile, createStat, deleteStat, 
   type Profile, type Stat 
@@ -28,6 +30,7 @@ export default function HeroPage() {
   const [statForm, setStatForm] = useState({ label: '', value: '', order: 0 });
   const [statDialogOpen, setStatDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
     dispatch(fetchProfile());
@@ -41,11 +44,25 @@ export default function HeroPage() {
 
   const handleProfileSave = async () => {
     setSaving(true);
-    // Explicitly pick only fields allowed by UpdateProfileDto to avoid 400 Bad Request
-    const { 
+    let { 
       name, title, bio, avatarUrl, location, resumeUrl, 
       availableForWork, headline, subHeadline, heroDescription 
     } = profileForm;
+
+    // 1. Upload Avatar if new local file exists
+    if (avatarFile) {
+      try {
+        const formData = new FormData();
+        formData.append('file', avatarFile);
+        formData.append('folder', 'hero');
+        const uploadRes = await api.post('/upload/image', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        avatarUrl = uploadRes.data.url;
+      } catch (err) {
+        console.error('Failed to upload avatar', err);
+      }
+    }
     
     const updateData = { 
       name, title, bio, avatarUrl, location, resumeUrl, 
@@ -118,11 +135,16 @@ export default function HeroPage() {
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField
-                    fullWidth
-                    label="Avatar URL"
-                    value={profileForm.avatarUrl || ''}
-                    onChange={(e) => setProfileForm({ ...profileForm, avatarUrl: e.target.value })}
+                  <ImageUpload 
+                    label="Avatar Image"
+                    folder="hero"
+                    value={profileForm.avatarUrl}
+                    deferred={true}
+                    onUploadSuccess={(url) => setProfileForm({ ...profileForm, avatarUrl: url })}
+                    onFileSelect={(file, preview) => {
+                      setProfileForm({ ...profileForm, avatarUrl: preview });
+                      setAvatarFile(file);
+                    }}
                   />
                 </Grid>
                 <Grid size={12}>

@@ -193,7 +193,7 @@ export type BlogPost = {
   slug: string;
   title: string;
   excerpt: string;
-  category: "Engineering" | "System Design" | "Career" | "Personal";
+  category: string;
   date: string;
   readingTime: string;
 };

@@ -14,6 +14,8 @@ import DashboardPage from './pages/DashboardPage';
 import ProjectsPage from './pages/ProjectsPage';
 import SkillsPage from './pages/SkillsPage';
 import HeroPage from './pages/HeroPage';
+import BlogsPage from './pages/BlogsPage';
+import BlogEditorPage from './pages/BlogEditorPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 
 // Protected Route Component
@@ -72,6 +74,30 @@ function App() {
           <ProtectedRoute>
             <AdminLayout>
               <SkillsPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/blogs" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <BlogsPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/blogs/add" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <BlogEditorPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/blogs/edit/:id" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <BlogEditorPage />
             </AdminLayout>
           </ProtectedRoute>
         } />

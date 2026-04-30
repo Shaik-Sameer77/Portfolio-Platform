@@ -34,6 +34,23 @@ export interface Project {
   category?: string; // Added to match mock
 }
 
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface Blog {
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt?: string;
+  coverImage?: string;
+  createdAt: string;
+  category?: Category;
+}
+
 // Helper to map backend project to UI project shape if needed
 export const mapProjectToUI = (p: Project) => ({
   ...p,
@@ -49,3 +66,6 @@ export const getProjects = async () => {
   const projects = await ApiService.get<Project[]>('/portfolio/projects');
   return projects.map(mapProjectToUI);
 };
+
+export const getBlogs = () => ApiService.get<Blog[]>('/blog');
+export const getBlogBySlug = (slug: string) => ApiService.get<Blog>(`/blog/${slug}`);

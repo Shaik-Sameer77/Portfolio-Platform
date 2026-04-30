@@ -2,11 +2,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, ChevronDown, Download } from "lucide-react";
+import { Menu, X, ChevronDown, Download, Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AvailabilityBadge } from "./AvailabilityBadge";
 import { NavMegaMenu } from "./NavMegaMenu";
 import { useUIStore } from "@/store/useUIStore";
+import { useTheme } from "next-themes";
 import { profile } from "@/data/mock";
 
 const navLinks = [
@@ -20,8 +21,11 @@ export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const { megaOpen, setMega, drawerOpen, setDrawer } = useUIStore();
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll);
@@ -79,6 +83,15 @@ export const Navbar = () => {
 
         {/* Right side */}
         <div className="flex items-center gap-3">
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface text-foreground transition-colors hover:bg-surface-2"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+          )}
           <div className="hidden md:block">
             <AvailabilityBadge available={profile.available} />
           </div>

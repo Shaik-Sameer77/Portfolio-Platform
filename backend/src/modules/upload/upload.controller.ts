@@ -6,6 +6,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Body,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -27,6 +28,10 @@ export class UploadController {
           type: 'string',
           format: 'binary',
         },
+        folder: {
+          type: 'string',
+          example: 'hero',
+        },
       },
     },
   })
@@ -41,8 +46,25 @@ export class UploadController {
       }),
     )
     file: Express.Multer.File,
+    @Body('folder') folder?: string,
   ) {
-    const url = await this.uploadService.uploadImage(file);
+    const url = await this.uploadService.uploadImage(file, folder);
+    return { url };
+  }
+
+  @Post('url')
+  @ApiOperation({ summary: 'Upload an image via URL to Cloudinary' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        url: { type: 'string' },
+        folder: { type: 'string', example: 'blogs' },
+      },
+    },
+  })
+  async uploadFromUrl(@Body() body: { url: string; folder?: string }) {
+    const url = await this.uploadService.uploadImageFromUrl(body.url, body.folder);
     return { url };
   }
 }

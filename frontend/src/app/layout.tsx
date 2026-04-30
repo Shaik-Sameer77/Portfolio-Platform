@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,15 +29,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} dark antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground">
-        <Navbar />
-        <main className="flex-1 pt-14">
-          {children}
-        </main>
-        <Footer />
-        <Toaster theme="dark" position="bottom-right" />
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <Navbar />
+          <main className="flex-1 pt-14">
+            {children}
+          </main>
+          <Footer />
+          <Toaster theme="system" position="bottom-right" />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -15,7 +15,7 @@ export class UploadService {
   async uploadImage(file: Express.Multer.File, folder: string = 'portfolio'): Promise<string> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder },
+        { folder: `portfolio/${folder}` },
         (error, result) => {
           if (error) return reject(error);
           resolve(result!.secure_url);
@@ -24,5 +24,16 @@ export class UploadService {
 
       streamifier.createReadStream(file.buffer).pipe(uploadStream);
     });
+  }
+
+  async uploadImageFromUrl(url: string, folder: string = 'portfolio'): Promise<string> {
+    try {
+      const result = await cloudinary.uploader.upload(url, {
+        folder: `portfolio/${folder}`,
+      });
+      return result.secure_url;
+    } catch (error) {
+      throw error;
+    }
   }
 }
