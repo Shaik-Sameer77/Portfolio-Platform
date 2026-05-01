@@ -5,20 +5,13 @@ import {
   TextField,
   Typography,
   Paper,
-  Tabs,
-  Tab,
   CircularProgress,
-  IconButton,
-  Tooltip,
   alpha,
   useTheme,
 } from '@mui/material';
 import {
   CloudUpload as UploadIcon,
-  Link as LinkIcon,
-  Delete as DeleteIcon,
   Image as ImageIcon,
-  CheckCircle as SuccessIcon,
 } from '@mui/icons-material';
 import api from '../api';
 

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, ChevronDown, Download, Sun, Moon } from "lucide-react";
+import { Menu, X, ChevronDown, Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AvailabilityBadge } from "./AvailabilityBadge";
 import { NavMegaMenu } from "./NavMegaMenu";

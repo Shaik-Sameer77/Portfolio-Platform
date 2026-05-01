@@ -20,7 +20,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Visibility as ViewIcon,
   Newspaper as BlogIcon,
 } from '@mui/icons-material';
 import api from '../api';

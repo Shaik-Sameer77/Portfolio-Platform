@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   Drawer,
   Box,
@@ -9,7 +8,6 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-  Avatar,
   Divider,
   Tooltip,
   IconButton,
@@ -25,7 +23,6 @@ import {
   School as EducationIcon,
   MiscellaneousServices as ServicesIcon,
   Person as ProfileIcon,
-  Logout as LogoutIcon,
   AutoAwesome as LogoIcon,
   ExpandLess,
   ExpandMore,
@@ -48,8 +45,7 @@ import {
   Home as HeroIcon,
   ChevronLeft as CloseIcon,
 } from '@mui/icons-material';
-import type { RootState } from '../store';
-import { logout } from '../features/authSlice';
+
 
 export const DRAWER_WIDTH = 280;
 export const COLLAPSED_WIDTH = 88;
@@ -124,9 +120,7 @@ export default function Sidebar({ mobileOpen, onClose, isCollapsed }: SidebarPro
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.auth.user);
-  const token = localStorage.getItem('admin_token');
+
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -149,10 +143,6 @@ export default function Sidebar({ mobileOpen, onClose, isCollapsed }: SidebarPro
     if (mobileOpen) onClose();
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
 
   const isActive = (path?: string) => {
     if (!path) return false;

@@ -55,7 +55,6 @@ import {
   FormatAlignLeft as AlignLeftIcon,
   FormatAlignCenter as AlignCenterIcon,
   FormatAlignRight as AlignRightIcon,
-  FormatAlignJustify as AlignJustifyIcon,
   FormatUnderlined as UnderlineIcon,
   Highlight as HighlightIcon,
   TableChart as TableIcon,
