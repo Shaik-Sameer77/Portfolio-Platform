@@ -12,6 +12,7 @@ export interface Profile {
   location?: string;
   resumeUrl?: string;
   availableForWork: boolean;
+  featuredBlogs?: Blog[];
 }
 
 export interface Stat {
@@ -48,7 +49,12 @@ export interface Blog {
   excerpt?: string;
   coverImage?: string;
   createdAt: string;
+  featured?: boolean;
+  published?: boolean;
+  /** Legacy single-category field (may be absent) */
   category?: Category;
+  /** Many-to-many categories returned by the backend */
+  categories?: Category[];
 }
 
 // Helper to map backend project to UI project shape if needed
@@ -69,3 +75,4 @@ export const getProjects = async () => {
 
 export const getBlogs = () => ApiService.get<Blog[]>('/blog');
 export const getBlogBySlug = (slug: string) => ApiService.get<Blog>(`/blog/${slug}`);
+export const getCategories = () => ApiService.get<Category[]>('/blog/categories');

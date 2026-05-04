@@ -205,12 +205,27 @@ export default function Home() {
 
       {/* Writing */}
       <Section
-        kicker="Recent writing"
+        kicker="Featured writing"
         title="Notes from the build."
         action={<Link href="/blog" className="hidden text-sm text-muted-foreground hover:text-foreground md:inline-flex">All posts →</Link>}
       >
         <div className="grid gap-6 md:grid-cols-3">
-          {posts.map((p) => <BlogCard key={p.slug} post={p} />)}
+          {(profileData?.featuredBlogs && profileData.featuredBlogs.length > 0) ? (
+            profileData.featuredBlogs.map((p: any) => (
+              <BlogCard 
+                key={p.slug} 
+                post={{
+                  ...p,
+                  featured: p.featured,
+                  date: new Date(p.createdAt).toLocaleDateString('en-GB'),
+                  readingTime: "5 min read",
+                  category: p.categories?.[0]?.name || "Uncategorized"
+                }} 
+              />
+            ))
+          ) : (
+            posts.map((p) => <BlogCard key={p.slug} post={p as any} />)
+          )}
         </div>
       </Section>
 

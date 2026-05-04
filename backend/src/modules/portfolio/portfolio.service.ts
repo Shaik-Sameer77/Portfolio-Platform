@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { BlogService } from '../blog/blog.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { UpdateSocialLinksDto } from './dto/update-social-links.dto.js';
@@ -20,12 +21,21 @@ import { UpdateStatDto } from './dto/update-stat.dto.js';
 
 @Injectable()
 export class PortfolioService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly blogService: BlogService,
+  ) {}
 
   // ─── Profile (single-row upsert) ──────────────────────────────────────────
 
   async getProfile() {
-    return this.prisma.profile.findFirst();
+    const profile = await this.prisma.profile.findFirst();
+    const featuredBlogs = await this.blogService.findFeatured();
+    
+    return {
+      ...profile,
+      featuredBlogs,
+    };
   }
 
   async updateProfile(dto: UpdateProfileDto) {
