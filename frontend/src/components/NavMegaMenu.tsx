@@ -41,11 +41,11 @@ const Row = ({ item, muted = false, onSelect }: { item: Item; muted?: boolean; o
         <item.Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0">
-        <div className="flex items-center gap-1 text-sm font-semibold text-foreground">
+        <div className="flex items-center gap-1 text-base font-semibold text-foreground">
           {item.title}
           {item.external && <ArrowUpRight className="h-3 w-3 text-muted-foreground" />}
         </div>
-        <div className="text-xs text-muted-foreground truncate">{item.subtitle}</div>
+        <div className="text-sm text-muted-foreground truncate">{item.subtitle}</div>
       </div>
     </div>
   );
@@ -86,15 +86,15 @@ export const NavMegaMenu = ({ onClose }: { onClose: () => void }) => {
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div>
-          <div className="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">Me</div>
+          <div className="px-3 pt-2 pb-1 text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Me</div>
           {col1.map((i) => <Row key={i.title} item={i} onSelect={onClose} />)}
         </div>
         <div>
-          <div className="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">Work</div>
+          <div className="px-3 pt-2 pb-1 text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Work</div>
           {col2.map((i) => <Row key={i.title} item={i} onSelect={onClose} />)}
         </div>
         <div className="rounded-lg bg-surface/60 p-1">
-          <div className="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">Quick links</div>
+          <div className="px-3 pt-2 pb-1 text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Quick links</div>
           {col3.map((i) => <Row key={i.title} item={i} muted onSelect={onClose} />)}
         </div>
       </div>

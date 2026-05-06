@@ -108,6 +108,13 @@ const navItems: NavItemData[] = [
   { label: 'Chats', icon: <ChatIcon />, path: '/chats' },
   { label: 'Theme Setter', icon: <ThemeIcon />, path: '/theme-setter' },
   { label: 'Support Tickets', icon: <SupportIcon />, path: '/support' },
+  {
+    label: 'System',
+    icon: <AnalyticsIcon />,
+    children: [
+      { label: 'API Logs', icon: <AIIcon fontSize="small" />, path: '/api-logs' },
+    ],
+  },
 ];
 
 interface SidebarProps {

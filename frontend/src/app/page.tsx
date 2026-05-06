@@ -11,14 +11,45 @@ import { CTACard } from "@/components/CTACard";
 import { profile as mockProfile, projects as mockProjects, posts, stats as mockStats, stack } from "@/data/mock";
 import { getProfile, getStats, getProjects, type Profile, type Stat, type Project } from "@/services/portfolio-service";
 
+import { InteractiveGrid } from "@/components/InteractiveGrid";
+import { useMotionValue, useSpring, useTransform } from "framer-motion";
+
 export default function Home() {
   const [profileData, setProfileData] = useState<Profile | null>(null);
   const [statsData, setStatsData] = useState<Stat[]>([]);
   const [projectsData, setProjectsData] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Mouse motion for parallax
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const smoothX = useSpring(mouseX, { damping: 20, stiffness: 100 });
+  const smoothY = useSpring(mouseY, { damping: 20, stiffness: 100 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e;
+      const { innerWidth, innerHeight } = window;
+      mouseX.set((clientX / innerWidth) - 0.5);
+      mouseY.set((clientY / innerHeight) - 0.5);
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
+
+  // Parallax transforms (Must be at top level)
+  const textX = useTransform(smoothX, (val) => val * 20);
+  const textY = useTransform(smoothY, (val) => val * 20);
+  const avatarX = useTransform(smoothX, (val) => val * -40);
+  const avatarY = useTransform(smoothY, (val) => val * -40);
+  const avatarRotateX = useTransform(smoothY, (val) => val * -10);
+  const avatarRotateY = useTransform(smoothX, (val) => val * 10);
+  const badgeX = useTransform(smoothX, (val) => val * 60);
+  const badgeY = useTransform(smoothY, (val) => val * 60);
+
   useEffect(() => {
     const fetchData = async () => {
+// ... existing data fetching code ...
       try {
         const [p, s, prj] = await Promise.all([
           getProfile(), 
@@ -47,7 +78,7 @@ export default function Home() {
   };
   
   const activeStats = statsData.length > 0 ? statsData : mockStats.map((s, i) => ({ id: i, ...s, order: i }));
-  const activeProjects = projectsData.length > 0 ? projectsData : mockProjects.map((p, i) => ({
+  const activeProjects: Project[] = projectsData.length > 0 ? projectsData : mockProjects.map((p, i) => ({
     id: i,
     title: p.title,
     description: p.description,
@@ -59,7 +90,8 @@ export default function Home() {
     live: p.live, // Add for ProjectCard
     featured: p.featured || false,
     order: i,
-    slug: p.slug
+    slug: p.slug,
+    category: p.category
   }));
 
   const featured = activeProjects.filter((p) => p.featured).slice(0, 3);
@@ -76,12 +108,16 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 grid-fade opacity-40 pointer-events-none" />
+      <section className="relative overflow-hidden min-h-[90vh] flex items-center">
+        <InteractiveGrid />
+        
         <div className="container-page relative pt-20 pb-20 md:pt-32 md:pb-28">
           <div className="flex flex-col-reverse items-center gap-12 md:flex-row md:gap-20 md:items-center">
             {/* Text column */}
-            <div className="flex-1 min-w-0">
+            <motion.div 
+              style={{ x: textX, y: textY }}
+              className="flex-1 min-w-0"
+            >
               <motion.div
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -127,14 +163,17 @@ export default function Home() {
                   Read my writing
                 </Link>
               </motion.div>
-            </div>
+            </motion.div>
 
             {/* Avatar column */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="flex-shrink-0"
+              style={{
+                x: avatarX,
+                y: avatarY,
+                rotateX: avatarRotateX,
+                rotateY: avatarRotateY,
+              }}
+              className="flex-shrink-0 perspective-1000"
             >
               <div className="relative group">
                 {/* Visual backdrops */}
@@ -151,14 +190,19 @@ export default function Home() {
                 
                 {/* Floating elements */}
                 <motion.div 
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -top-2 -right-2 rounded-2xl border border-border bg-background/80 backdrop-blur-md p-3 shadow-xl"
+                  style={{ x: badgeX, y: badgeY }}
+                  className="absolute -top-2 -right-2 z-20"
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-success" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Live Now</span>
-                  </div>
+                  <motion.div
+                    animate={{ y: [0, -6, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="rounded-2xl border border-border bg-background/80 backdrop-blur-md p-3 shadow-xl"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-success shadow-[0_0_8px_rgba(var(--success),0.5)]" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Live Now</span>
+                    </div>
+                  </motion.div>
                 </motion.div>
               </div>
             </motion.div>

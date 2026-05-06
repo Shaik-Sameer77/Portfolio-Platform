@@ -12,11 +12,14 @@ import {
   useTheme,
   alpha,
 } from '@mui/material';
+import { Navigate } from 'react-router-dom';
 import { Visibility, VisibilityOff, LockOutlined } from '@mui/icons-material';
 import api from '../api';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { loginSuccess } from '../features/authSlice';
+import { useSelector } from 'react-redux';
+import { type RootState } from '../store';
 
 export default function LoginPage() {
   const theme = useTheme();
@@ -29,6 +32,11 @@ export default function LoginPage() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

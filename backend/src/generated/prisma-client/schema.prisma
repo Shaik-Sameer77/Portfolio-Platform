@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma-client"
 }
 
 datasource db {
@@ -16,9 +17,9 @@ model Profile {
   name             String?
   title            String?
   bio              String?
-  headline         String?  // "I build systems, not just websites."
-  subHeadline      String?  // "not just websites."
-  heroDescription  String?  // Specialised pitch for the hero section
+  headline         String? // "I build systems, not just websites."
+  subHeadline      String? // "not just websites."
+  heroDescription  String? // Specialised pitch for the hero section
   avatarUrl        String?
   location         String?
   resumeUrl        String?
@@ -39,8 +40,8 @@ model SocialLinks {
 
 model Stat {
   id        Int      @id @default(autoincrement())
-  label     String   // e.g., "projects shipped"
-  value     String   // e.g., "5+"
+  label     String // e.g., "projects shipped"
+  value     String // e.g., "5+"
   order     Int      @default(0)
   updatedAt DateTime @updatedAt
 }
@@ -107,13 +108,13 @@ model DeveloperTool {
 }
 
 model UsesItem {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   description String
   // "Hardware" | "Editor" | "Terminal" | "Apps" | "Extensions"
   category    String
   url         String?
-  order       Int    @default(0)
+  order       Int     @default(0)
 }
 
 model GalleryPhoto {
@@ -129,19 +130,19 @@ model GalleryPhoto {
 // ─── Blog ──────────────────────────────────────────────────────────────────────
 
 model Blog {
-  id         Int       @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   title      String
-  slug       String    @unique
+  slug       String     @unique
   content    String
   excerpt    String?
   coverImage String?
-  published  Boolean   @default(false)
-  featured   Boolean   @default(false)
+  published  Boolean    @default(false)
+  featured   Boolean    @default(false)
   categories Category[]
   authorId   Int?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  author     User?     @relation(fields: [authorId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  author     User?      @relation(fields: [authorId], references: [id])
   comments   Comment[]
 }
 
@@ -192,15 +193,13 @@ enum Role {
 }
 
 model ApiLog {
-  id           Int      @id @default(autoincrement())
-  method       String
-  url          String
-  statusCode   Int?
-  duration     Int?     // in ms
-  ip           String?
-  userAgent    String?
-  requestBody  String?  @db.Text
-  responseBody String?  @db.Text
-  userId       Int?
-  createdAt    DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  method     String
+  url        String
+  statusCode Int?
+  duration   Int? // duration in ms
+  ip         String?
+  userId     Int?
+  userAgent  String?
+  createdAt  DateTime @default(now())
 }

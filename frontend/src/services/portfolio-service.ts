@@ -27,12 +27,16 @@ export interface Project {
   title: string;
   description: string;
   techStack: string[];
+  stack: string[];      // UI-friendly alias for techStack
+  slug: string;        // URL-friendly identifier
   githubUrl?: string;
+  github?: string;     // UI-friendly alias for githubUrl
   liveUrl?: string;
+  live?: string;       // UI-friendly alias for liveUrl
   imageUrl?: string;
   featured: boolean;
   order: number;
-  category?: string; // Added to match mock
+  category?: string;
 }
 
 export interface Category {

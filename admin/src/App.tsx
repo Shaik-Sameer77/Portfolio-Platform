@@ -17,6 +17,8 @@ import HeroPage from './pages/HeroPage';
 import BlogsPage from './pages/BlogsPage';
 import BlogEditorPage from './pages/BlogEditorPage';
 import ComingSoonPage from './pages/ComingSoonPage';
+import ApiLogsPage from './pages/ApiLogsPage';
+
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -98,6 +100,14 @@ function App() {
           <ProtectedRoute>
             <AdminLayout>
               <BlogEditorPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/api-logs" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <ApiLogsPage />
             </AdminLayout>
           </ProtectedRoute>
         } />

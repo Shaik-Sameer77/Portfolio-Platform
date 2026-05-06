@@ -21,7 +21,7 @@ export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const { megaOpen, setMega, drawerOpen, setDrawer } = useUIStore();
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -44,9 +44,9 @@ export const Navbar = () => {
           scrolled ? "bg-background/90 backdrop-blur-xl border-b border-border" : "bg-background/40 backdrop-blur-md"
         }`}
       >
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 md:px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
         {/* Logo */}
-        <Link href="/" className="text-[15px] font-semibold tracking-tight text-foreground">
+        <Link href="/" className="text-base font-semibold tracking-tight text-foreground">
           {profile.handle}
         </Link>
 
@@ -55,7 +55,7 @@ export const Navbar = () => {
           <button
             onClick={() => setMega(!megaOpen)}
             onMouseEnter={() => setMega(true)}
-            className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-sm transition-colors ${
+            className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-base transition-colors ${
               megaOpen ? "text-foreground bg-surface" : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -68,7 +68,7 @@ export const Navbar = () => {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
+                className={`rounded-md px-3 py-1.5 text-base transition-colors ${
                   isActive ? "text-foreground bg-surface" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -85,11 +85,15 @@ export const Navbar = () => {
         <div className="flex items-center gap-3">
           {mounted && (
             <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface text-foreground transition-colors hover:bg-surface-2"
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface text-foreground transition-all hover:bg-surface-2 active:scale-95"
               aria-label="Toggle theme"
             >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {resolvedTheme === "dark" ? (
+                <Moon className="h-4 w-4 text-indigo-400" />
+              ) : (
+                <Sun className="h-4 w-4 text-amber-500" />
+              )}
             </button>
           )}
           <div className="hidden md:block">
@@ -98,7 +102,7 @@ export const Navbar = () => {
           <span className="hidden h-5 w-px bg-border md:block" />
           <Link
             href="/contact"
-            className="inline-flex items-center rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-primary/10"
+            className="inline-flex items-center rounded-full border border-border bg-surface px-3.5 py-1.5 text-base font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-primary/10"
           >
             Let's talk
           </Link>
@@ -128,7 +132,7 @@ export const Navbar = () => {
               className="fixed right-0 top-0 z-50 flex h-full w-[86%] max-w-sm flex-col border-l border-border bg-background p-5 md:hidden"
             >
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold">{profile.handle}</span>
+                <span className="text-base font-semibold">{profile.handle}</span>
                 <button onClick={() => setDrawer(false)} aria-label="Close" className="rounded-md border border-border p-1.5">
                   <X className="h-4 w-4" />
                 </button>
@@ -170,7 +174,7 @@ const Section = ({ title, links }: { title: string; links: { label: string; href
     <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">{title}</div>
     <div className="flex flex-col">
       {links.map((l) => (
-        <Link key={l.href} href={l.href} className="rounded-md px-2 py-2 text-[15px] text-foreground/90 hover:bg-surface">
+        <Link key={l.href} href={l.href} className="rounded-md px-2 py-2 text-base text-foreground/90 hover:bg-surface">
           {l.label}
         </Link>
       ))}
