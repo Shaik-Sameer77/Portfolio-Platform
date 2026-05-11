@@ -30,6 +30,12 @@ export class CreateProjectDto {
   @IsString()
   imageUrl?: string;
 
+  @ApiPropertyOptional({ example: ['url1', 'url2'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  images?: string[];
+
   @ApiPropertyOptional({ example: false })
   @IsOptional()
   @IsBoolean()

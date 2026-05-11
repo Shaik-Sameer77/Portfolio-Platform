@@ -61,6 +61,7 @@ model Project {
   githubUrl   String?
   liveUrl     String?
   imageUrl    String?
+  images      String[]
   featured    Boolean  @default(false)
   order       Int      @default(0)
 }

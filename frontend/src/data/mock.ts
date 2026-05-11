@@ -31,6 +31,7 @@ export type Project = {
   github?: string;
   live?: string;
   featured?: boolean;
+  images?: string[];
 };
 
 export const projects: Project[] = [
@@ -43,6 +44,7 @@ export const projects: Project[] = [
     github: "https://github.com/Shaik-Sameer77",
     live: "#",
     featured: true,
+    images: ["/project_placeholder_1_1778503449199.png", "/project_placeholder_2_1778503465369.png"],
   },
   {
     slug: "ecommerce-api",
@@ -53,6 +55,7 @@ export const projects: Project[] = [
     github: "https://github.com/Shaik-Sameer77",
     live: "#",
     featured: true,
+    images: ["/project_placeholder_2_1778503465369.png", "/project_placeholder_3_1778503481624.png"],
   },
   {
     slug: "dev-tools-cli",
@@ -62,6 +65,7 @@ export const projects: Project[] = [
     category: "Open Source",
     github: "https://github.com/Shaik-Sameer77",
     featured: true,
+    images: ["/project_placeholder_3_1778503481624.png", "/project_placeholder_1_1778503449199.png"],
   },
   {
     slug: "realtime-dashboard",

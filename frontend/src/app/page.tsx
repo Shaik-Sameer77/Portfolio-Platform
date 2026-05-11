@@ -91,7 +91,8 @@ export default function Home() {
     featured: p.featured || false,
     order: i,
     slug: p.slug,
-    category: p.category
+    category: p.category,
+    images: p.images
   }));
 
   const featured = activeProjects.filter((p) => p.featured).slice(0, 3);
@@ -227,8 +228,8 @@ export default function Home() {
 
       {/* Selected work */}
       <Section
-        kicker="Selected work"
-        title="Things I've recently built"
+        kicker="Selected Projects"
+        title="Engineering solutions, one commit at a time."
         action={
           <Link href="/projects" className="hidden text-sm text-muted-foreground hover:text-foreground md:inline-flex items-center gap-1">
             View all projects <ArrowRight className="h-3.5 w-3.5" />

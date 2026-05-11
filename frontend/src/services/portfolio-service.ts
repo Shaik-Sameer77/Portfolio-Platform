@@ -34,6 +34,7 @@ export interface Project {
   liveUrl?: string;
   live?: string;       // UI-friendly alias for liveUrl
   imageUrl?: string;
+  images?: string[];    // Array of project images for carousel
   featured: boolean;
   order: number;
   category?: string;
@@ -75,6 +76,11 @@ export const getStats = () => ApiService.get<Stat[]>('/portfolio/stats');
 export const getProjects = async () => {
   const projects = await ApiService.get<Project[]>('/portfolio/projects');
   return projects.map(mapProjectToUI);
+};
+
+export const getProjectBySlug = async (slug: string) => {
+  const project = await ApiService.get<Project>(`/portfolio/projects/${slug}`);
+  return mapProjectToUI(project);
 };
 
 export const getBlogs = () => ApiService.get<Blog[]>('/blog');
