@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const CTACard = () => (
-  <section className="container-page pb-24">
+  <section className="container-page pb-24 relative z-10">
     <div className="relative overflow-hidden rounded-2xl border border-border bg-surface p-10 md:p-16">
       <div className="absolute inset-0 grid-fade opacity-30" />
       <div className="relative max-w-2xl">

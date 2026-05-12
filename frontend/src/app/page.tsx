@@ -109,7 +109,7 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden min-h-[90vh] flex items-center">
+      <section className="relative z-10 overflow-hidden min-h-[90vh] flex items-center">
         <InteractiveGrid />
         
         <div className="container-page relative pt-20 pb-20 md:pt-32 md:pb-28">

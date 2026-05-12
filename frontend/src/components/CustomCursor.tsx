@@ -44,26 +44,53 @@ export const CustomCursor = () => {
   return (
     <>
       <motion.div
-        className={`fixed top-0 left-0 w-8 h-8 border border-primary rounded-full pointer-events-none z-[9999] transition-colors duration-300 ${isHovered ? 'bg-primary/10' : 'bg-transparent'}`}
+        className="fixed top-0 left-0 pointer-events-none z-[9999] text-primary"
+        style={{
+          x: cursorX,
+          y: cursorY,
+          translateX: '-7px',
+          translateY: '-4px',
+        }}
+        animate={{
+          scale: isHovered ? 1.1 : 1,
+        }}
+      >
+        <svg 
+          width="36" 
+          height="36" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          className="drop-shadow-[0_0_12px_rgba(139,92,246,0.5)] drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]"
+        >
+          <path d="M4.5 3L19 13L13 14.5L16 21L13.5 22L10.5 15.5L4.5 21V3Z" />
+        </svg>
+      </motion.div>
+      
+      <motion.div
+        className="fixed top-0 left-0 pointer-events-none z-[1]"
         style={{
           x: cursorXSpring,
           y: cursorYSpring,
           translateX: '-50%',
           translateY: '-50%',
         }}
-        animate={{
-          scale: isHovered ? 2.5 : 1,
-        }}
-      />
-      <motion.div
-        className="fixed top-0 left-0 w-1.5 h-1.5 bg-primary rounded-full pointer-events-none z-[9999]"
-        style={{
-          x: cursorX,
-          y: cursorY,
-          translateX: '-50%',
-          translateY: '-50%',
-        }}
-      />
+      >
+        {/* Glow layer */}
+        <motion.div 
+          className="absolute inset-0 bg-primary/30 rounded-full blur-xl"
+          animate={{
+            scale: isHovered ? 3 : 2.5,
+          }}
+          transition={{ duration: 0.3 }}
+        />
+        {/* Inner ball */}
+        <motion.div 
+          className="w-4 h-4 bg-primary rounded-full shadow-[0_0_15px_hsl(var(--primary))]"
+        />
+      </motion.div>
     </>
   );
 };
