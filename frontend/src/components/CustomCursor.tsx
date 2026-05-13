@@ -9,7 +9,8 @@ export const CustomCursor = () => {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
   
-  const springConfig = { damping: 25, stiffness: 250 };
+  // Slower, more fluid spring config
+  const springConfig = { damping: 45, stiffness: 120 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
 
@@ -32,10 +33,14 @@ export const CustomCursor = () => {
     window.addEventListener('mousemove', moveCursor);
     window.addEventListener('mouseover', handleMouseOver);
     
+    // Hide default cursor
+    document.body.style.cursor = 'none';
+    
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', moveCursor);
       window.removeEventListener('mouseover', handleMouseOver);
+      document.body.style.cursor = 'auto';
     };
   }, [cursorX, cursorY]);
 
@@ -43,34 +48,38 @@ export const CustomCursor = () => {
 
   return (
     <>
+      {/* Hollow Arrow Cursor (Responsive Leader) */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9999] text-primary"
+        className="fixed top-0 left-0 pointer-events-none z-[10000] text-primary"
         style={{
           x: cursorX,
           y: cursorY,
-          translateX: '-7px',
-          translateY: '-4px',
-        }}
-        animate={{
-          scale: isHovered ? 1.1 : 1,
         }}
       >
         <svg 
-          width="36" 
-          height="36" 
+          width="40" 
+          height="40" 
           viewBox="0 0 24 24" 
           fill="none" 
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
-          className="drop-shadow-[0_0_12px_rgba(139,92,246,0.5)] drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]"
+          className="drop-shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
+          style={{
+            transform: 'translate(-2px, -2px)',
+          }}
         >
-          <path d="M4.5 3L19 13L13 14.5L16 21L13.5 22L10.5 15.5L4.5 21V3Z" />
+          {/* Combined Hollow Arrow (Head + Tail) */}
+          <path 
+            d="M3 3L10.07 19.97L11.5 13L17.5 19L19.5 17L13.5 11L19.97 10.07L3 3Z" 
+            stroke="currentColor" 
+            strokeWidth="1.5" 
+            strokeLinejoin="round"
+            fill="none"
+          />
         </svg>
       </motion.div>
-      
+
+      {/* Glowing Orb (Lagging Follower) */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[1]"
+        className="fixed top-0 left-0 pointer-events-none z-[9999]"
         style={{
           x: cursorXSpring,
           y: cursorYSpring,
@@ -78,17 +87,26 @@ export const CustomCursor = () => {
           translateY: '-50%',
         }}
       >
-        {/* Glow layer */}
-        <motion.div 
-          className="absolute inset-0 bg-primary/30 rounded-full blur-xl"
-          animate={{
-            scale: isHovered ? 3 : 2.5,
+        {/* Outer Emission Glow */}
+        <motion.div
+          className="w-14 h-14 rounded-full blur-[12px]"
+          style={{
+            background: 'hsl(var(--primary) / 0.3)',
           }}
-          transition={{ duration: 0.3 }}
+          animate={{
+            scale: isHovered ? 2 : 1,
+            opacity: isHovered ? 0.8 : 0.4,
+          }}
         />
-        {/* Inner ball */}
-        <motion.div 
-          className="w-4 h-4 bg-primary rounded-full shadow-[0_0_15px_hsl(var(--primary))]"
+        {/* Thick Light Core */}
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full"
+          style={{
+            boxShadow: '0 0 20px 4px hsl(var(--primary) / 0.6)',
+          }}
+          animate={{
+            scale: isHovered ? 1.8 : 1,
+          }}
         />
       </motion.div>
     </>

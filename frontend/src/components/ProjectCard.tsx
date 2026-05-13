@@ -46,7 +46,7 @@ export const ProjectCard = ({ project }: { project: Project }) => {
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
       className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-sm hover:shadow-md transition-all duration-300"
     >
-      <Link href={`/projects/${project.slug}`} className="absolute inset-0 z-0" aria-label={`View ${project.title} details`} />
+      <Link href={`/projects/${project.slug}`} className="absolute inset-0 z-20" aria-label={`View ${project.title} details`} />
       
       {/* Image Section / Carousel */}
       <div className="relative aspect-[16/10] overflow-hidden border-b border-border bg-gradient-to-br from-surface-2 to-background pointer-events-none">
@@ -98,7 +98,7 @@ export const ProjectCard = ({ project }: { project: Project }) => {
           </h3>
           
           {/* Quick Links */}
-          <div className="flex items-center gap-2.5 relative z-20">
+          <div className="flex items-center gap-2.5 relative z-30">
             {project.github && (
               <a 
                 href={project.github} 
