@@ -20,29 +20,30 @@ export default function About() {
       />
 
       <Section kicker="My story" title="How I got here">
-        <div className="grid gap-12 md:grid-cols-5 items-start">
-          <div className="md:col-span-3 space-y-6 text-muted-foreground leading-relaxed">
-            <p>
+        <div className="grid gap-20 md:grid-cols-12 items-center">
+          <div className="md:col-span-8 space-y-6 text-muted-foreground leading-relaxed">
+            <p className="text-lg">
               I started writing code because I wanted to make small, useful things. That hasn't really changed —
               the things just got bigger. Today I work across NestJS, Next.js, and the messy parts in between:
               contracts, queues, deploys, and the operational story behind a product.
             </p>
-            <p>
+            <p className="text-lg">
               I care about systems that hold up under pressure and interfaces that respect the person using them.
               I've shipped greenfield products solo and embedded with teams as a senior engineer.
             </p>
-            <div className="pt-4">
-              <div className="text-sm font-medium text-foreground">Based in {profile.location}</div>
-              <div className="text-xs text-muted-foreground">Available for remote & relocation</div>
+            <div className="pt-6">
+              <div className="text-base font-semibold text-foreground">Based in {profile.location}</div>
+              <div className="text-sm text-muted-foreground">Available for remote & relocation</div>
             </div>
           </div>
-          <div className="md:col-span-2 max-w-xs mx-auto md:mx-0">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl">
+          <div className="md:col-span-4">
+            <div className="relative max-w-sm aspect-[4/5] overflow-hidden rounded-[32px] border border-border bg-surface shadow-2xl transition-transform hover:scale-[1.02] duration-500">
               <img
                 src={profile.avatarUrl}
                 alt={profile.name}
                 className="h-full w-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-700"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
             </div>
           </div>
         </div>

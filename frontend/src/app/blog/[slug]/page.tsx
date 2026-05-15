@@ -30,52 +30,63 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
   return (
     <article className="container-page pt-16 pb-24">
-      <div className="mb-8">
-        <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground">← Back to blog</Link>
-      </div>
-      
-      {post.coverImage ? (
-        <div className="aspect-[16/7] rounded-2xl border border-border overflow-hidden">
-           <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground">← Back to blog</Link>
         </div>
-      ) : (
-        <div className="aspect-[16/7] rounded-2xl border border-border bg-gradient-to-br from-surface-2 to-background grid-fade" />
-      )}
-
-      <div className="mt-8 flex items-center gap-3 text-xs text-muted-foreground">
-        {post.categories && post.categories.length > 0 ? (
-          post.categories.map((cat: any) => (
-            <span key={cat.id} className="rounded-full border border-border bg-surface px-2 py-0.5">{cat.name}</span>
-          ))
+        {post.coverImage ? (
+          <div className="aspect-[16/8] rounded-2xl border border-border overflow-hidden shadow-2xl">
+            <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
+          </div>
         ) : (
-          <span className="rounded-full border border-border bg-surface px-2 py-0.5">{post.category || 'Uncategorized'}</span>
+          <div className="aspect-[16/8] rounded-2xl border border-border bg-gradient-to-br from-surface-2 to-background grid-fade" />
         )}
-        <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-      </div>
-      <h1 className="mt-4 font-display text-4xl md:text-5xl font-bold tracking-tight text-balance">{post.title}</h1>
 
-      <div className="mt-12 max-w-3xl mx-auto">
-        <div 
-          className="prose prose-invert max-w-none prose-headings:font-display prose-headings:tracking-tight prose-p:text-muted-foreground prose-strong:text-foreground prose-a:text-primary"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
-      </div>
-
-      <div className="mt-16 flex items-center gap-4 rounded-xl border border-border bg-surface p-5">
-        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary-glow" />
-        <div>
-          <div className="font-semibold">Shaik Sameer</div>
-          <div className="text-sm text-muted-foreground">Full Stack Engineer · Hyderabad</div>
+        <div className="mt-10 flex items-center gap-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          {post.categories && post.categories.length > 0 ? (
+            post.categories.map((cat: any) => (
+              <span key={cat.id} className="rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-primary">{cat.name}</span>
+            ))
+          ) : (
+            <span className="rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-primary">{post.category || 'Uncategorized'}</span>
+          )}
+          <span className="h-1 w-1 rounded-full bg-border" />
+          <span>{new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
         </div>
-      </div>
+        
+        <h1 className="mt-6 font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tightest leading-[1.1] text-balance">
+          {post.title}
+        </h1>
 
-      <div className="mt-12 rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground">
-        Comments coming soon.
-      </div>
+        <div className="mt-12">
+          <div 
+            className="prose prose-invert max-w-none prose-headings:font-display prose-headings:tracking-tight prose-p:text-muted-foreground/90 prose-p:leading-relaxed prose-p:text-lg prose-strong:text-foreground prose-a:text-primary prose-img:rounded-2xl prose-img:shadow-xl"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        </div>
 
-      <h3 className="mt-16 mb-6 font-display text-2xl font-semibold">More posts</h3>
-      <div className="grid gap-6 md:grid-cols-3">
-        {more.map((p: any) => <BlogCard key={p.slug} post={p} />)}
+        <div className="mt-20 flex items-center gap-4 rounded-2xl border border-border bg-surface/50 p-6 backdrop-blur-sm">
+          <div className="h-14 w-14 rounded-full bg-gradient-to-br from-primary to-primary-glow shadow-lg shadow-primary/20 flex items-center justify-center font-bold text-white text-xl">
+            SS
+          </div>
+          <div>
+            <div className="font-display text-lg font-bold">Shaik Sameer</div>
+            <div className="text-sm text-muted-foreground">Full Stack Engineer · Building systems at scale.</div>
+          </div>
+        </div>
+
+        <div className="mt-12 rounded-2xl border border-dashed border-border bg-surface/30 p-8 text-center text-sm text-muted-foreground">
+          Comments are currently disabled for this post.
+        </div>
+
+      <div className="mt-24 border-t border-border pt-16">
+        <h3 className="mb-8 font-display text-2xl font-bold tracking-tight">More from the blog</h3>
+        <div className="grid gap-6 md:grid-cols-3">
+          {more.map((p: any) => (
+            <BlogCard key={p.slug} post={p} />
+          ))}
+        </div>
+        </div>
       </div>
     </article>
   );

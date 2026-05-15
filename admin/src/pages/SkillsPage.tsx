@@ -4,7 +4,7 @@ import {
   Box, Paper, Typography, Button, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, Chip, IconButton,
-  CircularProgress, Alert, MenuItem, Grid,
+  CircularProgress, Alert, MenuItem, Grid, useTheme
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -25,6 +25,7 @@ const categories = ['Frontend', 'Backend', 'Database', 'DevOps', 'Tools', 'Cloud
 
 export default function SkillsPage() {
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
   const { items: skills, loading, error } = useSelector((s: RootState) => s.skills);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
@@ -50,8 +51,8 @@ export default function SkillsPage() {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: '#e2e8f0' }}>Skills</Typography>
-          <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700 }}>Skills</Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
             Manage your technical expertise
           </Typography>
         </Box>
@@ -59,7 +60,7 @@ export default function SkillsPage() {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setDialogOpen(true)}
-          sx={{ background: 'linear-gradient(135deg, #22d3ee, #0891b2)', color: '#0f172a' }}
+          sx={{ background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark || '#0891b2'})`, color: theme.palette.background.default }}
         >
           Add Skill
         </Button>
@@ -69,7 +70,7 @@ export default function SkillsPage() {
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress sx={{ color: '#22d3ee' }} />
+          <CircularProgress color="secondary" />
         </Box>
       ) : (
         <TableContainer component={Paper}>
@@ -87,12 +88,12 @@ export default function SkillsPage() {
                 <TableRow key={s.id}>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <CodeIcon sx={{ color: '#22d3ee' }} />
+                      <CodeIcon color="secondary" />
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>{s.name}</Typography>
                     </Box>
                   </TableCell>
                   <TableCell>
-                    <Chip label={s.category} size="small" variant="outlined" sx={{ borderColor: 'rgba(34,211,238,0.3)', color: '#22d3ee' }} />
+                    <Chip label={s.category} size="small" variant="outlined" sx={{ color: 'secondary.main' }} />
                   </TableCell>
                   <TableCell>{s.order}</TableCell>
                   <TableCell align="right">
@@ -130,8 +131,8 @@ export default function SkillsPage() {
         <DialogActions sx={{ px: 3, pb: 3 }}>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
           <Button variant="contained" onClick={handleSave} disabled={saving || !form.name}
-            sx={{ background: 'linear-gradient(135deg, #22d3ee, #0891b2)', color: '#0f172a' }}>
-            {saving ? <CircularProgress size={18} /> : 'Add Skill'}
+            sx={{ background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark || '#0891b2'})`, color: theme.palette.background.default }}>
+            {saving ? <CircularProgress size={18} color="inherit" /> : 'Add Skill'}
           </Button>
         </DialogActions>
       </Dialog>

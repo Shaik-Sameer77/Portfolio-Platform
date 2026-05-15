@@ -81,8 +81,8 @@ export default function Header({ onMenuClick, isCollapsed, onToggleSidebar }: He
           onClick={onToggleSidebar}
           sx={{
             display: { xs: 'none', md: 'flex' },
-            color: '#94a3b8',
-            border: '1px solid rgba(255,255,255,0.1)',
+            color: 'text.secondary',
+            border: `1px solid ${theme.palette.divider}`,
             borderRadius: '8px',
             p: 0.8,
           }}
@@ -92,7 +92,7 @@ export default function Header({ onMenuClick, isCollapsed, onToggleSidebar }: He
 
         <IconButton
           onClick={onMenuClick}
-          sx={{ display: { md: 'none' }, color: '#94a3b8' }}
+          sx={{ display: { md: 'none' }, color: 'text.secondary' }}
         >
           <MenuIcon />
         </IconButton>
@@ -191,10 +191,10 @@ export default function Header({ onMenuClick, isCollapsed, onToggleSidebar }: He
               {user?.name?.[0]?.toUpperCase() || 'A'}
             </Avatar>
             <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
-              <Typography variant="body2" sx={{ fontWeight: 600, color: '#e2e8f0', lineHeight: 1.2 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', lineHeight: 1.2 }}>
                 {user?.name || 'Admin'}
               </Typography>
-              <Typography variant="caption" sx={{ color: '#64748b', display: 'block' }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
                 Administrator
               </Typography>
             </Box>

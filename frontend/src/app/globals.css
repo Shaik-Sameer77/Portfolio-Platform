@@ -162,10 +162,10 @@
   }
   .text-balance { text-wrap: balance; }
   .container-page {
-    @apply mx-auto w-full max-w-6xl px-6;
+    @apply mx-auto w-full max-w-[1440px] px-6 md:px-10;
   }
   .section {
-    @apply py-16 md:py-28;
+    @apply py-10 md:py-12;
   }
   .grid-fade {
     background-image:
@@ -187,9 +187,7 @@
   }
   
   .prose p {
-    margin-bottom: 1rem;
-    line-height: 1.8;
-    font-size: 1.125rem;
+    @apply mb-6 leading-[1.8] text-[1.125rem] text-muted-foreground;
   }
   .prose h2 {
     font-size: 1.875rem;
@@ -222,12 +220,8 @@
     margin-bottom: 0;
   }
   .prose pre {
-    background-color: hsl(var(--surface-2));
-    padding: 1rem;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    overflow-x: auto;
-    border: 1px solid hsl(var(--border));
+    @apply bg-surface-2/50 border border-border p-4 rounded-xl mb-8 overflow-x-auto;
+    backdrop-filter: blur(8px);
   }
   .prose code {
     font-family: "JetBrains Mono", monospace;
@@ -294,3 +288,10 @@
   70% { box-shadow: 0 0 0 8px hsl(var(--success) / 0); }
 }
 .pulse-dot { animation: pulse-dot 1.8s infinite; }
+
+/* Hide default cursor on desktop when custom cursor is active */
+@media (min-width: 768px) {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+}

@@ -5,7 +5,7 @@ import {
   CircularProgress, Alert, Card, CardContent,
   IconButton, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Dialog, DialogTitle, DialogContent,
-  DialogActions, Switch, FormControlLabel
+  DialogActions, Switch, FormControlLabel, useTheme
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -24,6 +24,7 @@ import {
 
 export default function HeroPage() {
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
   const { profile, stats, loading, error } = useSelector((s: RootState) => s.profile);
   
   const [profileForm, setProfileForm] = useState<Profile>({});
@@ -96,8 +97,8 @@ export default function HeroPage() {
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: '#e2e8f0' }}>Hero Section</Typography>
-        <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
+        <Typography variant="h5" sx={{ fontWeight: 700 }}>Hero Section</Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
           Manage your landing page headlines, bio, and metrics
         </Typography>
       </Box>
@@ -107,10 +108,10 @@ export default function HeroPage() {
       <Grid container spacing={3}>
         {/* Left Column: Hero Text */}
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Card sx={{ background: '#1e293b', border: '1px solid #334155' }}>
+          <Card>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-                <HeroIcon sx={{ color: '#22d3ee' }} />
+                <HeroIcon color="secondary" />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>Hero Content</Typography>
               </Box>
 
@@ -164,10 +165,7 @@ export default function HeroPage() {
                       <Switch 
                         checked={profileForm.availableForWork || false}
                         onChange={(e) => setProfileForm({ ...profileForm, availableForWork: e.target.checked })}
-                        sx={{
-                          '& .MuiSwitch-switchBase.Mui-checked': { color: '#22d3ee' },
-                          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#22d3ee' }
-                        }}
+                        color="secondary"
                       />
                     }
                     label="Available for Work"
@@ -182,8 +180,8 @@ export default function HeroPage() {
                   onClick={handleProfileSave}
                   disabled={saving}
                   sx={{ 
-                    background: 'linear-gradient(135deg, #22d3ee, #0891b2)', 
-                    color: '#0f172a',
+                    background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark || '#0891b2'})`, 
+                    color: theme.palette.background.default,
                     px: 4
                   }}
                 >
@@ -196,11 +194,11 @@ export default function HeroPage() {
 
         {/* Right Column: Stats Management */}
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Card sx={{ background: '#1e293b', border: '1px solid #334155', height: '100%' }}>
+          <Card sx={{ height: '100%' }}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <StatsIcon sx={{ color: '#22d3ee' }} />
+                  <StatsIcon color="secondary" />
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>Stats</Typography>
                 </Box>
                 <Button 
@@ -208,7 +206,7 @@ export default function HeroPage() {
                   variant="outlined" 
                   startIcon={<AddIcon />}
                   onClick={() => setStatDialogOpen(true)}
-                  sx={{ color: '#22d3ee', borderColor: 'rgba(34,211,238,0.3)' }}
+                  color="secondary"
                 >
                   Add
                 </Button>
@@ -230,10 +228,10 @@ export default function HeroPage() {
                           <Typography variant="body2" sx={{ fontWeight: 500 }}>{s.label}</Typography>
                         </TableCell>
                         <TableCell sx={{ border: 'none', py: 1.5 }}>
-                          <Typography variant="body2" sx={{ color: '#22d3ee', fontWeight: 700 }}>{s.value}</Typography>
+                          <Typography variant="body2" sx={{ color: 'secondary.main', fontWeight: 700 }}>{s.value}</Typography>
                         </TableCell>
                         <TableCell align="right" sx={{ border: 'none', py: 1.5 }}>
-                          <IconButton size="small" onClick={() => handleStatDelete(s.id)} sx={{ color: '#ef4444' }}>
+                          <IconButton size="small" onClick={() => handleStatDelete(s.id)} color="error">
                             <DeleteIcon fontSize="small" />
                           </IconButton>
                         </TableCell>
@@ -288,7 +286,7 @@ export default function HeroPage() {
             variant="contained" 
             onClick={handleStatSave}
             disabled={!statForm.label || !statForm.value}
-            sx={{ background: 'linear-gradient(135deg, #22d3ee, #0891b2)', color: '#0f172a' }}
+            sx={{ background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark || '#0891b2'})`, color: theme.palette.background.default }}
           >
             Add Stat
           </Button>

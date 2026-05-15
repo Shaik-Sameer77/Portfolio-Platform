@@ -5,7 +5,7 @@ import {
   TableContainer, TableHead, TableRow, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, Chip, IconButton,
   CircularProgress, Alert, Switch, FormControlLabel, Tooltip,
-  Grid, Divider,
+  Grid, Divider, useTheme, alpha
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -34,6 +34,7 @@ const emptyForm = {
 
 export default function ProjectsPage() {
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
   const { items: projects, loading, error } = useSelector((s: RootState) => s.projects);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -145,8 +146,8 @@ export default function ProjectsPage() {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: '#e2e8f0' }}>Projects</Typography>
-          <Typography variant="body2" sx={{ color: '#64748b', mt: 0.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700 }}>Projects</Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
             {projects.length} project{projects.length !== 1 ? 's' : ''} in your portfolio
           </Typography>
         </Box>
@@ -154,7 +155,7 @@ export default function ProjectsPage() {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={openCreate}
-          sx={{ background: 'linear-gradient(135deg, #7c6af7, #5a49d6)', boxShadow: '0 4px 14px rgba(124,106,247,0.4)' }}
+          sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`, boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}` }}
         >
           Add Project
         </Button>
@@ -168,12 +169,12 @@ export default function ProjectsPage() {
         </Box>
       ) : projects.length === 0 ? (
         <Paper sx={{ p: 6, textAlign: 'center' }}>
-          <Typography variant="h6" sx={{ color: '#4a5568', mb: 1 }}>No projects yet</Typography>
-          <Typography variant="body2" sx={{ color: '#374151', mb: 3 }}>
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>No projects yet</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Add your first project to showcase in your portfolio
           </Typography>
           <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}
-            sx={{ background: 'linear-gradient(135deg, #7c6af7, #5a49d6)' }}>
+            sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})` }}>
             Add Project
           </Button>
         </Paper>
@@ -200,10 +201,10 @@ export default function ProjectsPage() {
                         </Box>
                       )}
                       <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#e2e8f0' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
                           {p.title}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#64748b', display: 'block', maxWidth: 200 }} noWrap>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', maxWidth: 200 }} noWrap>
                           {p.description}
                         </Typography>
                       </Box>
@@ -213,7 +214,7 @@ export default function ProjectsPage() {
                     <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
                       {p.techStack.slice(0, 3).map((t) => (
                         <Chip key={t} label={t} size="small"
-                          sx={{ fontSize: '0.65rem', height: 20, background: 'rgba(124,106,247,0.1)', color: '#7c6af7' }} />
+                          sx={{ fontSize: '0.65rem', height: 20, color: 'primary.main' }} />
                       ))}
                     </Box>
                   </TableCell>
@@ -230,7 +231,7 @@ export default function ProjectsPage() {
                       {p.liveUrl && (
                         <Tooltip title="Live Demo">
                           <IconButton size="small" component="a" href={p.liveUrl} target="_blank"
-                            sx={{ color: '#64748b', '&:hover': { color: '#22d3ee' } }}>
+                            sx={{ color: 'text.secondary', '&:hover': { color: 'secondary.main' } }}>
                             <LaunchIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
@@ -302,7 +303,7 @@ export default function ProjectsPage() {
                   
                   <FormControlLabel
                     control={<Switch checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                      sx={{ '& .MuiSwitch-thumb': { background: '#7c6af7' } }} />}
+                      color="primary" />}
                     label="Featured Project"
                   />
                 </Box>
@@ -386,9 +387,9 @@ export default function ProjectsPage() {
           </Grid>
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-          <Button onClick={() => setDialogOpen(false)} sx={{ color: '#64748b' }}>Cancel</Button>
+          <Button onClick={() => setDialogOpen(false)} sx={{ color: 'text.secondary' }}>Cancel</Button>
           <Button variant="contained" onClick={handleSave} disabled={saving || !form.title || !form.description}
-            sx={{ background: 'linear-gradient(135deg, #7c6af7, #5a49d6)', minWidth: 120 }}>
+            sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`, minWidth: 120 }}>
             {saving ? <CircularProgress size={18} color="inherit" /> : editingId !== null ? 'Update Project' : 'Create Project'}
           </Button>
         </DialogActions>

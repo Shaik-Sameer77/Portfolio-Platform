@@ -42,7 +42,7 @@ export default function Services() {
         <div className="divide-y divide-border rounded-xl border border-border bg-surface">
           {faqs.map((f) => (
             <details key={f.q} className="group p-5">
-              <summary className="flex cursor-pointer items-center justify-between text-sm font-medium">
+              <summary className="flex items-center justify-between text-sm font-medium">
                 {f.q}
                 <span className="text-muted-foreground group-open:rotate-45 transition-transform">+</span>
               </summary>

@@ -611,17 +611,30 @@ export default function BlogEditorPage() {
             }}
           >
             {/* Frontend Simulation Container */}
-            <Box sx={{ maxWidth: 800, mx: 'auto', p: 4, color: 'text.primary', fontFamily: '"Inter", sans-serif' }}>
+            <Box sx={{ maxWidth: 850, mx: 'auto', p: { xs: 2, md: 6 }, color: 'text.primary', fontFamily: '"Inter", sans-serif' }}>
               {coverImage && (
-                <Box sx={{ width: '100%', height: 300, borderRadius: '20px', overflow: 'hidden', mb: 4 }}>
+                <Box sx={{ width: '100%', aspectRatio: '16/8', borderRadius: '20px', overflow: 'hidden', mb: 4, shadow: 10 }}>
                   <img src={coverImage} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </Box>
               )}
-              <Typography variant="h3" sx={{ fontWeight: 800, mb: 2, letterSpacing: '-0.03em', color: 'text.primary' }}>
-                {title || 'Untitied Post'}
+              
+              <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
+                {categoryIds.length > 0 ? (
+                  categoryIds.map(id => {
+                    const cat = categories.find(c => c.id === id);
+                    return cat ? <Box key={id} sx={{ px: 1.5, py: 0.5, bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600 }}>{cat.name}</Box> : null;
+                  })
+                ) : (
+                  <Box sx={{ px: 1.5, py: 0.5, bgcolor: 'action.hover', color: 'text.secondary', borderRadius: '20px', fontSize: '0.75rem' }}>Uncategorized</Box>
+                )}
+              </Box>
+
+              <Typography variant="h2" sx={{ fontWeight: 800, mb: 4, letterSpacing: '-0.04em', lineHeight: 1.1, color: 'text.primary', fontSize: { xs: '2.5rem', md: '3.5rem' } }}>
+                {title || 'Untitled Post'}
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 6, color: 'text.secondary' }}>
-                <Box sx={{ width: 32, height: 32, borderRadius: 'full', bgcolor: 'divider' }} />
+
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 8, color: 'text.secondary' }}>
+                <Box sx={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #7c6af7, #6366f1)', display: 'flex', alignItems: 'center', justify: 'center', color: 'white', fontWeight: 'bold' }}>SS</Box>
                 <Typography variant="body2">By Sameer • {new Date().toLocaleDateString()}</Typography>
               </Box>
 
@@ -629,16 +642,15 @@ export default function BlogEditorPage() {
                 className="preview-content"
                 dangerouslySetInnerHTML={{ __html: content }} 
                 sx={{
-                  '& p': { mb: 4, lineHeight: 1.8, fontSize: '1.125rem', color: 'text.secondary' },
-                  '& h2': { fontSize: '1.875rem', fontWeight: 700, mt: 6, mb: 4, color: 'text.primary' },
-                  '& h3': { fontSize: '1.5rem', fontWeight: 600, mt: 5, mb: 3, color: 'text.primary' },
-                  '& img': { maxWidth: '100%', borderRadius: '16px', my: 6 },
+                  '& p': { mb: 3, lineHeight: 1.8, fontSize: '1.125rem', color: 'text.secondary' },
+                  '& h2': { fontSize: '2rem', fontWeight: 700, mt: 6, mb: 3, color: 'text.primary' },
+                  '& h3': { fontSize: '1.5rem', fontWeight: 600, mt: 5, mb: 2, color: 'text.primary' },
+                  '& img': { maxWidth: '100%', borderRadius: '16px', my: 6, boxShadow: 3 },
                   '& blockquote': { borderLeft: '4px solid #7c6af7', pl: 6, py: 1, my: 6, '& p': { fontStyle: 'italic', color: 'text.secondary', mb: 0 } },
-                  '& pre': { bgcolor: 'action.hover', p: 4, borderRadius: '12px', mb: 6, overflowX: 'auto', border: `1px solid ${theme.palette.divider}` },
+                  '& pre': { bgcolor: alpha(theme.palette.background.paper, 0.8), p: 4, borderRadius: '12px', mb: 6, overflowX: 'auto', border: `1px solid ${theme.palette.divider}` },
                   '& code': { fontFamily: '"JetBrains Mono", monospace', fontSize: '0.9em' },
-                  '& a': { color: '#7c6af7', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } },
-                  '& ul, & ol': { mb: 6, pl: 5, '& li': { mb: 2, color: 'text.secondary' } },
-                  '& table': { borderCollapse: 'collapse', width: '100%', mb: 6, '& th, & td': { border: `1px solid ${theme.palette.divider}`, p: 1 }, '& th': { bgcolor: 'action.hover', fontWeight: 'bold', color: 'text.primary' } },
+                  '& a': { color: theme.palette.primary.main, textDecoration: 'none' },
+                  '& ul, & ol': { mb: 6, pl: 5, '& li': { mb: 1, color: 'text.secondary' } },
                 }}
               />
             </Box>

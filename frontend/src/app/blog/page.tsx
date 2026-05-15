@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { BlogCard } from "@/components/BlogCard";
@@ -93,10 +94,33 @@ export default function Blog() {
         eyebrow="Blog"
         title="Writing about the work."
         subtitle="Engineering, system design, and the occasional rant."
-      />
+      >
+        <div className="relative w-40 h-24 md:w-48 md:h-28 pointer-events-none select-none">
+          <motion.div
+            animate={{ 
+              y: [0, 12, 0],
+              rotate: [0, 1, 0]
+            }}
+            transition={{ 
+              duration: 7, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="absolute -top-8 right-12 md:-top-12 md:right-32 w-40 h-40 md:w-[280px] md:h-[280px]"
+          >
+            <img 
+              src="/blog_writing_illustration.png" 
+              alt="Writing illustration"
+              className="w-full h-full object-cover rounded-[40px] border border-white/10 shadow-2xl drop-shadow-[0_20px_60px_rgba(124,106,247,0.4)]"
+            />
+          </motion.div>
+          {/* Ambient glow behind illustration */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary/30 blur-[100px] -z-10 rounded-full" />
+        </div>
+      </PageHeader>
       <div className="container-page pb-24">
         {/* Search bar */}
-        <div className="mb-6 flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5">
+        <div className="mb-6 flex max-w-md items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5">
           <Search className="h-4 w-4 text-muted-foreground" />
           <input
             value={q}

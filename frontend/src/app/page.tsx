@@ -8,6 +8,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { BlogCard } from "@/components/BlogCard";
 import { SkillTile } from "@/components/SkillTile";
 import { CTACard } from "@/components/CTACard";
+import { TechMarquee } from "@/components/TechMarquee";
 import { profile as mockProfile, projects as mockProjects, posts, stats as mockStats, stack } from "@/data/mock";
 import { getProfile, getStats, getProjects, type Profile, type Stat, type Project } from "@/services/portfolio-service";
 
@@ -109,10 +110,10 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden min-h-[90vh] flex items-center">
+      <section className="relative overflow-hidden min-h-[70vh] flex items-center">
         <InteractiveGrid />
         
-        <div className="container-page relative pt-20 pb-20 md:pt-32 md:pb-28">
+        <div className="container-page relative pt-12 pb-8 md:pt-20 md:pb-12">
           <div className="flex flex-col-reverse items-center gap-12 md:flex-row md:gap-20 md:items-center">
             {/* Text column */}
             <motion.div 
@@ -214,7 +215,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-20 grid grid-cols-2 gap-8 border-t border-border pt-12 md:grid-cols-4"
+            className="mt-12 grid grid-cols-2 gap-8 border-t border-border pt-8 md:grid-cols-4"
           >
             {activeStats.map((s) => (
               <div key={s.id} className="group">
@@ -240,14 +241,11 @@ export default function Home() {
           {featured.map((p) => <ProjectCard key={p.slug} project={p} />)}
         </div>
       </Section>
-
+ 
       {/* Skills snapshot */}
       <Section kicker="What I work with" title="A focused stack, used in anger.">
-        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3">
-          {allSkills.map((s) => <SkillTile key={s} name={s} />)}
-        </div>
+        <TechMarquee />
       </Section>
-
       {/* Writing */}
       <Section
         kicker="Featured writing"

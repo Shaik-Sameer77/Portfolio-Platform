@@ -82,8 +82,9 @@ export const NavMegaMenu = ({ onClose }: { onClose: () => void }) => {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -6, scale: 0.98 }}
       transition={{ duration: 0.16, ease: "easeOut" }}
-      className="absolute left-1/2 top-full mt-3 w-[min(900px,calc(100vw-2rem))] -translate-x-1/2 rounded-xl border border-border bg-background/95 backdrop-blur-2xl p-3 shadow-2xl shadow-black/50"
+      className="absolute left-1/2 top-full mt-3 w-[min(1200px,calc(100vw-2rem))] -translate-x-1/2 rounded-xl border border-border bg-background/95 backdrop-blur-2xl p-3 shadow-2xl shadow-black/50"
     >
+      <div className="absolute -top-3 left-0 right-0 h-3" />
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div>
           <div className="px-3 pt-2 pb-1 text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Me</div>

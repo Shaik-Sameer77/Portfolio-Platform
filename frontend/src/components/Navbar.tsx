@@ -44,14 +44,17 @@ export const Navbar = () => {
           scrolled ? "bg-background/90 backdrop-blur-xl border-b border-border" : "bg-background/40 backdrop-blur-md"
         }`}
       >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-6 md:px-10">
         {/* Logo */}
         <Link href="/" className="text-base font-semibold tracking-tight text-foreground">
           {profile.handle}
         </Link>
 
         {/* Center nav */}
-        <nav className="relative hidden items-center gap-1 md:flex">
+        <nav 
+          className="relative hidden items-center gap-1 md:flex"
+          onMouseLeave={() => setMega(false)}
+        >
           <button
             onClick={() => setMega(!megaOpen)}
             onMouseEnter={() => setMega(true)}
@@ -68,6 +71,7 @@ export const Navbar = () => {
               <Link
                 key={l.href}
                 href={l.href}
+                onMouseEnter={() => setMega(false)}
                 className={`rounded-md px-3 py-1.5 text-base transition-colors ${
                   isActive ? "text-foreground bg-surface" : "text-muted-foreground hover:text-foreground"
                 }`}
