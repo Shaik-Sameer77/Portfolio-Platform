@@ -1,7 +1,9 @@
 "use client";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { getTechStack, type TechStackItem } from "@/services/portfolio-service";
 
-const techStack = [
+const defaultTechStack: Partial<TechStackItem>[] = [
   { name: "Next.js", slug: "nextdotjs" },
   { name: "React", slug: "react" },
   { name: "TypeScript", slug: "typescript" },
@@ -20,8 +22,24 @@ const techStack = [
 ];
 
 export const TechMarquee = () => {
+  const [stackItems, setStackItems] = useState<Partial<TechStackItem>[]>(defaultTechStack);
+
+  useEffect(() => {
+    const fetchStack = async () => {
+      try {
+        const items = await getTechStack();
+        if (items && items.length > 0) {
+          setStackItems(items);
+        }
+      } catch (error) {
+        console.warn("Failed to fetch tech stack from API, using defaults:", error);
+      }
+    };
+    fetchStack();
+  }, []);
+
   // Duplicate the list to create a seamless loop
-  const duplicatedStack = [...techStack, ...techStack];
+  const duplicatedStack = [...stackItems, ...stackItems];
 
   return (
     <div className="relative w-screen mx-[calc(-50vw+50%)] overflow-hidden border-y border-border/50 bg-surface/30 py-8 backdrop-blur-sm">
@@ -39,24 +57,38 @@ export const TechMarquee = () => {
           repeat: Infinity,
         }}
       >
-        {duplicatedStack.map((tech, idx) => (
-          <div
-            key={`${tech.slug}-${idx}`}
-            className="group flex items-center gap-3 grayscale transition-all hover:grayscale-0"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface p-2 shadow-sm ring-1 ring-border group-hover:ring-primary/50 group-hover:shadow-primary/10 transition-all">
-              <img
-                src={`https://cdn.simpleicons.org/${tech.slug}`}
-                alt={tech.name}
-                className="h-full w-full object-contain"
-                loading="lazy"
-              />
+        {duplicatedStack.map((tech, idx) => {
+          const imageSrc = tech.iconUrl || (tech.slug ? `https://cdn.simpleicons.org/${tech.slug}` : 'https://cdn.simpleicons.org/cpu');
+          const customColor = tech.color || '';
+          const brandColor = customColor || 'rgb(var(--primary-rgb))';
+          const glowColor = customColor ? `${customColor}20` : 'rgba(var(--primary-rgb), 0.08)';
+
+          return (
+            <div
+              key={`${tech.slug || 'custom'}-${idx}`}
+              style={{
+                '--brand-color': brandColor,
+                '--brand-glow': glowColor
+              } as React.CSSProperties}
+              className="group flex items-center gap-3 grayscale transition-all hover:grayscale-0 cursor-pointer"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface p-2 shadow-sm ring-1 ring-border group-hover:ring-[var(--brand-color)] group-hover:shadow-lg group-hover:shadow-[var(--brand-glow)] transition-all">
+                <img
+                  src={imageSrc}
+                  alt={tech.name}
+                  className="h-full w-full object-contain"
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://cdn.simpleicons.org/cpu';
+                  }}
+                />
+              </div>
+              <span className="text-sm font-semibold tracking-wide text-muted-foreground group-hover:text-[var(--brand-color)] transition-colors">
+                {tech.name}
+              </span>
             </div>
-            <span className="text-sm font-semibold tracking-wide text-muted-foreground group-hover:text-foreground transition-colors">
-              {tech.name}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </motion.div>
     </div>
   );

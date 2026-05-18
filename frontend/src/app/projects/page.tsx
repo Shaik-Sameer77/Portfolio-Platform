@@ -35,7 +35,8 @@ export default function Projects() {
           ))}
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {list.map((p) => <ProjectCard key={p.slug} project={p} />)}
+          {list.map((p) => <ProjectCard key={p.slug} project={p as any} />)}
+
         </div>
       </div>
     </>

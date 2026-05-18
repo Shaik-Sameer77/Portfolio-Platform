@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { Section } from "@/components/Section";
 import { ProjectCard } from "@/components/ProjectCard";
 import { BlogCard } from "@/components/BlogCard";
-import { SkillTile } from "@/components/SkillTile";
 import { CTACard } from "@/components/CTACard";
 import { TechMarquee } from "@/components/TechMarquee";
+
 import { profile as mockProfile, projects as mockProjects, posts, stats as mockStats, stack } from "@/data/mock";
 import { getProfile, getStats, getProjects, type Profile, type Stat, type Project } from "@/services/portfolio-service";
 
@@ -97,7 +97,7 @@ export default function Home() {
   }));
 
   const featured = activeProjects.filter((p) => p.featured).slice(0, 3);
-  const allSkills = Object.values(stack).flat().slice(0, 9);
+
 
   if (loading) {
     return (

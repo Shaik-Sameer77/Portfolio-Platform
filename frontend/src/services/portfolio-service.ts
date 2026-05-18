@@ -86,3 +86,18 @@ export const getProjectBySlug = async (slug: string) => {
 export const getBlogs = () => ApiService.get<Blog[]>('/blog');
 export const getBlogBySlug = (slug: string) => ApiService.get<Blog>(`/blog/${slug}`);
 export const getCategories = () => ApiService.get<Category[]>('/blog/categories');
+
+export interface TechStackItem {
+  id: number;
+  name: string;
+  slug: string;
+  category: string;
+  iconUrl?: string;
+  color?: string;
+  order: number;
+}
+
+
+
+export const getTechStack = () => ApiService.get<TechStackItem[]>('/portfolio/tech-stack');
+

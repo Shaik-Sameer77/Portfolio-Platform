@@ -12,12 +12,14 @@ import AdminLayout from './layout/AdminLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectsPage from './pages/ProjectsPage';
-import SkillsPage from './pages/SkillsPage';
+
 import HeroPage from './pages/HeroPage';
 import BlogsPage from './pages/BlogsPage';
 import BlogEditorPage from './pages/BlogEditorPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 import ApiLogsPage from './pages/ApiLogsPage';
+import TechStackPage from './pages/TechStackPage';
+
 
 
 // Protected Route Component
@@ -72,13 +74,16 @@ function App() {
           </ProtectedRoute>
         } />
 
-        <Route path="/skills" element={
+
+
+        <Route path="/tech-stack" element={
           <ProtectedRoute>
             <AdminLayout>
-              <SkillsPage />
+              <TechStackPage />
             </AdminLayout>
           </ProtectedRoute>
         } />
+
 
         <Route path="/blogs" element={
           <ProtectedRoute>

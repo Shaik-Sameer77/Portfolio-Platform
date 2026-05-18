@@ -45,13 +45,19 @@ model Stat {
   updatedAt DateTime @updatedAt
 }
 
-model Skill {
-  id       Int     @id @default(autoincrement())
-  name     String
-  category String
-  iconUrl  String?
-  order    Int     @default(0)
+model TechStack {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String
+  category  String
+  iconUrl   String?
+  color     String?
+  order     Int      @default(0)
+  updatedAt DateTime @updatedAt
 }
+
+
+
 
 model Project {
   id          Int      @id @default(autoincrement())

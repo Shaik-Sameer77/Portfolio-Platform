@@ -12,7 +12,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PortfolioService } from './portfolio.service.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { UpdateSocialLinksDto } from './dto/update-social-links.dto.js';
-import { CreateSkillDto } from './dto/create-skill.dto.js';
+
 import { CreateProjectDto } from './dto/create-project.dto.js';
 import { UpdateProjectDto } from './dto/update-project.dto.js';
 import { CreateExperienceDto } from './dto/create-experience.dto.js';
@@ -27,6 +27,9 @@ import { CreateGalleryPhotoDto } from './dto/create-gallery-photo.dto.js';
 import { UpdateGalleryPhotoDto } from './dto/update-gallery-photo.dto.js';
 import { CreateStatDto } from './dto/create-stat.dto.js';
 import { UpdateStatDto } from './dto/update-stat.dto.js';
+import { CreateTechStackDto } from './dto/create-tech-stack.dto.js';
+import { UpdateTechStackDto } from './dto/update-tech-stack.dto.js';
+
 
 @ApiTags('Portfolio')
 @Controller('portfolio')
@@ -90,25 +93,7 @@ export class PortfolioController {
     return this.portfolioService.deleteStat(id);
   }
 
-  // ─── Skills ───────────────────────────────────────────────────────────────
 
-  @Get('skills')
-  @ApiOperation({ summary: 'List all skills (public)' })
-  getSkills() {
-    return this.portfolioService.getSkills();
-  }
-
-  @Post('skills')
-  @ApiOperation({ summary: 'Add a skill (admin)' })
-  createSkill(@Body() dto: CreateSkillDto) {
-    return this.portfolioService.createSkill(dto);
-  }
-
-  @Delete('skills/:id')
-  @ApiOperation({ summary: 'Remove a skill (admin)' })
-  deleteSkill(@Param('id', ParseIntPipe) id: number) {
-    return this.portfolioService.deleteSkill(id);
-  }
 
   // ─── Projects ─────────────────────────────────────────────────────────────
 
@@ -282,4 +267,34 @@ export class PortfolioController {
   deleteGalleryPhoto(@Param('id', ParseIntPipe) id: number) {
     return this.portfolioService.deleteGalleryPhoto(id);
   }
+
+  // ─── Tech Stack ───────────────────────────────────────────────────────────
+
+  @Get('tech-stack')
+  @ApiOperation({ summary: 'List all tech stack items (public)' })
+  getTechStack() {
+    return this.portfolioService.getTechStack();
+  }
+
+  @Post('tech-stack')
+  @ApiOperation({ summary: 'Add a tech stack item (admin)' })
+  createTechStack(@Body() dto: CreateTechStackDto) {
+    return this.portfolioService.createTechStack(dto);
+  }
+
+  @Patch('tech-stack/:id')
+  @ApiOperation({ summary: 'Update a tech stack item (admin)' })
+  updateTechStack(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateTechStackDto,
+  ) {
+    return this.portfolioService.updateTechStack(id, dto);
+  }
+
+  @Delete('tech-stack/:id')
+  @ApiOperation({ summary: 'Delete a tech stack item (admin)' })
+  deleteTechStack(@Param('id', ParseIntPipe) id: number) {
+    return this.portfolioService.deleteTechStack(id);
+  }
 }
+

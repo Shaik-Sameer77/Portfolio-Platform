@@ -74,7 +74,9 @@ const navItems: NavItemData[] = [
     children: [
       { label: 'Hero Section', icon: <HeroIcon fontSize="small" />, path: '/portfolio/hero' },
       { label: 'About', icon: <ProfileIcon fontSize="small" />, path: '/portfolio/about' },
-      { label: 'Skills', icon: <SkillsIcon fontSize="small" />, path: '/skills' },
+      { label: 'Tech Stack', icon: <SkillsIcon fontSize="small" />, path: '/tech-stack' },
+
+
       { label: 'Projects', icon: <ProjectsIcon fontSize="small" />, path: '/projects' },
       { label: 'Experience', icon: <ExperienceIcon fontSize="small" />, path: '/experience' },
       { label: 'Education', icon: <EducationIcon fontSize="small" />, path: '/education' },

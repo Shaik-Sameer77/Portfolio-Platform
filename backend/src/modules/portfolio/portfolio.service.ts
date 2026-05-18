@@ -3,7 +3,7 @@ import { BlogService } from '../blog/blog.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { UpdateSocialLinksDto } from './dto/update-social-links.dto.js';
-import { CreateSkillDto } from './dto/create-skill.dto.js';
+
 import { CreateProjectDto } from './dto/create-project.dto.js';
 import { UpdateProjectDto } from './dto/update-project.dto.js';
 import { CreateExperienceDto } from './dto/create-experience.dto.js';
@@ -18,6 +18,9 @@ import { CreateGalleryPhotoDto } from './dto/create-gallery-photo.dto.js';
 import { UpdateGalleryPhotoDto } from './dto/update-gallery-photo.dto.js';
 import { CreateStatDto } from './dto/create-stat.dto.js';
 import { UpdateStatDto } from './dto/update-stat.dto.js';
+import { CreateTechStackDto } from './dto/create-tech-stack.dto.js';
+import { UpdateTechStackDto } from './dto/update-tech-stack.dto.js';
+
 
 @Injectable()
 export class PortfolioService {
@@ -94,23 +97,7 @@ export class PortfolioService {
     return this.prisma.stat.delete({ where: { id } });
   }
 
-  // ─── Skills ───────────────────────────────────────────────────────────────
 
-  async getSkills() {
-    return this.prisma.skill.findMany({
-      orderBy: [{ category: 'asc' }, { order: 'asc' }],
-    });
-  }
-
-  async createSkill(dto: CreateSkillDto) {
-    return this.prisma.skill.create({ data: dto });
-  }
-
-  async deleteSkill(id: number) {
-    const skill = await this.prisma.skill.findUnique({ where: { id } });
-    if (!skill) throw new NotFoundException(`Skill #${id} not found`);
-    return this.prisma.skill.delete({ where: { id } });
-  }
 
   // ─── Projects ─────────────────────────────────────────────────────────────
 
@@ -272,4 +259,29 @@ export class PortfolioService {
     if (!existing) throw new NotFoundException(`GalleryPhoto #${id} not found`);
     return this.prisma.galleryPhoto.delete({ where: { id } });
   }
+
+  // ─── Tech Stack ───────────────────────────────────────────────────────────
+
+  async getTechStack() {
+    return this.prisma.techStack.findMany({
+      orderBy: { order: 'asc' },
+    });
+  }
+
+  async createTechStack(dto: CreateTechStackDto) {
+    return this.prisma.techStack.create({ data: dto });
+  }
+
+  async updateTechStack(id: number, dto: UpdateTechStackDto) {
+    const existing = await this.prisma.techStack.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`TechStack #${id} not found`);
+    return this.prisma.techStack.update({ where: { id }, data: dto });
+  }
+
+  async deleteTechStack(id: number) {
+    const existing = await this.prisma.techStack.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`TechStack #${id} not found`);
+    return this.prisma.techStack.delete({ where: { id } });
+  }
 }
+

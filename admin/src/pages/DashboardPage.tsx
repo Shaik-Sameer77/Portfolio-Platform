@@ -24,7 +24,7 @@ import {
 } from '@mui/icons-material';
 import type { AppDispatch, RootState } from '../store';
 import { fetchProjects } from '../features/projectsSlice';
-import { fetchSkills } from '../features/skillsSlice';
+import { fetchTechStack } from '../features/techStackSlice';
 import { fetchExperience } from '../features/experienceSlice';
 import { fetchServices } from '../features/servicesSlice';
 import { fetchProfile } from '../features/profileSlice';
@@ -83,7 +83,7 @@ export default function DashboardPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const projects = useSelector((s: RootState) => s.projects.items);
-  const skills = useSelector((s: RootState) => s.skills.items);
+  const techStack = useSelector((s: RootState) => s.techStack.items);
   const experience = useSelector((s: RootState) => s.experience.items);
   const services = useSelector((s: RootState) => s.services.items);
   const { profile } = useSelector((s: RootState) => s.profile);
@@ -91,18 +91,18 @@ export default function DashboardPage() {
 
   useEffect(() => {
     dispatch(fetchProjects());
-    dispatch(fetchSkills());
+    dispatch(fetchTechStack());
     dispatch(fetchExperience());
     dispatch(fetchServices());
     dispatch(fetchProfile());
   }, [dispatch]);
 
   const featuredProjects = Array.isArray(projects) ? projects.filter((p) => p.featured) : [];
-  const skillCategories = Array.isArray(skills) ? [...new Set(skills.map((s) => s.category))] : [];
+  const skillCategories = Array.isArray(techStack) ? [...new Set(techStack.map((s) => s.category))] : [];
 
   const quickActions = [
     { label: 'Add Project', path: '/projects', color: '#7c6af7' },
-    { label: 'Add Skill', path: '/skills', color: '#22d3ee' },
+    { label: 'Add Tech Stack', path: '/tech-stack', color: '#22d3ee' },
     { label: 'Add Experience', path: '/experience', color: '#10b981' },
     { label: 'Edit Profile', path: '/profile', color: '#f59e0b' },
   ];
@@ -144,7 +144,7 @@ export default function DashboardPage() {
             Welcome back, {profile.name?.split(' ')[0] || 'Admin'} 👋
           </Typography>
           <Typography variant="body2" sx={{ color: theme.palette.text.secondary, maxWidth: 480 }}>
-            Manage your portfolio content from here. Update projects, skills, experience, and more.
+            Manage your portfolio content from here. Update projects, tech stack, experience, and more.
           </Typography>
           <Box sx={{ display: 'flex', gap: 2, mt: 3, flexWrap: 'wrap' }}>
             {quickActions.map((a) => (
@@ -181,12 +181,12 @@ export default function DashboardPage() {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
-            title="Skills"
-                        count={Array.isArray(skills) ? skills.length : 0}
+            title="Tech Stack"
+            count={Array.isArray(techStack) ? techStack.length : 0}
             icon={<SkillsIcon />}
             color="#22d3ee"
             bgColor="rgba(34,211,238,0.15)"
-            path="/skills"
+            path="/tech-stack"
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
@@ -261,14 +261,14 @@ export default function DashboardPage() {
           </Paper>
         </Grid>
 
-        {/* Skills by Category */}
+        {/* Tech Stack Overview */}
         <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Skills Overview
+                Tech Stack Overview
               </Typography>
-              <Button size="small" endIcon={<ArrowIcon />} onClick={() => navigate('/skills')}
+              <Button size="small" endIcon={<ArrowIcon />} onClick={() => navigate('/tech-stack')}
                 sx={{ color: '#22d3ee' }}>
                 Manage
               </Button>
@@ -276,16 +276,16 @@ export default function DashboardPage() {
             {skillCategories.length === 0 ? (
               <Box sx={{ textAlign: 'center', py: 4, color: '#4a5568' }}>
                 <SkillsIcon sx={{ fontSize: 40, mb: 1 }} />
-                <Typography variant="body2">No skills added yet</Typography>
-                <Button size="small" sx={{ mt: 1, color: '#22d3ee' }} onClick={() => navigate('/skills')}>
-                  Add skills →
+                <Typography variant="body2">No tech stack items added yet</Typography>
+                <Button size="small" sx={{ mt: 1, color: '#22d3ee' }} onClick={() => navigate('/tech-stack')}>
+                  Add items →
                 </Button>
               </Box>
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {skillCategories.map((cat) => {
-                  const count = skills.filter((s) => s.category === cat).length;
-                  const pct = Math.round((count / skills.length) * 100);
+                  const count = techStack.filter((s) => s.category === cat).length;
+                  const pct = Math.round((count / techStack.length) * 100);
                   return (
                     <Box key={cat}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
@@ -293,7 +293,7 @@ export default function DashboardPage() {
                           {cat}
                         </Typography>
                         <Typography variant="caption" sx={{ color: '#64748b' }}>
-                          {count} skills
+                          {count} items
                         </Typography>
                       </Box>
                       <LinearProgress
