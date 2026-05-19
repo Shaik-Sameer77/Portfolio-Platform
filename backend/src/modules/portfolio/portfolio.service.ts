@@ -3,11 +3,16 @@ import { BlogService } from '../blog/blog.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { UpdateSocialLinksDto } from './dto/update-social-links.dto.js';
+import { UpdateAboutSectionDto } from './dto/update-about-section.dto.js';
 
 import { CreateProjectDto } from './dto/create-project.dto.js';
 import { UpdateProjectDto } from './dto/update-project.dto.js';
 import { CreateExperienceDto } from './dto/create-experience.dto.js';
+import { UpdateExperienceDto } from './dto/update-experience.dto.js';
 import { CreateEducationDto } from './dto/create-education.dto.js';
+import { UpdateEducationDto } from './dto/update-education.dto.js';
+import { CreateCertificationDto } from './dto/create-certification.dto.js';
+import { UpdateCertificationDto } from './dto/update-certification.dto.js';
 import { CreateServiceDto } from './dto/create-service.dto.js';
 import { UpdateServiceDto } from './dto/update-service.dto.js';
 import { CreateDeveloperToolDto } from './dto/create-developer-tool.dto.js';
@@ -127,18 +132,24 @@ export class PortfolioService {
 
   async getExperience() {
     return this.prisma.experience.findMany({
-      orderBy: { startDate: 'desc' },
+      orderBy: { order: 'asc' },
     });
   }
 
   async createExperience(dto: CreateExperienceDto) {
-    return this.prisma.experience.create({
-      data: {
-        ...dto,
-        startDate: new Date(dto.startDate),
-        endDate: dto.endDate ? new Date(dto.endDate) : null,
-      },
-    });
+    return this.prisma.experience.create({ data: dto });
+  }
+
+  async updateExperience(id: number, dto: UpdateExperienceDto) {
+    const existing = await this.prisma.experience.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Experience #${id} not found`);
+    return this.prisma.experience.update({ where: { id }, data: dto });
+  }
+
+  async deleteExperience(id: number) {
+    const existing = await this.prisma.experience.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Experience #${id} not found`);
+    return this.prisma.experience.delete({ where: { id } });
   }
 
   // ─── Education ────────────────────────────────────────────────────────────
@@ -151,6 +162,42 @@ export class PortfolioService {
 
   async createEducation(dto: CreateEducationDto) {
     return this.prisma.education.create({ data: dto });
+  }
+
+  async updateEducation(id: number, dto: UpdateEducationDto) {
+    const existing = await this.prisma.education.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Education #${id} not found`);
+    return this.prisma.education.update({ where: { id }, data: dto });
+  }
+
+  async deleteEducation(id: number) {
+    const existing = await this.prisma.education.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Education #${id} not found`);
+    return this.prisma.education.delete({ where: { id } });
+  }
+
+  // ─── Certifications ───────────────────────────────────────────────────────
+
+  async getCertifications() {
+    return this.prisma.certification.findMany({
+      orderBy: { order: 'asc' },
+    });
+  }
+
+  async createCertification(dto: CreateCertificationDto) {
+    return this.prisma.certification.create({ data: dto });
+  }
+
+  async updateCertification(id: number, dto: UpdateCertificationDto) {
+    const existing = await this.prisma.certification.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Certification #${id} not found`);
+    return this.prisma.certification.update({ where: { id }, data: dto });
+  }
+
+  async deleteCertification(id: number) {
+    const existing = await this.prisma.certification.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException(`Certification #${id} not found`);
+    return this.prisma.certification.delete({ where: { id } });
   }
 
   // ─── Services ─────────────────────────────────────────────────────────────
@@ -282,6 +329,37 @@ export class PortfolioService {
     const existing = await this.prisma.techStack.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException(`TechStack #${id} not found`);
     return this.prisma.techStack.delete({ where: { id } });
+  }
+
+  // ─── About Section (single-row upsert) ────────────────────────────────────
+
+  async getAboutSection() {
+    let about = await this.prisma.aboutSection.findFirst();
+    // Seed default content if none exists
+    if (!about) {
+      about = await this.prisma.aboutSection.create({
+        data: {
+          title: "I'm Sameer, a full-stack engineer.",
+          subtitle: "I build event-driven backends and the polished interfaces that sit on top of them.",
+          storyTitle: "How I got here",
+          storyText: "I started writing code because I wanted to make small, useful things. That hasn't really changed — the things just got bigger.\n\nToday I work across NestJS, Next.js, and the messy parts in between: contracts, queues, deploys, and the operational story behind a product.",
+          beyondTitle: "A camera, mostly.",
+          beyondText: "Outside of building software, I take photos — quiet streets, light through buildings, the road. It keeps me looking at things instead of through them."
+        }
+      });
+    }
+    return about;
+  }
+
+  async updateAboutSection(dto: UpdateAboutSectionDto) {
+    const existing = await this.prisma.aboutSection.findFirst();
+    if (existing) {
+      return this.prisma.aboutSection.update({
+        where: { id: existing.id },
+        data: dto,
+      });
+    }
+    return this.prisma.aboutSection.create({ data: dto });
   }
 }
 

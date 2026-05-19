@@ -3,6 +3,7 @@ import authReducer from './features/authSlice';
 import projectsReducer from './features/projectsSlice';
 import experienceReducer from './features/experienceSlice';
 import educationReducer from './features/educationSlice';
+import certificationReducer from './features/certificationSlice';
 import servicesReducer from './features/servicesSlice';
 import profileReducer from './features/profileSlice';
 import themeReducer from './features/themeSlice';
@@ -14,6 +15,7 @@ export const store = configureStore({
     projects: projectsReducer,
     experience: experienceReducer,
     education: educationReducer,
+    certification: certificationReducer,
     services: servicesReducer,
     profile: profileReducer,
     theme: themeReducer,

@@ -1,13 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { getTechStack, type TechStackItem } from "@/services/portfolio-service";
+import { type TechStackItem } from "@/services/portfolio-service";
 
 const defaultTechStack: Partial<TechStackItem>[] = [
   { name: "Next.js", slug: "nextdotjs" },
   { name: "React", slug: "react" },
+  {name:"redux",slug:"redux"},
   { name: "TypeScript", slug: "typescript" },
   { name: "Node.js", slug: "nodedotjs" },
+  {name:"Express.js",slug:"express"},
   { name: "NestJS", slug: "nestjs" },
   { name: "PostgreSQL", slug: "postgresql" },
   { name: "Prisma", slug: "prisma" },
@@ -18,28 +20,12 @@ const defaultTechStack: Partial<TechStackItem>[] = [
   { name: "Tailwind", slug: "tailwindcss" },
   { name: "Framer", slug: "framer" },
   { name: "Git", slug: "git" },
-  { name: "Vercel", slug: "vercel" },
+  { name: "Vercel", slug: "vercel" }
 ];
 
 export const TechMarquee = () => {
-  const [stackItems, setStackItems] = useState<Partial<TechStackItem>[]>(defaultTechStack);
-
-  useEffect(() => {
-    const fetchStack = async () => {
-      try {
-        const items = await getTechStack();
-        if (items && items.length > 0) {
-          setStackItems(items);
-        }
-      } catch (error) {
-        console.warn("Failed to fetch tech stack from API, using defaults:", error);
-      }
-    };
-    fetchStack();
-  }, []);
-
   // Duplicate the list to create a seamless loop
-  const duplicatedStack = [...stackItems, ...stackItems];
+  const duplicatedStack = [...defaultTechStack, ...defaultTechStack];
 
   return (
     <div className="relative w-screen mx-[calc(-50vw+50%)] overflow-hidden border-y border-border/50 bg-surface/30 py-8 backdrop-blur-sm">

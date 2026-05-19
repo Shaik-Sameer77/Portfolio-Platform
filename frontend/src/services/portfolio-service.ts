@@ -72,6 +72,17 @@ export const mapProjectToUI = (p: Project) => ({
 });
 
 export const getProfile = () => ApiService.get<Profile>('/portfolio/profile');
+export interface AboutSection {
+  id: number;
+  title: string;
+  subtitle: string;
+  storyTitle: string;
+  storyText: string;
+  beyondTitle: string;
+  beyondText: string;
+  imageUrl?: string;
+}
+export const getAboutSection = () => ApiService.get<AboutSection>('/portfolio/about-section');
 export const getStats = () => ApiService.get<Stat[]>('/portfolio/stats');
 export const getProjects = async () => {
   const projects = await ApiService.get<Project[]>('/portfolio/projects');
@@ -101,3 +112,37 @@ export interface TechStackItem {
 
 export const getTechStack = () => ApiService.get<TechStackItem[]>('/portfolio/tech-stack');
 
+export interface Experience {
+  id: number;
+  company: string;
+  role: string;
+  startDate: string;
+  endDate?: string;
+  current: boolean;
+  bullets: string[];
+  stack: string[];
+  order: number;
+}
+
+export const getExperience = () => ApiService.get<Experience[]>('/portfolio/experience');
+
+export interface Education {
+  id: number;
+  institution: string;
+  degree: string;
+  startYear: number;
+  endYear?: number;
+}
+
+export const getEducation = () => ApiService.get<Education[]>('/portfolio/education');
+
+export interface Certification {
+  id: number;
+  name: string;
+  issuer: string;
+  date?: string;
+  url?: string;
+  order: number;
+}
+
+export const getCertifications = () => ApiService.get<Certification[]>('/portfolio/certifications');

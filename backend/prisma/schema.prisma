@@ -73,13 +73,15 @@ model Project {
 }
 
 model Experience {
-  id          Int       @id @default(autoincrement())
-  company     String
-  role        String
-  startDate   DateTime
-  endDate     DateTime?
-  current     Boolean   @default(false)
-  description String
+  id        Int      @id @default(autoincrement())
+  company   String
+  role      String
+  startDate String
+  endDate   String?
+  current   Boolean  @default(false)
+  bullets   String[]
+  stack     String[]
+  order     Int      @default(0)
 }
 
 model Education {
@@ -88,6 +90,15 @@ model Education {
   degree      String
   startYear   Int
   endYear     Int?
+}
+
+model Certification {
+  id        Int      @id @default(autoincrement())
+  name      String
+  issuer    String
+  date      String?
+  url       String?
+  order     Int      @default(0)
 }
 
 // ─── Extended sections ─────────────────────────────────────────────────────────
@@ -210,4 +221,16 @@ model ApiLog {
   responseBody String?  @db.Text
   userId       Int?
   createdAt    DateTime @default(now())
+}
+
+model AboutSection {
+  id          Int      @id @default(autoincrement())
+  title       String?  @db.Text
+  subtitle    String?  @db.Text
+  storyTitle  String?  @db.Text
+  storyText   String?  @db.Text
+  beyondTitle String?  @db.Text
+  beyondText  String?  @db.Text
+  imageUrl    String?  @db.Text
+  updatedAt   DateTime @updatedAt
 }

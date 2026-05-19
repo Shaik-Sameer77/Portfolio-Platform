@@ -44,7 +44,7 @@ export const Navbar = () => {
           scrolled ? "bg-background/90 backdrop-blur-xl border-b border-border" : "bg-background/40 backdrop-blur-md"
         }`}
       >
-      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-6 md:px-10">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 md:px-10">
         {/* Logo */}
         <Link href="/" className="text-base font-semibold tracking-tight text-foreground">
           {profile.handle}
@@ -86,7 +86,7 @@ export const Navbar = () => {
         </nav>
 
         {/* Right side */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
           {mounted && (
             <button
               onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
@@ -106,7 +106,7 @@ export const Navbar = () => {
           <span className="hidden h-5 w-px bg-border md:block" />
           <Link
             href="/contact"
-            className="inline-flex items-center rounded-full border border-border bg-surface px-3.5 py-1.5 text-base font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-primary/10"
+            className="inline-flex items-center whitespace-nowrap rounded-full border border-border bg-surface px-3.5 py-1.5 text-base font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-primary/10"
           >
             Let's talk
           </Link>
@@ -142,20 +142,30 @@ export const Navbar = () => {
                 </button>
               </div>
               <div className="mt-8 space-y-6 overflow-auto">
-                <Section title="Portfolio" links={[
-                  { label: "Home", href: "/" },
-                  { label: "About", href: "/about" },
-                  { label: "Experience", href: "/experience" },
-                  { label: "Projects", href: "/projects" },
-                  { label: "Tech stack", href: "/stack" },
-                ]} />
+                <Section 
+                  title="Portfolio" 
+                  onItemClick={() => setDrawer(false)}
+                  links={[
+                    { label: "Home", href: "/" },
+                    { label: "About", href: "/about" },
+                    { label: "Experience", href: "/experience" },
+                    { label: "Education", href: "/education" },
+                    { label: "Projects", href: "/projects" },
+                    { label: "Tech stack", href: "/stack" },
+                    { label: "Uses", href: "/uses" },
+                  ]} 
+                />
                 <div className="h-px bg-border" />
-                <Section title="More" links={[
-                  { label: "Blog", href: "/blog" },
-                  { label: "Services", href: "/services" },
-                  { label: "Developer tools", href: "/tools" },
-                  { label: "Gallery", href: "/gallery" },
-                ]} />
+                <Section 
+                  title="More" 
+                  onItemClick={() => setDrawer(false)}
+                  links={[
+                    { label: "Blog", href: "/blog" },
+                    { label: "Services", href: "/services" },
+                    { label: "Developer tools", href: "/tools" },
+                    { label: "Gallery", href: "/gallery" },
+                  ]} 
+                />
                 <div className="h-px bg-border" />
               </div>
 
@@ -173,12 +183,25 @@ export const Navbar = () => {
   );
 };
 
-const Section = ({ title, links }: { title: string; links: { label: string; href: string }[] }) => (
+const Section = ({ 
+  title, 
+  links, 
+  onItemClick 
+}: { 
+  title: string; 
+  links: { label: string; href: string }[]; 
+  onItemClick?: () => void;
+}) => (
   <div>
     <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">{title}</div>
     <div className="flex flex-col">
       {links.map((l) => (
-        <Link key={l.href} href={l.href} className="rounded-md px-2 py-2 text-base text-foreground/90 hover:bg-surface">
+        <Link 
+          key={l.href} 
+          href={l.href} 
+          onClick={onItemClick}
+          className="rounded-md px-2 py-2 text-base text-foreground/90 hover:bg-surface"
+        >
           {l.label}
         </Link>
       ))}

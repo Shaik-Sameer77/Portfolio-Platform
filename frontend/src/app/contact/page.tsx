@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { Mail, Clock } from "lucide-react";
+import { Mail, Clock, ChevronDown } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { profile } from "@/data/mock";
 import { AvailabilityBadge } from "@/components/AvailabilityBadge";
 import { toast } from "sonner";
@@ -20,6 +21,24 @@ const subjects = ["Job opportunity", "Freelance project", "Just saying hi", "Oth
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", subject: subjects[0], message: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isOpen, setIsOpen] = useState(false);
+  const selectRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setIsOpen(false);
+    }
+  };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,9 +87,52 @@ export default function Contact() {
             <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="input" />
           </Field>
           <Field label="Subject">
-            <select value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className="input">
-              {subjects.map((s) => <option key={s}>{s}</option>)}
-            </select>
+            <div ref={selectRef} className="relative w-full" onKeyDown={handleKeyDown}>
+              <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className={`input flex items-center justify-between text-left transition-all duration-200 ${
+                  isOpen ? "border-primary ring-1 ring-primary/20" : ""
+                }`}
+              >
+                <span>{form.subject}</span>
+                <ChevronDown
+                  className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+                    isOpen ? "rotate-180 text-primary" : ""
+                  }`}
+                />
+              </button>
+
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    className="absolute left-0 right-0 mt-2 rounded-lg border border-border bg-surface-2 p-1 shadow-2xl z-50"
+                  >
+                    {subjects.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => {
+                          setForm({ ...form, subject: s });
+                          setIsOpen(false);
+                        }}
+                        className={`w-full rounded-md px-3.5 py-2 text-left text-sm transition-all duration-150 ${
+                          form.subject === s
+                            ? "bg-primary text-primary-foreground font-medium"
+                            : "text-foreground hover:bg-surface"
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </Field>
           <Field label="Message" error={errors.message}>
             <textarea rows={6} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="input resize-none" />

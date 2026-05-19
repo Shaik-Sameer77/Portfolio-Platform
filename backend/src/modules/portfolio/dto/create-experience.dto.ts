@@ -1,30 +1,41 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsArray, IsInt } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateExperienceDto {
-  @ApiProperty({ example: 'Google' })
+  @ApiProperty()
   @IsString()
   company: string;
 
-  @ApiProperty({ example: 'Software Engineer' })
+  @ApiProperty()
   @IsString()
   role: string;
 
-  @ApiProperty({ example: '2023-06-01' })
-  @IsDateString()
+  @ApiProperty()
+  @IsString()
   startDate: string;
 
-  @ApiPropertyOptional({ example: '2024-12-31' })
+  @ApiProperty({ required: false })
   @IsOptional()
-  @IsDateString()
+  @IsString()
   endDate?: string;
 
-  @ApiPropertyOptional({ example: false })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsBoolean()
   current?: boolean;
 
-  @ApiProperty({ example: 'Built microservices architecture for analytics pipeline...' })
-  @IsString()
-  description: string;
+  @ApiProperty({ type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  bullets: string[];
+
+  @ApiProperty({ type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  stack: string[];
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsInt()
+  order?: number;
 }

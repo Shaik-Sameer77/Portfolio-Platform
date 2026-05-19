@@ -14,14 +14,14 @@ import DashboardPage from './pages/DashboardPage';
 import ProjectsPage from './pages/ProjectsPage';
 
 import HeroPage from './pages/HeroPage';
+import AboutPage from './pages/AboutPage';
 import BlogsPage from './pages/BlogsPage';
 import BlogEditorPage from './pages/BlogEditorPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 import ApiLogsPage from './pages/ApiLogsPage';
 import TechStackPage from './pages/TechStackPage';
-
-
-
+import ExperiencePage from './pages/ExperiencePage';
+import EducationPage from './pages/EducationPage';
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -66,6 +66,14 @@ function App() {
           </ProtectedRoute>
         } />
 
+        <Route path="/portfolio/about" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <AboutPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
         <Route path="/projects" element={
           <ProtectedRoute>
             <AdminLayout>
@@ -74,7 +82,21 @@ function App() {
           </ProtectedRoute>
         } />
 
+        <Route path="/experience" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <ExperiencePage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
 
+        <Route path="/education" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <EducationPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
 
         <Route path="/tech-stack" element={
           <ProtectedRoute>

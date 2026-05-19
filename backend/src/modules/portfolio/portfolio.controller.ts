@@ -12,11 +12,16 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PortfolioService } from './portfolio.service.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { UpdateSocialLinksDto } from './dto/update-social-links.dto.js';
+import { UpdateAboutSectionDto } from './dto/update-about-section.dto.js';
 
 import { CreateProjectDto } from './dto/create-project.dto.js';
 import { UpdateProjectDto } from './dto/update-project.dto.js';
 import { CreateExperienceDto } from './dto/create-experience.dto.js';
+import { UpdateExperienceDto } from './dto/update-experience.dto.js';
 import { CreateEducationDto } from './dto/create-education.dto.js';
+import { UpdateEducationDto } from './dto/update-education.dto.js';
+import { CreateCertificationDto } from './dto/create-certification.dto.js';
+import { UpdateCertificationDto } from './dto/update-certification.dto.js';
 import { CreateServiceDto } from './dto/create-service.dto.js';
 import { UpdateServiceDto } from './dto/update-service.dto.js';
 import { CreateDeveloperToolDto } from './dto/create-developer-tool.dto.js';
@@ -138,6 +143,21 @@ export class PortfolioController {
     return this.portfolioService.createExperience(dto);
   }
 
+  @Patch('experience/:id')
+  @ApiOperation({ summary: 'Update an experience entry (admin)' })
+  updateExperience(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateExperienceDto,
+  ) {
+    return this.portfolioService.updateExperience(id, dto);
+  }
+
+  @Delete('experience/:id')
+  @ApiOperation({ summary: 'Delete an experience entry (admin)' })
+  deleteExperience(@Param('id', ParseIntPipe) id: number) {
+    return this.portfolioService.deleteExperience(id);
+  }
+
   // ─── Education ────────────────────────────────────────────────────────────
 
   @Get('education')
@@ -150,6 +170,50 @@ export class PortfolioController {
   @ApiOperation({ summary: 'Add an education entry (admin)' })
   createEducation(@Body() dto: CreateEducationDto) {
     return this.portfolioService.createEducation(dto);
+  }
+
+  @Patch('education/:id')
+  @ApiOperation({ summary: 'Update an education entry (admin)' })
+  updateEducation(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateEducationDto,
+  ) {
+    return this.portfolioService.updateEducation(id, dto);
+  }
+
+  @Delete('education/:id')
+  @ApiOperation({ summary: 'Delete an education entry (admin)' })
+  deleteEducation(@Param('id', ParseIntPipe) id: number) {
+    return this.portfolioService.deleteEducation(id);
+  }
+
+  // ─── Certifications ───────────────────────────────────────────────────────
+
+  @Get('certifications')
+  @ApiOperation({ summary: 'List all certifications (public)' })
+  getCertifications() {
+    return this.portfolioService.getCertifications();
+  }
+
+  @Post('certifications')
+  @ApiOperation({ summary: 'Add a certification (admin)' })
+  createCertification(@Body() dto: CreateCertificationDto) {
+    return this.portfolioService.createCertification(dto);
+  }
+
+  @Patch('certifications/:id')
+  @ApiOperation({ summary: 'Update a certification (admin)' })
+  updateCertification(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCertificationDto,
+  ) {
+    return this.portfolioService.updateCertification(id, dto);
+  }
+
+  @Delete('certifications/:id')
+  @ApiOperation({ summary: 'Delete a certification (admin)' })
+  deleteCertification(@Param('id', ParseIntPipe) id: number) {
+    return this.portfolioService.deleteCertification(id);
   }
 
   // ─── Services ─────────────────────────────────────────────────────────────
@@ -295,6 +359,20 @@ export class PortfolioController {
   @ApiOperation({ summary: 'Delete a tech stack item (admin)' })
   deleteTechStack(@Param('id', ParseIntPipe) id: number) {
     return this.portfolioService.deleteTechStack(id);
+  }
+
+  // ─── About Section ────────────────────────────────────────────────────────
+
+  @Get('about-section')
+  @ApiOperation({ summary: 'Get about section data (public)' })
+  getAboutSection() {
+    return this.portfolioService.getAboutSection();
+  }
+
+  @Patch('about-section')
+  @ApiOperation({ summary: 'Update about section data (admin)' })
+  updateAboutSection(@Body() dto: UpdateAboutSectionDto) {
+    return this.portfolioService.updateAboutSection(dto);
   }
 }
 

@@ -14,6 +14,16 @@ export interface Profile {
   availableForWork?: boolean;
 }
 
+export interface AboutSection {
+  title?: string;
+  subtitle?: string;
+  storyTitle?: string;
+  storyText?: string;
+  beyondTitle?: string;
+  beyondText?: string;
+  imageUrl?: string;
+}
+
 export interface Stat {
   id: number;
   label: string;
@@ -31,6 +41,7 @@ export interface SocialLinks {
 interface ProfileState {
   profile: Profile;
   socialLinks: SocialLinks;
+  about: AboutSection;
   stats: Stat[];
   loading: boolean;
   error: string | null;
@@ -39,23 +50,35 @@ interface ProfileState {
 const initialState: ProfileState = {
   profile: {},
   socialLinks: {},
+  about: {},
   stats: [],
   loading: false,
   error: null,
 };
 
 export const fetchProfile = createAsyncThunk('profile/fetch', async () => {
-  const [profileRes, socialRes, statsRes] = await Promise.all([
+  const [profileRes, socialRes, statsRes, aboutRes] = await Promise.all([
     api.get('/portfolio/profile'),
     api.get('/portfolio/social-links'),
     api.get('/portfolio/stats'),
+    api.get('/portfolio/about-section').catch(() => ({ data: {} })),
   ]);
-  return { profile: profileRes.data, socialLinks: socialRes.data, stats: statsRes.data };
+  return { 
+    profile: profileRes.data, 
+    socialLinks: socialRes.data, 
+    stats: statsRes.data,
+    about: aboutRes.data
+  };
 });
 
 export const updateProfile = createAsyncThunk('profile/update', async (data: Profile) => {
   const res = await api.patch('/portfolio/profile', data);
   return res.data as Profile;
+});
+
+export const updateAboutSection = createAsyncThunk('profile/updateAbout', async (data: AboutSection) => {
+  const res = await api.patch('/portfolio/about-section', data);
+  return res.data as AboutSection;
 });
 
 export const updateSocialLinks = createAsyncThunk('profile/updateSocial', async (data: SocialLinks) => {
@@ -85,9 +108,11 @@ const profileSlice = createSlice({
         s.profile = a.payload.profile;
         s.socialLinks = a.payload.socialLinks;
         s.stats = a.payload.stats;
+        s.about = a.payload.about;
       })
       .addCase(fetchProfile.rejected, (s, a) => { s.loading = false; s.error = a.error.message ?? 'Error'; })
       .addCase(updateProfile.fulfilled, (s, a) => { s.profile = a.payload; })
+      .addCase(updateAboutSection.fulfilled, (s, a) => { s.about = a.payload; })
       .addCase(updateSocialLinks.fulfilled, (s, a) => { s.socialLinks = a.payload; })
       .addCase(createStat.fulfilled, (s, a) => { s.stats.push(a.payload); })
       .addCase(deleteStat.fulfilled, (s, a) => { s.stats = s.stats.filter(st => st.id !== a.payload); });
