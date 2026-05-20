@@ -295,3 +295,14 @@
     cursor: none !important;
   }
 }
+
+/* Splash visited helper to hide the full screen loader instantly on initial render pass */
+.splash-visited .splash-overlay {
+  display: none !important;
+}
+
+/* Hide header and footer completely on the very first load until the splash screen is finished */
+html:not(.splash-visited) header,
+html:not(.splash-visited) footer {
+  display: none !important;
+}

@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,6 +35,21 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} antialiased cursor-none`}
       suppressHydrationWarning
     >
+      <head>
+        <Script
+          id="splash-visited-script"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (sessionStorage.getItem('sameer_portfolio_visited') === 'true') {
+                  document.documentElement.classList.add('splash-visited');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <CustomCursor />

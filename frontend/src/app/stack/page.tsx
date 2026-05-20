@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { getTechStack, type TechStackItem } from "@/services/portfolio-service";
+import { DevLoader } from "@/components/DevLoader";
 
 const fallbackStack = {
   Frontend: [
@@ -78,15 +79,15 @@ export default function Stack() {
     return orderA - orderB;
   });
 
+  if (loading) {
+    return <DevLoader fullScreen={false} />;
+  }
+
   return (
     <>
       <PageHeader eyebrow="Tech stack" title="What I reach for." subtitle="Tools I use most. Updated as the stack evolves." />
       <div className="container-page pb-24 space-y-14">
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          </div>
-        ) : dynamicStack.length > 0 ? (
+        {dynamicStack.length > 0 ? (
           sortedDynamicCategories.map(([category, items]) => (
             <section key={category}>
               <h2 className="mb-4 text-sm uppercase tracking-wider text-muted-foreground">{category}</h2>

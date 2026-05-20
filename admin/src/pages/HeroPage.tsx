@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Box, Paper, Typography, Button, TextField, Grid,
+  Box, Typography, Button, TextField, Grid,
   CircularProgress, Alert, Card, CardContent,
   IconButton, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Dialog, DialogTitle, DialogContent,
@@ -19,7 +19,7 @@ import type { AppDispatch, RootState } from '../store';
 import api from '../api';
 import { 
   fetchProfile, updateProfile, createStat, deleteStat, 
-  type Profile, type Stat 
+  type Profile
 } from '../features/profileSlice';
 
 export default function HeroPage() {

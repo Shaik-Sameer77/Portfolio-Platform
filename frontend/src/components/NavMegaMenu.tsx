@@ -49,18 +49,38 @@ const Row = ({ item, muted = false, onSelect }: { item: Item; muted?: boolean; o
       </div>
     </div>
   );
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (item.title === "Resume") {
+      const hasResume = item.href && item.href.startsWith("http");
+      if (!hasResume) {
+        e.preventDefault();
+        alert("Resume isn't uploaded yet.");
+        onSelect();
+        return;
+      }
+    }
+    onSelect();
+  };
+
   if (item.external) {
     return (
-      <a href={item.href} target="_blank" rel="noreferrer" onClick={onSelect}>
+      <a href={item.href || "#"} target={item.href?.startsWith("http") ? "_blank" : undefined} rel="noreferrer" onClick={handleClick}>
         {inner}
       </a>
     );
   }
-  return <Link href={item.href} onClick={onSelect}>{inner}</Link>;
+  return <Link href={item.href} onClick={handleClick}>{inner}</Link>;
 };
 
-export const NavMegaMenu = ({ onClose }: { onClose: () => void }) => {
+export const NavMegaMenu = ({ onClose, resumeUrl }: { onClose: () => void; resumeUrl?: string }) => {
   const ref = useRef<HTMLDivElement>(null);
+  
+  const dynamicCol3 = [
+    { href: resumeUrl || "", title: "Resume", subtitle: "Download PDF", Icon: Download, external: true },
+    { href: "https://github.com/Shaik-Sameer77", title: "GitHub", subtitle: "github.com/Shaik-Sameer77", Icon: Github, external: true },
+    { href: "https://linkedin.com/in/shaik-sameer", title: "LinkedIn", subtitle: "Connect with me", Icon: Linkedin, external: true },
+  ];
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -96,7 +116,7 @@ export const NavMegaMenu = ({ onClose }: { onClose: () => void }) => {
         </div>
         <div className="rounded-lg bg-surface/60 p-1">
           <div className="px-3 pt-2 pb-1 text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Quick links</div>
-          {col3.map((i) => <Row key={i.title} item={i} muted onSelect={onClose} />)}
+          {dynamicCol3.map((i) => <Row key={i.title} item={i} muted onSelect={onClose} />)}
         </div>
       </div>
     </motion.div>

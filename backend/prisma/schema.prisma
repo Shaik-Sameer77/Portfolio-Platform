@@ -97,7 +97,7 @@ model Certification {
   name      String
   issuer    String
   date      String?
-  url       String?
+  imageUrl  String?
   order     Int      @default(0)
 }
 

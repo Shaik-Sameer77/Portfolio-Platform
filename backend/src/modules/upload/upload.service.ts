@@ -26,6 +26,23 @@ export class UploadService {
     });
   }
 
+  async uploadFile(file: Express.Multer.File, folder: string = 'resumes'): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { 
+          folder: `portfolio/${folder}`,
+          resource_type: 'auto',
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result!.secure_url);
+        },
+      );
+
+      streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
+  }
+
   async uploadImageFromUrl(url: string, folder: string = 'portfolio'): Promise<string> {
     try {
       const result = await cloudinary.uploader.upload(url, {

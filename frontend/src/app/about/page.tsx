@@ -7,6 +7,7 @@ import { Section } from "@/components/Section";
 import { Compass, Hammer, Camera } from "lucide-react";
 import { profile as mockProfile } from "@/data/mock";
 import { getProfile, getAboutSection, type Profile, type AboutSection } from "@/services/portfolio-service";
+import { DevLoader } from "@/components/DevLoader";
 
 const values = [
   { Icon: Compass, title: "Clarity over cleverness", text: "Boring code that's easy to change beats clever code that isn't." },
@@ -38,11 +39,7 @@ export default function About() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
+    return <DevLoader fullScreen={false} />;
   }
 
   const activeProfile = profileData || {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Toolbar, useMediaQuery, useTheme } from '@mui/material';
-import Sidebar, { DRAWER_WIDTH, COLLAPSED_WIDTH } from './Sidebar';
+import { Box, Toolbar, useTheme } from '@mui/material';
+import Sidebar from './Sidebar';
 import Header from './Header';
 
 interface AdminLayoutProps {
@@ -9,11 +9,8 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const drawerWidth = isCollapsed ? COLLAPSED_WIDTH : DRAWER_WIDTH;
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', background: theme.palette.background.default }}>

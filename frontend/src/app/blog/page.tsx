@@ -12,6 +12,7 @@ import {
   type Category,
 } from "@/services/portfolio-service";
 import { posts as mockPosts, type BlogPost } from "@/data/mock";
+import { DevLoader } from "@/components/DevLoader";
 
 export default function Blog() {
   const [q, setQ] = useState("");
@@ -81,11 +82,7 @@ export default function Blog() {
   );
 
   if (loading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
+    return <DevLoader fullScreen={false} />;
   }
 
   return (

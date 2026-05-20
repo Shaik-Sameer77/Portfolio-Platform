@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import ImageUpload from '../components/ImageUpload';
+import api from '../api';
 import {
   Box, Typography, Button, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, IconButton, Dialog, DialogTitle,
@@ -28,14 +30,16 @@ export default function EducationPage() {
   const { items: certItems, loading: certLoading } = useSelector((state: RootState) => state.certification);
   const [certOpen, setCertOpen] = useState(false);
   const [editingCert, setEditingCert] = useState<Certification | null>(null);
-  const [certForm, setCertForm] = useState({ name: '', issuer: '', date: '', url: '', order: 0 });
+  const [certForm, setCertForm] = useState({ name: '', issuer: '', date: '', imageUrl: '', order: 0 });
+  const [certFile, setCertFile] = useState<File | null>(null);
+  const [certSaving, setCertSaving] = useState(false);
 
   useEffect(() => {
     dispatch(fetchEducation());
     dispatch(fetchCertifications());
   }, [dispatch]);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
   };
 
@@ -72,21 +76,43 @@ export default function EducationPage() {
     if (cert) {
       setEditingCert(cert);
       setCertForm({
-        name: cert.name, issuer: cert.issuer, date: cert.date || '', url: cert.url || '', order: cert.order
+        name: cert.name, issuer: cert.issuer, date: cert.date || '', imageUrl: cert.imageUrl || '', order: cert.order
       });
+      setCertFile(null);
     } else {
       setEditingCert(null);
-      setCertForm({ name: '', issuer: '', date: '', url: '', order: 0 });
+      setCertForm({ name: '', issuer: '', date: '', imageUrl: '', order: 0 });
+      setCertFile(null);
     }
     setCertOpen(true);
   };
 
-  const handleSaveCert = () => {
-    if (editingCert) {
-      dispatch(updateCertification({ id: editingCert.id, data: certForm }));
-    } else {
-      dispatch(createCertification(certForm));
+  const handleSaveCert = async () => {
+    setCertSaving(true);
+    let imageUrl = certForm.imageUrl;
+
+    if (certFile) {
+      try {
+        const formData = new FormData();
+        formData.append('file', certFile);
+        formData.append('folder', 'certifications');
+        const uploadRes = await api.post('/upload/image', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        imageUrl = uploadRes.data.url;
+      } catch (err) {
+        console.error('Failed to upload certification image', err);
+      }
     }
+
+    const payload = { ...certForm, imageUrl };
+
+    if (editingCert) {
+      await dispatch(updateCertification({ id: editingCert.id, data: payload }));
+    } else {
+      await dispatch(createCertification(payload));
+    }
+    setCertSaving(false);
     setCertOpen(false);
   };
 
@@ -216,7 +242,17 @@ export default function EducationPage() {
               <TextField fullWidth label="Date (e.g. Sep 2024)" value={certForm.date} onChange={(e) => setCertForm({ ...certForm, date: e.target.value })} />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <TextField fullWidth label="Credential URL" value={certForm.url} onChange={(e) => setCertForm({ ...certForm, url: e.target.value })} />
+              <ImageUpload
+                label="Certification Image"
+                folder="certifications"
+                value={certForm.imageUrl}
+                deferred={true}
+                onUploadSuccess={(url) => setCertForm({ ...certForm, imageUrl: url })}
+                onFileSelect={(file, preview) => {
+                  setCertForm({ ...certForm, imageUrl: preview });
+                  setCertFile(file);
+                }}
+              />
             </Grid>
             <Grid size={{ xs: 12 }}>
               <TextField fullWidth type="number" label="Order" value={certForm.order} onChange={(e) => setCertForm({ ...certForm, order: parseInt(e.target.value) || 0 })} />
@@ -225,7 +261,9 @@ export default function EducationPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCertOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSaveCert}>Save</Button>
+          <Button variant="contained" onClick={handleSaveCert} disabled={certSaving}>
+            {certSaving ? <CircularProgress size={20} color="inherit" /> : 'Save'}
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

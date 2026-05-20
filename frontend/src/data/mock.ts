@@ -145,6 +145,12 @@ export const education = [
   { school: "JNTU Hyderabad", degree: "B.Tech, Computer Science", date: "2019 — 2023" },
 ];
 
+export const certifications = [
+  { name: "AWS Certified Developer - Associate", issuer: "Amazon Web Services", date: "Aug 2024", imageUrl: "/project_placeholder_1_1778503449199.png" },
+  { name: "HashiCorp Certified: Terraform Associate", issuer: "HashiCorp", date: "May 2024", imageUrl: "/project_placeholder_2_1778503465369.png" },
+  { name: "Stripe Certified Developer", issuer: "Stripe", date: "Jan 2025", imageUrl: "/project_placeholder_3_1778503481624.png" },
+];
+
 export const stack = {
   Frontend: ["Next.js", "React", "Tailwind CSS", "TypeScript", "Zustand", "Framer Motion"],
   Backend: ["NestJS", "Node.js", "Prisma", "REST APIs", "Kafka"],

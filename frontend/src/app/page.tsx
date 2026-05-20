@@ -8,6 +8,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { BlogCard } from "@/components/BlogCard";
 import { CTACard } from "@/components/CTACard";
 import { TechMarquee } from "@/components/TechMarquee";
+import { DevLoader } from "@/components/DevLoader";
 
 import { profile as mockProfile, projects as mockProjects, posts, stats as mockStats, stack } from "@/data/mock";
 import { getProfile, getStats, getProjects, type Profile, type Stat, type Project } from "@/services/portfolio-service";
@@ -20,6 +21,16 @@ export default function Home() {
   const [statsData, setStatsData] = useState<Stat[]>([]);
   const [projectsData, setProjectsData] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hasVisited = sessionStorage.getItem("sameer_portfolio_visited");
+      if (hasVisited === "true") {
+        setShowSplash(false);
+      }
+    }
+  }, []);
 
   // Mouse motion for parallax
   const mouseX = useMotionValue(0);
@@ -63,7 +74,15 @@ export default function Home() {
       } catch (error) {
         console.warn("Using mock data as fallback due to API error:", error);
       } finally {
-        setLoading(false);
+        if (typeof window !== "undefined" && !sessionStorage.getItem("sameer_portfolio_visited")) {
+          setTimeout(() => {
+            setLoading(false);
+            sessionStorage.setItem("sameer_portfolio_visited", "true");
+            document.documentElement.classList.add("splash-visited");
+          }, 3500);
+        } else {
+          setLoading(false);
+        }
       }
     };
     fetchData();
@@ -100,11 +119,7 @@ export default function Home() {
 
 
   if (loading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
+    return <DevLoader fullScreen={showSplash} />;
   }
 
   return (
@@ -218,7 +233,7 @@ export default function Home() {
             className="mt-12 grid grid-cols-2 gap-8 border-t border-border pt-8 md:grid-cols-4"
           >
             {activeStats.map((s) => (
-              <div key={s.id} className="group">
+              <div key={s.id} className="group text-center">
                 <div className="font-display text-3xl md:text-4xl font-bold tracking-tight transition-colors group-hover:text-primary">{s.value}</div>
                 <div className="mt-1 text-xs uppercase tracking-widest text-muted-foreground font-medium">{s.label}</div>
               </div>

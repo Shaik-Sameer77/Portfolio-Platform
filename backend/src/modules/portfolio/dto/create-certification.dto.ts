@@ -18,7 +18,7 @@ export class CreateCertificationDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  url?: string;
+  imageUrl?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

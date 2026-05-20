@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { experience as mockExperience, stack } from "@/data/mock";
 import { getExperience, type Experience as ApiExperience } from "@/services/portfolio-service";
+import { DevLoader } from "@/components/DevLoader";
 
 /* ─── Animated counter ──────────────────────────────────────────── */
 function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
@@ -85,11 +86,7 @@ export default function Experience() {
   }));
 
   if (loading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
+    return <DevLoader fullScreen={false} />;
   }
 
   return (

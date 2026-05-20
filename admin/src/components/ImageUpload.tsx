@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Box,
   Button,
-  TextField,
   Typography,
   Paper,
   CircularProgress,
@@ -26,7 +25,6 @@ interface ImageUploadProps {
 
 export default function ImageUpload({ onUploadSuccess, onFileSelect, folder, label, value, deferred }: ImageUploadProps) {
   const theme = useTheme();
-  const [tab, setTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   

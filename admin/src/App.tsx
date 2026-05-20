@@ -22,6 +22,7 @@ import ApiLogsPage from './pages/ApiLogsPage';
 import TechStackPage from './pages/TechStackPage';
 import ExperiencePage from './pages/ExperiencePage';
 import EducationPage from './pages/EducationPage';
+import ResumePage from './pages/ResumePage';
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -70,6 +71,14 @@ function App() {
           <ProtectedRoute>
             <AdminLayout>
               <AboutPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/portfolio/resume" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <ResumePage />
             </AdminLayout>
           </ProtectedRoute>
         } />

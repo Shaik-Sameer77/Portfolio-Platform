@@ -52,6 +52,41 @@ export class UploadController {
     return { url };
   }
 
+  @Post('pdf')
+  @ApiOperation({ summary: 'Upload a PDF/document to Cloudinary (returns URL)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        folder: {
+          type: 'string',
+          example: 'resumes',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadPdf(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
+          new FileTypeValidator({ fileType: '.(pdf|doc|docx)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body('folder') folder?: string,
+  ) {
+    const url = await this.uploadService.uploadFile(file, folder || 'resumes');
+    return { url };
+  }
+
   @Post('url')
   @ApiOperation({ summary: 'Upload an image via URL to Cloudinary' })
   @ApiBody({

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Typography, Button, Container, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { AutoAwesome as ComingSoonIcon, ArrowBack as BackIcon } from '@mui/icons-material';

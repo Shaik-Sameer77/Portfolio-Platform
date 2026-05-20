@@ -9,6 +9,7 @@ import { NavMegaMenu } from "./NavMegaMenu";
 import { useUIStore } from "@/store/useUIStore";
 import { useTheme } from "next-themes";
 import { profile } from "@/data/mock";
+import { getProfile, type Profile } from "@/services/portfolio-service";
 
 const navLinks = [
   { label: "Blog", href: "/blog" },
@@ -23,6 +24,7 @@ export const Navbar = () => {
   const pathname = usePathname();
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [profileData, setProfileData] = useState<Profile | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -33,9 +35,17 @@ export const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    getProfile()
+      .then((data) => setProfileData(data))
+      .catch((err) => console.warn("Failed to fetch profile in Navbar:", err));
+  }, []);
+
+  useEffect(() => {
     setMega(false);
     setDrawer(false);
   }, [pathname, setMega, setDrawer]);
+
+  const activeResumeUrl = profileData?.resumeUrl || profile.resumeUrl || "/resume.pdf";
 
   return (
     <>
@@ -81,7 +91,7 @@ export const Navbar = () => {
             );
           })}
           <AnimatePresence>
-            {megaOpen && <NavMegaMenu onClose={() => setMega(false)} />}
+            {megaOpen && <NavMegaMenu onClose={() => setMega(false)} resumeUrl={profileData?.resumeUrl || ""} />}
           </AnimatePresence>
         </nav>
 
@@ -169,12 +179,20 @@ export const Navbar = () => {
                 <div className="h-px bg-border" />
               </div>
 
-              <a
-                href={profile.resumeUrl}
-                className="mt-6 mb-4 inline-flex items-center gap-1 text-[15px] font-medium text-success hover:text-success/80"
+              <button
+                onClick={() => {
+                  const hasResume = typeof profileData?.resumeUrl === "string" && profileData.resumeUrl.startsWith("http");
+                  if (hasResume) {
+                    window.open(profileData.resumeUrl, "_blank", "noopener,noreferrer");
+                  } else {
+                    alert("Resume isn't uploaded yet.");
+                  }
+                  setDrawer(false);
+                }}
+                className="mt-6 mb-4 inline-flex items-center gap-1 text-[15px] font-medium text-success hover:text-success/80 text-left bg-transparent border-none cursor-pointer"
               >
                 Resume <span className="text-base font-normal">↓</span>
-              </a>
+              </button>
             </motion.aside>
           </>
         )}
