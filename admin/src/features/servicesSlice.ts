@@ -5,6 +5,7 @@ export interface Service {
   id: number;
   title: string;
   description: string;
+  includes?: string[];
   icon?: string;
   price?: number;
   currency?: string;

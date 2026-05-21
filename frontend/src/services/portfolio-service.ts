@@ -146,3 +146,17 @@ export interface Certification {
 }
 
 export const getCertifications = () => ApiService.get<Certification[]>('/portfolio/certifications');
+
+export interface Service {
+  id: number;
+  title: string;
+  description: string;
+  includes?: string[];
+  icon?: string;
+  price?: number;
+  currency?: string;
+  featured?: boolean;
+  order?: number;
+}
+
+export const getServices = () => ApiService.get<Service[]>('/portfolio/services');

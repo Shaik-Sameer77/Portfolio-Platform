@@ -104,14 +104,15 @@ model Certification {
 // ─── Extended sections ─────────────────────────────────────────────────────────
 
 model Service {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   title       String
   description String
+  includes    String[] @default([])
   icon        String?
   price       Float?
-  currency    String  @default("USD")
-  featured    Boolean @default(false)
-  order       Int     @default(0)
+  currency    String   @default("USD")
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
 }
 
 model DeveloperTool {

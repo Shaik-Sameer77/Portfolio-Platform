@@ -1,8 +1,12 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { Section } from "@/components/Section";
 import { Check } from "lucide-react";
-import { services } from "@/data/mock";
+import { services as mockServices } from "@/data/mock";
+import { getServices, type Service } from "@/services/portfolio-service";
 
 const faqs = [
   { q: "How do you usually start an engagement?", a: "A 30-minute call to understand the problem, then a short written proposal." },
@@ -11,42 +15,71 @@ const faqs = [
 ];
 
 export default function Services() {
+  const [servicesData, setServicesData] = useState<any[]>(mockServices);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const items = await getServices();
+        if (items && items.length > 0) {
+          setServicesData(items);
+        }
+      } catch (error) {
+        console.warn("Failed to fetch services from API, using fallback mock data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
   return (
     <>
       <PageHeader eyebrow="Services" title="How I can help you." subtitle="A few ways we can work together." />
       <div className="container-page pb-12">
         <div className="grid gap-6 md:grid-cols-2">
-          {services.map((s) => (
-            <div key={s.title} className="flex flex-col rounded-xl border border-border bg-surface p-6">
-              <h3 className="font-display text-xl font-semibold">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{s.description}</p>
-              <ul className="mt-5 space-y-2 text-sm">
-                {s.includes.map((i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-4 w-4 text-primary" />
-                    <span className="text-foreground/90">{i}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 flex items-center justify-between border-t border-border pt-5 mt-auto">
-                <span className="text-sm text-muted-foreground">{s.price}</span>
-                <Link href="/contact" className="rounded-full border border-border bg-background px-4 py-1.5 text-sm hover:border-primary/50">
-                  Get in touch
-                </Link>
+          {servicesData.map((s) => {
+            const isMock = !('id' in s);
+            const descText = s.description;
+            const includesList = s.includes || [];
+            
+            const priceText = isMock 
+              ? s.price 
+              : (s.price !== undefined && s.price !== null ? `${s.price} ${s.currency || 'USD'}` : 'Get in touch');
+
+            return (
+              <div key={s.title} className={`flex flex-col rounded-xl border border-border bg-surface p-6 ${!isMock && s.featured ? 'ring-2 ring-primary/50 shadow-sm' : ''}`}>
+                <h3 className="font-display text-xl font-semibold">{s.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{descText}</p>
+                <ul className="mt-5 space-y-2 text-sm">
+                  {includesList.map((i: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 text-primary shrink-0" />
+                      <span className="text-foreground/90">{i}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-6 flex items-center justify-between border-t border-border pt-5 mt-auto">
+                  <span className="text-sm text-muted-foreground font-medium">{priceText}</span>
+                  <Link href="/contact" className="rounded-full border border-border bg-background px-4 py-1.5 text-sm hover:border-primary/50 transition-colors">
+                    Get in touch
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
       <Section kicker="FAQ" title="Common questions">
         <div className="divide-y divide-border rounded-xl border border-border bg-surface">
           {faqs.map((f) => (
-            <details key={f.q} className="group p-5">
-              <summary className="flex items-center justify-between text-sm font-medium">
+            <details key={f.q} className="group">
+              <summary className="flex cursor-pointer items-center justify-between p-5 text-sm font-medium select-none">
                 {f.q}
                 <span className="text-muted-foreground group-open:rotate-45 transition-transform">+</span>
               </summary>
-              <p className="mt-3 text-sm text-muted-foreground">{f.a}</p>
+              <p className="px-5 pb-5 text-sm text-muted-foreground">{f.a}</p>
             </details>
           ))}
         </div>

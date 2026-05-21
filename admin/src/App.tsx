@@ -23,6 +23,7 @@ import TechStackPage from './pages/TechStackPage';
 import ExperiencePage from './pages/ExperiencePage';
 import EducationPage from './pages/EducationPage';
 import ResumePage from './pages/ResumePage';
+import ServicesPage from './pages/ServicesPage';
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -115,6 +116,13 @@ function App() {
           </ProtectedRoute>
         } />
 
+        <Route path="/services" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <ServicesPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
 
         <Route path="/blogs" element={
           <ProtectedRoute>

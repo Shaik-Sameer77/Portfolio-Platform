@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsArray, IsBoolean, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateServiceDto {
   @ApiProperty({ example: 'Full Stack Development' })
@@ -9,6 +9,12 @@ export class CreateServiceDto {
   @ApiProperty({ example: 'Custom web apps...' })
   @IsString()
   description: string;
+
+  @ApiPropertyOptional({ example: ['Next.js + NestJS apps', 'Auth, billing'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  includes?: string[];
 
   @ApiPropertyOptional({ example: 'code-xml' })
   @IsOptional()
