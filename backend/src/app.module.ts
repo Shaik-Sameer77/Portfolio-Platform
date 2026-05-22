@@ -8,6 +8,7 @@ import { UploadModule } from './modules/upload/upload.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { BlogModule } from './modules/blog/blog.module.js';
 import { ApiLogModule } from './modules/api-log/api-log.module.js';
+import { ProductModule } from './modules/product/product.module.js';
 import { DecryptMiddleware } from './common/middleware/decrypt.middleware.js';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
 
@@ -19,6 +20,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js
     AuthModule,
     BlogModule,
     ApiLogModule,
+    ProductModule,
   ],
   controllers: [AppController],
 

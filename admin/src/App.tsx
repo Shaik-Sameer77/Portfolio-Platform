@@ -24,6 +24,7 @@ import ExperiencePage from './pages/ExperiencePage';
 import EducationPage from './pages/EducationPage';
 import ResumePage from './pages/ResumePage';
 import ServicesPage from './pages/ServicesPage';
+import ProductsPage from './pages/ProductsPage';
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -120,6 +121,22 @@ function App() {
           <ProtectedRoute>
             <AdminLayout>
               <ServicesPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/ecommerce/products" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <ProductsPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/ecommerce/products/add" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <ProductsPage defaultOpenAdd={true} />
             </AdminLayout>
           </ProtectedRoute>
         } />

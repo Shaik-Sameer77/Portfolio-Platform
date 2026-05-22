@@ -2,11 +2,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, ChevronDown, Sun, Moon } from "lucide-react";
+import { Menu, X, ChevronDown, Sun, Moon, ShoppingCart, Trash2, Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AvailabilityBadge } from "./AvailabilityBadge";
 import { NavMegaMenu } from "./NavMegaMenu";
 import { useUIStore } from "@/store/useUIStore";
+import { useCartStore } from "@/store/useCartStore";
 import { useTheme } from "next-themes";
 import { profile } from "@/data/mock";
 import { getProfile, type Profile } from "@/services/portfolio-service";
@@ -14,7 +15,7 @@ import { getProfile, type Profile } from "@/services/portfolio-service";
 const navLinks = [
   { label: "Blog", href: "/blog" },
   { label: "Services", href: "/services" },
-  { label: "Tools", href: "/tools" },
+  { label: "Products", href: "/products" },
   { label: "Gallery", href: "/gallery" },
 ];
 
@@ -25,6 +26,9 @@ export const Navbar = () => {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [profileData, setProfileData] = useState<Profile | null>(null);
+  
+  const { cartOpen, setCartOpen, items: cartItems, removeItem, updateQuantity, totalPrice } = useCartStore();
+  const totalCartItems = useCartStore((state) => state.totalItems());
 
   useEffect(() => {
     setMounted(true);
@@ -97,6 +101,20 @@ export const Navbar = () => {
 
         {/* Right side */}
         <div className="flex items-center gap-2 md:gap-3">
+          {mounted && (
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface text-foreground transition-all hover:bg-surface-2 active:scale-95"
+              aria-label="Open cart"
+            >
+              <ShoppingCart className="h-4 w-4 text-foreground" />
+              {totalCartItems > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {totalCartItems}
+                </span>
+              )}
+            </button>
+          )}
           {mounted && (
             <button
               onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
@@ -172,7 +190,7 @@ export const Navbar = () => {
                   links={[
                     { label: "Blog", href: "/blog" },
                     { label: "Services", href: "/services" },
-                    { label: "Developer tools", href: "/tools" },
+                    { label: "Products", href: "/products" },
                     { label: "Gallery", href: "/gallery" },
                   ]} 
                 />
@@ -193,6 +211,98 @@ export const Navbar = () => {
               >
                 Resume <span className="text-base font-normal">↓</span>
               </button>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Cart drawer */}
+      <AnimatePresence>
+        {cartOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 bg-background/70"
+              onClick={() => setCartOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
+              transition={{ type: "tween", duration: 0.25 }}
+              className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-border bg-background p-6 shadow-2xl"
+            >
+              <div className="flex items-center justify-between pb-4 border-b border-border">
+                <h2 className="text-xl font-semibold">Your Cart</h2>
+                <button onClick={() => setCartOpen(false)} aria-label="Close" className="rounded-md border border-border p-1.5 hover:bg-surface transition-colors">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {cartItems.length === 0 ? (
+                <div className="flex flex-1 flex-col items-center justify-center text-center">
+                  <ShoppingCart className="h-16 w-16 text-muted-foreground/30 mb-4" />
+                  <p className="text-lg font-medium text-foreground">Your cart is empty</p>
+                  <p className="text-sm text-muted-foreground mt-1 mb-6">Looks like you haven't added any products yet.</p>
+                  <button 
+                    onClick={() => setCartOpen(false)}
+                    className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
+                    Continue Shopping
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex-1 overflow-y-auto py-4 space-y-4">
+                    {cartItems.map((item) => (
+                      <div key={item.id} className="flex gap-4 rounded-xl border border-border bg-surface p-3">
+                        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-border bg-background flex items-center justify-center p-2">
+                          <img src={item.image} alt={item.name} className="object-contain w-full h-full" />
+                        </div>
+                        <div className="flex flex-1 flex-col justify-between">
+                          <div className="flex justify-between items-start gap-2">
+                            <h3 className="font-medium text-sm leading-tight">{item.name}</h3>
+                            <p className="font-semibold text-sm whitespace-nowrap">${item.price}</p>
+                          </div>
+                          
+                          <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center gap-2 rounded-lg border border-border bg-background p-0.5">
+                              <button 
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-surface text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                <Minus className="h-3 w-3" />
+                              </button>
+                              <span className="w-4 text-center text-xs font-medium">{item.quantity}</span>
+                              <button 
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-surface text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </button>
+                            </div>
+                            <button 
+                              onClick={() => removeItem(item.id)}
+                              className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                              aria-label="Remove item"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="border-t border-border pt-4 space-y-4">
+                    <div className="flex justify-between text-base font-semibold">
+                      <span>Total</span>
+                      <span>${totalPrice().toFixed(2)}</span>
+                    </div>
+                    <button className="w-full rounded-xl bg-primary py-3.5 text-center text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-[0.98]">
+                      Checkout
+                    </button>
+                  </div>
+                </>
+              )}
             </motion.aside>
           </>
         )}

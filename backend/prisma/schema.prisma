@@ -235,3 +235,34 @@ model AboutSection {
   imageUrl    String?  @db.Text
   updatedAt   DateTime @updatedAt
 }
+
+// ─── Products ─────────────────────────────────────────────────────────────────
+
+enum ProductType {
+  SOFTWARE
+  ECOMMERCE
+}
+
+model Product {
+  id              Int         @id @default(autoincrement())
+  type            ProductType @default(SOFTWARE)
+  name            String
+  slug            String      @unique
+  description     String
+  longDescription String
+  category        String
+  images          String[]
+  url             String?
+  
+  // Software specific
+  techStack       String[]    @default([])
+  features        String[]    @default([])
+  liveUrl         String?
+  
+  // Ecommerce specific
+  price           Float?
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
