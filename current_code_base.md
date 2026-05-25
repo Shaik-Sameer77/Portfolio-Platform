@@ -191,7 +191,7 @@ The core features are functional, well-structured, and integrated using highly r
 #### What Needs Improvement / Technical Debt
 *   **Local Storage Auth Handling:** Storing raw authorization tokens in standard `localStorage` on the admin panel presents XSS vulnerabilities. High-security profiles should favor HTTP-Only cookies with proper CORS policies.
 *   **Lack of Workspace Integration:** Despite living under a single repository, there is no shared package management (e.g., Turborepo or npm/pnpm workspaces). This results in duplicate TypeScript definitions and schema interfaces between backend, admin, and frontend directories.
-*   **Error Boundaries & State Resiliency:** Earlier debugging sessions highlighted edge cases where network requests failed due to 401s, causing blank screen freezes or loading flashes rather than graceful, automated logout redirections or user alerts.
+*   **Error Boundaries & State Resiliency:** Edge cases exist where network requests failed due to 401s, causing blank screen freezes or loading flashes rather than graceful, automated logout redirections or user alerts.
 
 ---
 
@@ -208,5 +208,28 @@ An analysis comparing the design paradigms specifically for this platform reveal
 | **Performance** | **Sub-millisecond latency.** Internal module communication and direct SQL transactions. | **Network bound.** Latency added at every boundary due to network hops and queue delivery. |
 | **Data Consistency** | **Transactional integrity (ACID).** Single database query handles atomic state updates. | **Eventual consistency.** Event-driven synchronization introduces out-of-order logs and retry complexity. |
 
-#### Conclusion
-For a high-profile portfolio, blog, and showcase platform, a **Modular Monolith** delivers superior performance, simplified operational costs, and an elite developer experience. Over-engineering with event buses (like Apache Kafka) adds unnecessary distributed system problems without any real scale-driven justification. Keep the core system simple, and leverage caching (e.g., Redis) or CDN edges for massive read traffic.
+---
+
+### 9.4 Concrete Technical Recommendations & Next Steps
+
+Based on the audit, the following engineering tasks are recommended to achieve production readiness:
+
+#### 1. Transition to pnpm Workspaces
+*   Initialize a root `pnpm-workspace.yaml` to declare `admin`, `backend`, and `frontend` as workspace packages.
+*   Establish a shared folder `packages/shared-types` containing global TypeScript interfaces and models.
+*   Use internal dependency links to eliminate code/type duplication across the monorepo.
+
+#### 2. Toughen Token Security with HTTP-Only Cookies
+*   Modify `backend/src/modules/auth` to set JWTs in secure, HTTP-only, SameSite cookies rather than sending them in raw JSON payloads.
+*   Adjust the admin Axios API configurations to support sending and receiving credentials (cookies).
+*   This neutralizes most token-theft XSS attack vectors.
+
+#### 3. Standardize App-Wide Error Boundaries & Redirection
+*   Implement global React Error Boundaries in both the admin and frontend workspaces.
+*   Use the existing global Axios interceptor (`admin/src/api.ts`) to intercept `401 Unauthorized` responses and immediately trigger a Redux state action to clear user auth and redirect to the `/login` route gracefully, ending any persistent loading spins.
+
+#### 4. Add Database Performance Optimizations
+*   Ensure that high-frequency query lookup columns in `schema.prisma` (such as `Product.slug`, `Blog.slug`, and `User.email`) have index declarations (`@unique` or explicit `@@index` properties) to maintain lightning-fast PostgreSQL performance as the content database grows.
+
+#### 5. Integrate Automated CI/CD & Security Audits
+*   Implement GitHub Actions workflows to automate `eslint`, `tsc --noEmit`, and dependency audit steps before staging or master merges are allowed.
