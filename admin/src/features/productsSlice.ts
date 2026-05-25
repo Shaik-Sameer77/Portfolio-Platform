@@ -30,7 +30,7 @@ interface ProductsState {
   error: string | null;
 }
 
-const initialState: ProductsState = { items: [], loading: false, error: null };
+const initialState: ProductsState = { items: [], loading: true, error: null };
 
 export const fetchProducts = createAsyncThunk('products/fetch', async () => {
   const res = await api.get('/products');

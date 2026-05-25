@@ -34,6 +34,10 @@ api.interceptors.response.use((response) => {
   if (IS_ENCRYPTED && error.response?.data?.result && typeof error.response.data.result === 'string') {
     error.response.data = decryptData(error.response.data.result);
   }
+  if (error.response?.status === 401) {
+    localStorage.removeItem('admin_token');
+    window.location.href = '/login';
+  }
   return Promise.reject(error);
 });
 

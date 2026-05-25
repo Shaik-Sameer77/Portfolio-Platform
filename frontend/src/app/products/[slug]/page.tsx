@@ -4,6 +4,7 @@ import { useEffect, useState, use } from "react";
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getProductBySlug, type Product } from "@/services/product-service";
+import { DevLoader } from "@/components/DevLoader";
 import { useCartStore } from "@/store/useCartStore";
 import {
   ArrowLeft,
@@ -16,7 +17,6 @@ import {
   Truck,
   RotateCcw,
   Package,
-  Loader2,
 } from "lucide-react";
 
 const perks = [
@@ -58,12 +58,7 @@ export default function ProductDetailPage({
   const { addItem, setCartOpen } = useCartStore();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center text-muted-foreground">
-        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-        <p className="text-sm font-medium">Loading product details...</p>
-      </div>
-    );
+    return <DevLoader fullScreen={false} />;
   }
 
   if (error || !product) {

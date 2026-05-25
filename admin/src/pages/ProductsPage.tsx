@@ -445,7 +445,7 @@ export default function ProductsPage({ defaultOpenAdd = false }: ProductsPagePro
               }}
             >
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, uppercase: true }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, textTransform: 'uppercase' }}>
                   Product Images
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: -2 }}>

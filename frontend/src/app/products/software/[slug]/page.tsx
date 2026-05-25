@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getProductBySlug, type Product } from "@/services/product-service";
+import { DevLoader } from "@/components/DevLoader";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -14,7 +15,6 @@ import {
   Layers,
   Zap,
   GitBranch,
-  Loader2,
 } from "lucide-react";
 
 export default function SoftwareDetailPage({
@@ -43,12 +43,7 @@ export default function SoftwareDetailPage({
   const [activeImage, setActiveImage] = useState(0);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center text-muted-foreground">
-        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-        <p className="text-sm font-medium">Loading software details...</p>
-      </div>
-    );
+    return <DevLoader fullScreen={false} />;
   }
 
   if (error || !product) {

@@ -7,6 +7,7 @@ import { Section } from "@/components/Section";
 import { Check } from "lucide-react";
 import { services as mockServices } from "@/data/mock";
 import { getServices, type Service } from "@/services/portfolio-service";
+import { DevLoader } from "@/components/DevLoader";
 
 const faqs = [
   { q: "How do you usually start an engagement?", a: "A 30-minute call to understand the problem, then a short written proposal." },
@@ -15,7 +16,7 @@ const faqs = [
 ];
 
 export default function Services() {
-  const [servicesData, setServicesData] = useState<any[]>(mockServices);
+  const [servicesData, setServicesData] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,12 +35,18 @@ export default function Services() {
     fetchServices();
   }, []);
 
+  if (loading) {
+    return <DevLoader fullScreen={false} />;
+  }
+
+  const activeServices = servicesData || mockServices;
+
   return (
     <>
       <PageHeader eyebrow="Services" title="How I can help you." subtitle="A few ways we can work together." />
       <div className="container-page pb-12">
         <div className="grid gap-6 md:grid-cols-2">
-          {servicesData.map((s) => {
+          {activeServices.map((s) => {
             const isMock = !('id' in s);
             const descText = s.description;
             const includesList = s.includes || [];

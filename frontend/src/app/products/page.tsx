@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
-import { ArrowUpRight, Loader2 } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { getProducts, type Product, ProductType } from "@/services/product-service";
+import { DevLoader } from "@/components/DevLoader";
 
 const softwareFilters = ["All", "Built by me", "Curated", "CLI", "Web tools"] as const;
 const ecommerceFilters = ["All", "Laptops", "Books", "Pendrives"] as const;
@@ -49,6 +50,10 @@ export default function Products() {
   const currentCat = type === "software" ? softwareCat : ecommerceCat;
   const setCurrentCat = type === "software" ? setSoftwareCat : setEcommerceCat;
 
+  if (loading) {
+    return <DevLoader fullScreen={false} />;
+  }
+
   return (
     <>
       <PageHeader eyebrow="Products" title="Softwares and Ecommerce Products." subtitle="A growing catalog of softwares I've built and ecommerce products." />
@@ -87,12 +92,7 @@ export default function Products() {
           ))}
         </div>
 
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-            <p className="text-sm font-medium">Fetching catalog items...</p>
-          </div>
-        ) : error ? (
+        {error ? (
           <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-6 text-center text-red-500 max-w-md mx-auto">
             <p className="font-semibold">{error}</p>
           </div>
