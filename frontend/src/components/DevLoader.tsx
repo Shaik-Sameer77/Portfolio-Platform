@@ -42,7 +42,8 @@ export const DevLoader = ({ fullScreen = true }: { fullScreen?: boolean }) => {
 
     const typingInterval = setInterval(() => {
       if (charIndex < stageInfo.text.length) {
-        setTypedText((prev) => prev + stageInfo.text.charAt(charIndex));
+        const nextChar = stageInfo.text.charAt(charIndex);
+        setTypedText((prev) => prev + nextChar);
         charIndex++;
       } else {
         clearInterval(typingInterval);

@@ -150,7 +150,7 @@ export const Navbar = () => {
 
           <Link
             href="/contact"
-            className="inline-flex items-center whitespace-nowrap rounded-full border border-border bg-surface px-3.5 py-1.5 text-base font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-primary/10"
+            className="hidden md:inline-flex items-center whitespace-nowrap rounded-full border border-border bg-surface px-3.5 py-1.5 text-base font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-primary/10"
           >
             Let's talk
           </Link>
@@ -337,6 +337,14 @@ export const Navbar = () => {
                 )}
               </div>
 
+              <Link
+                href="/contact"
+                onClick={() => setDrawer(false)}
+                className="mt-6 w-full inline-flex items-center justify-center rounded-xl border border-border bg-surface py-3.5 text-[15px] font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-primary/10 cursor-pointer text-center"
+              >
+                Let's talk
+              </Link>
+
               <button
                 onClick={() => {
                   const hasResume = typeof profileData?.resumeUrl === "string" && profileData.resumeUrl.startsWith("http");
@@ -347,7 +355,7 @@ export const Navbar = () => {
                   }
                   setDrawer(false);
                 }}
-                className="mt-6 mb-4 inline-flex items-center gap-1 text-[15px] font-medium text-success hover:text-success/80 text-left bg-transparent border-none cursor-pointer"
+                className="mt-4 mb-4 inline-flex items-center gap-1 text-[15px] font-medium text-success hover:text-success/80 text-left bg-transparent border-none cursor-pointer"
               >
                 Resume <span className="text-base font-normal">↓</span>
               </button>
