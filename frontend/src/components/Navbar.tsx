@@ -4,13 +4,16 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, ChevronDown, Sun, Moon, ShoppingCart, Trash2, Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { AvailabilityBadge } from "./AvailabilityBadge";
 import { NavMegaMenu } from "./NavMegaMenu";
 import { useUIStore } from "@/store/useUIStore";
 import { useCartStore } from "@/store/useCartStore";
 import { useTheme } from "next-themes";
 import { profile } from "@/data/mock";
 import { getProfile, type Profile } from "@/services/portfolio-service";
+import { LogOut } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { AuthModal } from "./AuthModal";
+import { toast } from "sonner";
 
 const navLinks = [
   { label: "Blog", href: "/blog" },
@@ -19,6 +22,18 @@ const navLinks = [
   { label: "Gallery", href: "/gallery" },
 ];
 
+function getInitials(name: string | null | undefined, email: string): string {
+  if (name && name.trim()) {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+  return email.slice(0, 2).toUpperCase();
+}
+
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const { megaOpen, setMega, drawerOpen, setDrawer } = useUIStore();
@@ -26,17 +41,21 @@ export const Navbar = () => {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [profileData, setProfileData] = useState<Profile | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const { token, user, logout, openModal, initialize } = useAuthStore();
   
   const { cartOpen, setCartOpen, items: cartItems, removeItem, updateQuantity, totalPrice } = useCartStore();
   const totalCartItems = useCartStore((state) => state.totalItems());
 
   useEffect(() => {
     setMounted(true);
+    initialize(); // Initial load of auth session
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [initialize]);
 
   useEffect(() => {
     getProfile()
@@ -128,16 +147,82 @@ export const Navbar = () => {
               )}
             </button>
           )}
-          <div className="hidden md:block">
-            <AvailabilityBadge available={profile.available} />
-          </div>
-          <span className="hidden h-5 w-px bg-border md:block" />
+
           <Link
             href="/contact"
             className="inline-flex items-center whitespace-nowrap rounded-full border border-border bg-surface px-3.5 py-1.5 text-base font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-primary/10"
           >
             Let's talk
           </Link>
+
+          {mounted && (
+            <div className="hidden md:flex items-center">
+              {user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className={`h-9 w-9 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white transition-all duration-150 active:scale-95 cursor-pointer ${
+                      user.role === "ADMIN"
+                        ? "bg-gradient-to-br from-violet-500 to-purple-700 shadow-md shadow-purple-500/20 hover:shadow-purple-500/35 border border-primary/20"
+                        : "bg-gradient-to-br from-zinc-600 to-zinc-800 hover:brightness-110 border border-border/40"
+                    }`}
+                  >
+                    {getInitials(user.name, user.email)}
+                  </button>
+                  
+                  <AnimatePresence>
+                    {userMenuOpen && (
+                      <>
+                        <div className="fixed inset-0 z-30" onClick={() => setUserMenuOpen(false)} />
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute right-0 mt-2 z-40 w-64 rounded-xl border border-border bg-popover/95 backdrop-blur-md p-4 shadow-xl text-popover-foreground"
+                        >
+                          <div className="flex flex-col gap-1 border-b border-border pb-3 mb-3">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-sm font-semibold truncate text-foreground">
+                                {user.name || user.email.split("@")[0]}
+                              </span>
+                              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                                user.role === "ADMIN"
+                                  ? "bg-primary/10 border border-primary/20 text-primary"
+                                  : "bg-surface-2 border border-border text-muted-foreground"
+                              }`}>
+                                {user.role === "ADMIN" ? "✦ Admin" : "User"}
+                              </span>
+                            </div>
+                            <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                          </div>
+                          
+                          <button
+                            onClick={() => {
+                              setUserMenuOpen(false);
+                              logout();
+                              toast.success("Signed out successfully.");
+                            }}
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors duration-150 text-left cursor-pointer"
+                          >
+                            <LogOut className="h-4 w-4" />
+                            Sign Out
+                          </button>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <button
+                  onClick={() => openModal("login")}
+                  className="inline-flex items-center whitespace-nowrap rounded-full border border-border bg-surface px-4 py-1.5 text-base font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10 active:scale-95 cursor-pointer duration-150"
+                >
+                  Sign In
+                </button>
+              )}
+            </div>
+          )}
           <button
             className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface text-foreground md:hidden"
             onClick={() => setDrawer(true)}
@@ -195,6 +280,61 @@ export const Navbar = () => {
                   ]} 
                 />
                 <div className="h-px bg-border" />
+              </div>
+
+              {/* Mobile Auth */}
+              <div className="mt-4 border-t border-border pt-4">
+                {mounted && (
+                  user ? (
+                    <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold text-white ${
+                          user.role === "ADMIN"
+                            ? "bg-gradient-to-br from-violet-500 to-purple-700"
+                            : "bg-gradient-to-br from-zinc-600 to-zinc-800"
+                        }`}>
+                          {getInitials(user.name, user.email)}
+                        </div>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold truncate text-foreground">
+                              {user.name || user.email.split("@")[0]}
+                            </span>
+                            <span className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider ${
+                              user.role === "ADMIN"
+                                ? "bg-primary/10 border border-primary/20 text-primary"
+                                : "bg-surface-2 border border-border text-muted-foreground"
+                            }`}>
+                              {user.role === "ADMIN" ? "Admin" : "User"}
+                            </span>
+                          </div>
+                          <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setDrawer(false);
+                          logout();
+                          toast.success("Signed out successfully.");
+                        }}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-destructive/10 py-3 text-sm font-semibold text-destructive hover:bg-destructive/15 transition-all active:scale-[0.98] cursor-pointer"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Sign Out
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setDrawer(false);
+                        openModal("login");
+                      }}
+                      className="w-full rounded-xl bg-primary py-3.5 text-center text-sm font-semibold text-white transition-all hover:bg-primary/90 active:scale-[0.98] cursor-pointer"
+                    >
+                      Sign In / Register
+                    </button>
+                  )
+                )}
               </div>
 
               <button
@@ -307,6 +447,7 @@ export const Navbar = () => {
           </>
         )}
       </AnimatePresence>
+      <AuthModal />
     </>
   );
 };

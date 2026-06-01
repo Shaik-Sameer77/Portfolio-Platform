@@ -8,6 +8,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
 
 // Request interceptor: add token and encrypt payload
@@ -36,6 +37,14 @@ api.interceptors.response.use((response) => {
   }
   if (error.response?.status === 401) {
     localStorage.removeItem('admin_token');
+    
+    // Dynamic import to break circular dependency
+    import('./store').then(({ store }) => {
+      import('./features/authSlice').then(({ logout }) => {
+        store.dispatch(logout());
+      });
+    });
+    
     window.location.href = '/login';
   }
   return Promise.reject(error);

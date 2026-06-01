@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getBlogBySlug, getBlogs } from "@/services/portfolio-service";
 import { BlogCard } from "@/components/BlogCard";
 import { posts as mockPosts } from "@/data/mock";
+import CommentSection from "@/components/CommentSection";
 
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -75,9 +76,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           </div>
         </div>
 
-        <div className="mt-12 rounded-2xl border border-dashed border-border bg-surface/30 p-8 text-center text-sm text-muted-foreground">
-          Comments are currently disabled for this post.
-        </div>
+        <CommentSection blogId={post.id} />
 
       <div className="mt-24 border-t border-border pt-16">
         <h3 className="mb-8 font-display text-2xl font-bold tracking-tight">More from the blog</h3>

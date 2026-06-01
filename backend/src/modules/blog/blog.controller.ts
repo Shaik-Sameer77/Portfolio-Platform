@@ -10,11 +10,13 @@ import {
   Query,
   UseGuards,
   Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BlogService } from './blog.service.js';
 import { CreateBlogDto } from './dto/create-blog.dto.js';
 import { UpdateBlogDto } from './dto/update-blog.dto.js';
+import { CreateCommentDto } from './dto/create-comment.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 @ApiTags('Blog')
@@ -54,6 +56,55 @@ export class BlogController {
   @ApiOperation({ summary: 'Create a new category (admin)' })
   createCategory(@Body('name') name: string) {
     return this.blogService.createCategory(name);
+  }
+
+  @Get('comments/admin')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all comments for admin moderation' })
+  adminGetComments(@Request() req) {
+    if (req.user.role !== 'ADMIN') {
+      throw new ForbiddenException('Admin access only.');
+    }
+    return this.blogService.adminGetComments();
+  }
+
+  @Get(':id/comments')
+  @ApiOperation({ summary: 'Get comments tree for a blog post (public)' })
+  getComments(@Param('id', ParseIntPipe) id: number) {
+    return this.blogService.getCommentsForBlog(id);
+  }
+
+  @Post(':id/comments')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Add a comment or reply to a blog post (auth)' })
+  createComment(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CreateCommentDto,
+    @Request() req,
+  ) {
+    return this.blogService.createComment(id, req.user.userId, dto);
+  }
+
+  @Patch('comments/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a comment (auth)' })
+  updateComment(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('content') content: string,
+    @Request() req,
+  ) {
+    return this.blogService.updateComment(id, req.user.userId, req.user.role, content);
+  }
+
+  @Delete('comments/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete a comment (auth/admin)' })
+  deleteComment(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.blogService.deleteComment(id, req.user.userId, req.user.role);
   }
 
   @Get(':slug')

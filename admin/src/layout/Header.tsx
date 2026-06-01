@@ -32,6 +32,7 @@ import { DRAWER_WIDTH, COLLAPSED_WIDTH } from './Sidebar';
 import { logout } from '../features/authSlice';
 import { toggleTheme } from '../features/themeSlice';
 import type { RootState } from '../store';
+import api from '../api';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -52,8 +53,13 @@ export default function Header({ onMenuClick, isCollapsed, onToggleSidebar }: He
 
   const handleThemeToggle = () => dispatch(toggleTheme());
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     handleProfileClose();
+    try {
+      await api.post('/auth/logout');
+    } catch (err) {
+      console.warn('Failed server logout:', err);
+    }
     dispatch(logout());
   };
 

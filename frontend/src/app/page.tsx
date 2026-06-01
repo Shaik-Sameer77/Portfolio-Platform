@@ -140,7 +140,14 @@ export default function Home() {
                 transition={{ duration: 0.5 }}
               >
                 <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/50 px-3 py-1 text-xs text-muted-foreground">
-                  <span className={`h-1.5 w-1.5 rounded-full ${activeProfile.availableForWork ? 'bg-success shadow-[0_0_8px_rgba(var(--success),0.5)]' : 'bg-muted'}`} />
+                  {activeProfile.availableForWork ? (
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inset-0 rounded-full bg-success/60 pulse-dot" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+                    </span>
+                  ) : (
+                    <span className="h-2 w-2 rounded-full bg-muted" />
+                  )}
                   {activeProfile.availableForWork ? 'Available for new opportunities' : 'Not currently available'}
                 </span>
               </motion.div>

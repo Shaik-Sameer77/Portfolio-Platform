@@ -162,6 +162,8 @@ model Blog {
   updatedAt  DateTime  @updatedAt
   author     User?     @relation(fields: [authorId], references: [id])
   comments   Comment[]
+
+  @@index([slug])
 }
 
 model Category {
@@ -172,13 +174,18 @@ model Category {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  content   String
+  id        Int       @id @default(autoincrement())
+  content   String    @db.Text
   blogId    Int
   userId    Int?
-  createdAt DateTime @default(now())
-  blog      Blog     @relation(fields: [blogId], references: [id])
-  user      User?    @relation(fields: [userId], references: [id])
+  parentId  Int?
+  createdAt DateTime  @default(now())
+  blog      Blog      @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+
+  @@index([blogId])
 }
 
 // ─── Contact ───────────────────────────────────────────────────────────────────
@@ -196,13 +203,17 @@ model Contact {
 // ─── Auth / Users ──────────────────────────────────────────────────────────────
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  role      Role      @default(USER)
-  createdAt DateTime  @default(now())
-  blogs     Blog[]
-  comments  Comment[]
+  id                      Int       @id @default(autoincrement())
+  email                   String    @unique
+  password                String
+  name                    String?
+  role                    Role      @default(USER)
+  isVerified              Boolean   @default(false)
+  verificationToken       String?   @unique
+  verificationTokenExpires DateTime?
+  createdAt               DateTime  @default(now())
+  blogs                   Blog[]
+  comments                Comment[]
 }
 
 enum Role {
@@ -264,5 +275,7 @@ model Product {
   
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+
+  @@index([slug])
 }
 

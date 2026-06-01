@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { CreateBlogDto } from './dto/create-blog.dto.js';
 import { UpdateBlogDto } from './dto/update-blog.dto.js';
@@ -142,5 +142,134 @@ export class BlogService {
     if (!blog) throw new NotFoundException(`Blog #${id} not found`);
 
     return this.prisma.blog.delete({ where: { id } });
+  }
+
+  // ─── Comment Services ────────────────────────────────────────────────────────
+
+  async getCommentsForBlog(blogId: number) {
+    const comments = await this.prisma.comment.findMany({
+      where: { blogId },
+      orderBy: { createdAt: 'asc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    const map = new Map<number, any>();
+    const roots: any[] = [];
+
+    for (const c of comments) {
+      map.set(c.id, { ...c, replies: [] });
+    }
+
+    for (const c of comments) {
+      const mapped = map.get(c.id);
+      if (c.parentId) {
+        const parent = map.get(c.parentId);
+        if (parent) {
+          parent.replies.push(mapped);
+        } else {
+          roots.push(mapped);
+        }
+      } else {
+        roots.push(mapped);
+      }
+    }
+
+    return roots;
+  }
+
+  async createComment(blogId: number, userId: number, dto: any) {
+    const blog = await this.prisma.blog.findUnique({ where: { id: blogId } });
+    if (!blog) throw new NotFoundException(`Blog #${blogId} not found`);
+
+    if (dto.parentId) {
+      const parent = await this.prisma.comment.findUnique({ where: { id: dto.parentId } });
+      if (!parent) throw new NotFoundException(`Parent comment #${dto.parentId} not found`);
+    }
+
+    return this.prisma.comment.create({
+      data: {
+        content: dto.content,
+        blogId,
+        userId,
+        parentId: dto.parentId || null,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+          },
+        },
+      },
+    });
+  }
+
+  async updateComment(commentId: number, userId: number, userRole: string, content: string) {
+    const comment = await this.prisma.comment.findUnique({ where: { id: commentId } });
+    if (!comment) throw new NotFoundException(`Comment #${commentId} not found`);
+
+    if (comment.userId !== userId && userRole !== 'ADMIN') {
+      throw new ForbiddenException('You can only edit your own comments.');
+    }
+
+    return this.prisma.comment.update({
+      where: { id: commentId },
+      data: { content },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteComment(commentId: number, userId: number, userRole: string) {
+    const comment = await this.prisma.comment.findUnique({ where: { id: commentId } });
+    if (!comment) throw new NotFoundException(`Comment #${commentId} not found`);
+
+    if (comment.userId !== userId && userRole !== 'ADMIN') {
+      throw new ForbiddenException('You can only delete your own comments.');
+    }
+
+    return this.prisma.comment.delete({ where: { id: commentId } });
+  }
+
+  async adminGetComments() {
+    return this.prisma.comment.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+          },
+        },
+        blog: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+          },
+        },
+      },
+    });
   }
 }

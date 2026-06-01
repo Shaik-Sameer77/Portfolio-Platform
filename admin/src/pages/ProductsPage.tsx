@@ -4,14 +4,13 @@ import {
   Box, Paper, Typography, Button, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, Chip, IconButton,
-  CircularProgress, Alert, Switch, FormControlLabel, Tooltip,
+  CircularProgress, Alert, Tooltip,
   Grid, Divider, useTheme, alpha, MenuItem, Select, FormControl, InputLabel
 } from '@mui/material';
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
-  Launch as LaunchIcon,
   Close as CloseIcon,
   CheckCircle as ActiveIcon,
   Code as CodeIcon,

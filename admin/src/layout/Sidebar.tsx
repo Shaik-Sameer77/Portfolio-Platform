@@ -40,6 +40,7 @@ import {
   Folder as FileIcon,
   Chat as ChatIcon,
   Palette as ThemeIcon,
+  ModeComment as CommentsIcon,
   ConfirmationNumber as SupportIcon,
   Description as ResumeIcon,
   Home as HeroIcon,
@@ -90,6 +91,7 @@ const navItems: NavItemData[] = [
     children: [
       { label: 'All Blogs', icon: <BlogIcon fontSize="small" />, path: '/blogs' },
       { label: 'Add Blog', icon: <AddIcon fontSize="small" />, path: '/blogs/add' },
+      { label: 'Comments', icon: <CommentsIcon fontSize="small" />, path: '/blogs/comments' },
     ],
   },
   {

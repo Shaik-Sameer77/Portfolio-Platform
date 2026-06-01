@@ -25,6 +25,7 @@ import EducationPage from './pages/EducationPage';
 import ResumePage from './pages/ResumePage';
 import ServicesPage from './pages/ServicesPage';
 import ProductsPage from './pages/ProductsPage';
+import CommentsPage from './pages/CommentsPage';
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -161,6 +162,14 @@ function App() {
           <ProtectedRoute>
             <AdminLayout>
               <BlogEditorPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/blogs/comments" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <CommentsPage />
             </AdminLayout>
           </ProtectedRoute>
         } />
