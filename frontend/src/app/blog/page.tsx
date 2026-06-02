@@ -12,8 +12,6 @@ import {
   type Category,
 } from "@/services/portfolio-service";
 import { posts as mockPosts, type BlogPost } from "@/data/mock";
-import { DevLoader } from "@/components/DevLoader";
-
 export default function Blog() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("All");
@@ -81,10 +79,6 @@ export default function Blog() {
     [q, cat, activeBlogs]
   );
 
-  if (loading) {
-    return <DevLoader fullScreen={false} />;
-  }
-
   return (
     <>
       <PageHeader
@@ -145,7 +139,26 @@ export default function Blog() {
         </div>
 
         {/* Blog grid */}
-        {filtered.length > 0 ? (
+        {loading ? (
+          <div className="grid gap-6 md:grid-cols-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex flex-col gap-4 rounded-3xl border border-border bg-surface p-4">
+                <div className="aspect-[16/10] rounded-2xl bg-muted animate-pulse" />
+                <div className="space-y-3 p-2">
+                  <div className="flex gap-2">
+                    <div className="h-6 w-20 bg-muted rounded-full animate-pulse" />
+                    <div className="h-6 w-24 bg-muted rounded-full animate-pulse" />
+                  </div>
+                  <div className="h-6 w-3/4 bg-muted rounded animate-pulse" />
+                  <div className="space-y-2 mt-4">
+                    <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                    <div className="h-4 w-5/6 bg-muted rounded animate-pulse" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2">
             {filtered.map((p) => (
               <BlogCard key={p.slug} post={p as any} />

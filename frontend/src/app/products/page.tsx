@@ -5,8 +5,6 @@ import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { ArrowUpRight } from "lucide-react";
 import { getProducts, type Product, ProductType } from "@/services/product-service";
-import { DevLoader } from "@/components/DevLoader";
-
 const softwareFilters = ["All", "Built by me", "Curated", "CLI", "Web tools"] as const;
 const ecommerceFilters = ["All", "Laptops", "Books", "Pendrives"] as const;
 
@@ -50,10 +48,6 @@ export default function Products() {
   const currentCat = type === "software" ? softwareCat : ecommerceCat;
   const setCurrentCat = type === "software" ? setSoftwareCat : setEcommerceCat;
 
-  if (loading) {
-    return <DevLoader fullScreen={false} />;
-  }
-
   return (
     <>
       <PageHeader eyebrow="Products" title="Softwares and Ecommerce Products." subtitle="A growing catalog of softwares I've built and ecommerce products." />
@@ -95,6 +89,22 @@ export default function Products() {
         {error ? (
           <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-6 text-center text-red-500 max-w-md mx-auto">
             <p className="font-semibold">{error}</p>
+          </div>
+        ) : loading ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="flex flex-col rounded-xl border border-border bg-surface p-5 animate-pulse">
+                <div className="mb-4 aspect-video w-full rounded-lg bg-muted" />
+                <div className="h-4 w-16 bg-muted rounded-full mb-4" />
+                <div className="h-6 w-3/4 bg-muted rounded mb-2" />
+                <div className="h-4 w-full bg-muted rounded mb-1" />
+                <div className="h-4 w-5/6 bg-muted rounded mb-5" />
+                <div className="mt-5 flex items-center justify-between pt-4 border-t border-border/50">
+                  <div className="h-5 w-16 bg-muted rounded" />
+                  <div className="h-5 w-24 bg-muted rounded" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : list.length === 0 ? (
           <div className="text-center py-20 border border-dashed border-border rounded-2xl bg-surface/50">

@@ -4,7 +4,7 @@ import { useEffect, useState, use } from "react";
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getProductBySlug, type Product } from "@/services/product-service";
-import { DevLoader } from "@/components/DevLoader";
+
 import { useCartStore } from "@/store/useCartStore";
 import {
   ArrowLeft,
@@ -58,7 +58,38 @@ export default function ProductDetailPage({
   const { addItem, setCartOpen } = useCartStore();
 
   if (loading) {
-    return <DevLoader fullScreen={false} />;
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container-page pt-24 pb-4">
+          <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+        </div>
+        <div className="container-page pb-24">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+            <div className="flex flex-col gap-4">
+              <div className="aspect-square w-full rounded-2xl bg-muted animate-pulse" />
+              <div className="flex gap-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-20 w-20 rounded-xl bg-muted animate-pulse" />
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <div className="h-6 w-24 bg-muted rounded-full mb-4 animate-pulse" />
+              <div className="h-10 w-3/4 bg-muted rounded mb-4 animate-pulse" />
+              <div className="h-6 w-32 bg-muted rounded mb-6 animate-pulse" />
+              <div className="h-10 w-48 bg-muted rounded mb-6 animate-pulse" />
+              <div className="space-y-3 mb-6">
+                <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                <div className="h-4 w-5/6 bg-muted rounded animate-pulse" />
+                <div className="h-4 w-4/5 bg-muted rounded animate-pulse" />
+              </div>
+              <div className="my-6 h-px bg-border" />
+              <div className="h-12 w-full bg-muted rounded-xl animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error || !product) {

@@ -1,19 +1,39 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { ProjectCard } from "@/components/ProjectCard";
-import { projects } from "@/data/mock";
+import { projects as mockProjects } from "@/data/mock";
+import { getProjects } from "@/services/portfolio-service";
+import { DevLoader } from "@/components/DevLoader";
 
 const filters = ["All", "Full Stack", "Backend", "Frontend", "Open Source"] as const;
 
 export default function Projects() {
   const [active, setActive] = useState<(typeof filters)[number]>("All");
+  const [projectsData, setProjectsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getProjects()
+      .then((data) => {
+        setProjectsData(data.length > 0 ? data : mockProjects);
+        setLoading(false);
+      })
+      .catch(() => {
+        setProjectsData(mockProjects);
+        setLoading(false);
+      });
+  }, []);
   
   const list = useMemo(() => {
-    const items = active === "All" ? projects : projects.filter((p) => p.category === active);
+    const items = active === "All" ? projectsData : projectsData.filter((p) => p.category === active);
     return [...items].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
-  }, [active]);
+  }, [active, projectsData]);
+
+  if (loading) {
+    return <DevLoader fullScreen={false} />;
+  }
 
   return (
     <>

@@ -1,7 +1,22 @@
+"use client";
+
 import { PageHeader } from "@/components/PageHeader";
 import { uses } from "@/data/mock";
+import { useEffect, useState } from "react";
+import { DevLoader } from "@/components/DevLoader";
 
 export default function Uses() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate API fetch delay
+    const timer = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <DevLoader fullScreen={false} />;
+  }
   return (
     <>
       <PageHeader eyebrow="Uses" title="What I use to build things." subtitle="Updated whenever something changes." />

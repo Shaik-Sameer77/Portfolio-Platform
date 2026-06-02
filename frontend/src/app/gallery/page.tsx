@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { gallery } from "@/data/mock";
 
@@ -8,6 +8,14 @@ const filters = ["All", "Nature", "Architecture", "Street", "Travel"] as const;
 
 export default function Gallery() {
   const [cat, setCat] = useState<(typeof filters)[number]>("All");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate API fetch delay
+    const timer = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
+
   const items = useMemo(() => (cat === "All" ? gallery : gallery.filter((g) => g.category === cat)), [cat]);
 
   return (
@@ -29,7 +37,15 @@ export default function Gallery() {
         </div>
 
         <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">
-          {items.map((g) => (
+          {loading ? (
+            [300, 400, 250, 450, 320, 380, 280, 410].map((h, i) => (
+              <div
+                key={i}
+                className="mb-4 w-full rounded-xl bg-muted animate-pulse break-inside-avoid"
+                style={{ height: h }}
+              />
+            ))
+          ) : items.map((g) => (
             <figure
               key={g.id}
               className="group relative mb-4 overflow-hidden rounded-xl border border-border bg-gradient-to-br from-surface-2 to-background break-inside-avoid"

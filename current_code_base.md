@@ -50,22 +50,25 @@ Every piece of content is dynamically served via the NestJS API gateway, allowin
 ## Tech Stack
 
 ### Public Storefront
-- **Framework**: Next.js 16 (App Router)
-- **Styling**: Tailwind CSS, Framer Motion
+- **Framework**: Next.js 16 (App Router) with React 19
+- **Styling**: Tailwind CSS v4, Framer Motion
 - **State Management**: Zustand
 - **Icons**: Lucide React
 
 ### Admin Dashboard
-- **Framework**: React + Vite
+- **Framework**: React 19 + Vite 8
 - **UI Library**: Material UI (MUI) v9
+- **Rich Text Editor**: TipTap (with Lowlight for syntax highlighting)
 - **State Management**: Redux Toolkit (RTK)
 - **HTTP Client**: Axios (configured with `withCredentials: true` and 401 Interceptors)
 
 ### Backend Services
-- **Framework**: NestJS (TypeScript Monolith)
+- **Framework**: NestJS 11 (TypeScript Monolith)
 - **ORM**: Prisma v7
 - **Database**: PostgreSQL (Neon Serverless)
 - **Auth**: Passport.js + JWT (HTTP-Only Cookie extraction strategy)
+- **Media Ingestion**: Multer + Cloudinary integrations
+- **Email/Communications**: Nodemailer
 - **Logging**: Morgan HTTP logger
 - **API Specs**: Swagger (OpenAPI)
 
@@ -360,9 +363,9 @@ The system is structured as a standard multi-root repository layout, grouping in
 portfolio-platform/
 ├── admin/               # React + Vite Admin dashboard
 │   ├── src/
-│   │   ├── features/    # Redux Toolkit state slices (authSlice, productsSlice)
+│   │   ├── features/    # RTK slices (authSlice, productsSlice, profileSlice, themeSlice, etc.)
 │   │   ├── layout/      # Sidebar, Header navigation shells
-│   │   ├── pages/       # Admin CRUD views (ProductsPage, LoginPage)
+│   │   ├── pages/       # Admin views (BlogEditorPage, ApiLogsPage, CommentsPage, etc.)
 │   │   ├── api.ts       # Axios client with withCredentials and 401 Interceptors
 │   │   ├── store.ts     # Global RTK Store configuration
 │   │   └── main.tsx     # React Entry point
@@ -374,8 +377,10 @@ portfolio-platform/
 │   │   └── migrations/
 │   ├── src/
 │   │   ├── modules/
+│   │   │   ├── api-log/ # System telemetry and request logging
 │   │   │   ├── auth/    # Login, Cookie management, Custom Extractors
 │   │   │   ├── blog/    # Blogging engine
+│   │   │   ├── mail/    # Nodemailer email communications
 │   │   │   ├── portfolio# Experience, TechStack, Skills controllers
 │   │   │   ├── product/ # Digital products manager
 │   │   │   └── upload/  # Cloudinary file uploads pipeline
@@ -409,9 +414,11 @@ portfolio-platform/
 ### Admin Dashboard (React + Vite + Material UI)
 - **`/login`**: Centered, glassmorphic auth panel verifying credential inputs.
 - **`/dashboard`**: Unified central dashboard featuring system status and quick links.
-- **`/products`**: Interactive grid allowing full creation, dynamic slug generation, and multiple asset uploads for products.
-- **`/blogs`**: Full Markdown editor supporting rich layouts and cover image uploads.
-- **`/projects`, `/experience`, `/education`**: Data tables enabling quick resume updates.
+- **`/products` & `/services`**: Interactive grids allowing full creation and editing of products and freelance services.
+- **`/blogs` & `/comments`**: Full rich-text editor (TipTap) supporting custom layouts and code highlighting, plus a comment moderation dashboard.
+- **`/projects`, `/experience`, `/education`, `/tech-stack`**: Data tables enabling quick resume and portfolio updates.
+- **`/hero` & `/about`**: Editors for the landing page hero section and detailed personal brand copy.
+- **`/api-logs`**: System observability UI showing backend telemetry and request metrics.
 
 ---
 
@@ -434,6 +441,13 @@ portfolio-platform/
 
 ### `/blogs/*` (Blogging Module)
 - Modular CRUD controllers managing `Blog`, `Category`, and user-submitted `Comment` attachments.
+
+### `/mail/*` & `/upload/*` (Utility Modules)
+- `POST /mail/contact`: Handles public contact form submissions and forwards them via Nodemailer.
+- `POST /upload/image`: Ingests files via Multer and pipes them directly to Cloudinary for static asset hosting.
+
+### `/api-log/*` (Observability Module)
+- Intercepts and records detailed telemetry (methods, latencies, status codes) for system health monitoring.
 
 ---
 
