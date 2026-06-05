@@ -4,6 +4,7 @@ import { getBlogBySlug, getBlogs } from "@/services/portfolio-service";
 import { BlogCard } from "@/components/BlogCard";
 import { posts as mockPosts } from "@/data/mock";
 import CommentSection from "@/components/CommentSection";
+import BlogContent from "@/components/BlogContent";
 
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -60,9 +61,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         </h1>
 
         <div className="mt-12">
-          <div 
+          <BlogContent
+            html={post.content}
             className="prose prose-invert max-w-none prose-headings:font-display prose-headings:tracking-tight prose-p:text-muted-foreground/90 prose-p:leading-relaxed prose-p:text-lg prose-strong:text-foreground prose-a:text-primary prose-img:rounded-2xl prose-img:shadow-xl"
-            dangerouslySetInnerHTML={{ __html: post.content }}
           />
         </div>
 

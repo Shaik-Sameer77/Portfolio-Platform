@@ -106,7 +106,7 @@ const navItems: NavItemData[] = [
     ],
   },
   { label: 'AI Assistant', icon: <AIIcon />, path: '/ai' },
-  { label: 'Calendar', icon: <CalendarIcon />, path: '/calendar' },
+  { label: 'Appointments', icon: <CalendarIcon />, path: '/appointments' },
   { label: 'Users', icon: <UsersIcon />, path: '/users' },
   { label: 'File Manager', icon: <FileIcon />, path: '/files' },
   { label: 'Chats', icon: <ChatIcon />, path: '/chats' },

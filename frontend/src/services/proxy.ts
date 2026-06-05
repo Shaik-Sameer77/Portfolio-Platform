@@ -15,11 +15,10 @@ proxy.interceptors.request.use((config) => {
     config.data = { payload: encryptData(config.data) };
   }
   
-  // Example of attaching an auth token (to be integrated properly later)
-  // const token = useAuthStore.getState().token;
-  // if (token) {
-  //   config.headers.Authorization = `Bearer ${token}`;
-  // }
+  const token = typeof window !== 'undefined' ? localStorage.getItem('portfolio_user_token') : null;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   
   return config;
 }, (error) => Promise.reject(error));

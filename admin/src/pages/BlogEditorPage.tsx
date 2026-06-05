@@ -1,5 +1,6 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import mermaid from 'mermaid';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { Extension } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
@@ -215,6 +216,53 @@ export default function BlogEditorPage() {
     }
   }, [editor, id, fetchBlog]);
 
+  // Initialize mermaid
+  useEffect(() => {
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+  }, []);
+
+  // Render mermaid blocks in the live preview
+  useEffect(() => {
+    const renderMermaid = async () => {
+      try {
+        const previewEl = document.querySelector('.preview-content');
+        if (!previewEl) return;
+        
+        const mermaidBlocks = previewEl.querySelectorAll('pre code.language-mermaid');
+        
+        for (let i = 0; i < mermaidBlocks.length; i++) {
+          const block = mermaidBlocks[i];
+          const pre = block.parentElement;
+          if (!pre) continue;
+          
+          const code = block.textContent || '';
+          const id = `mermaid-${Date.now()}-${i}`;
+          
+          try {
+            const { svg } = await mermaid.render(id, code);
+            const div = document.createElement('div');
+            div.innerHTML = svg;
+            div.className = 'mermaid-rendered';
+            div.style.display = 'flex';
+            div.style.justifyContent = 'center';
+            div.style.margin = '2rem 0';
+            
+            // Replace the <pre> with the rendered SVG
+            pre.parentNode?.replaceChild(div, pre);
+          } catch (e) {
+            console.error("Mermaid syntax error:", e);
+            // Ignore syntax errors while typing
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const timeoutId = setTimeout(renderMermaid, 150);
+    return () => clearTimeout(timeoutId);
+  }, [content]);
+
   const handleSave = async () => {
     if (!title || !editor) return;
     setSaving(true);
@@ -384,7 +432,7 @@ export default function BlogEditorPage() {
 
       <Grid container spacing={3} sx={{ flexGrow: 1, minHeight: 0 }}>
         {/* Left Side: Editor */}
-        <Grid size={{ xs: 12, md: 6 }} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Grid size={{ xs: 12, md: 6 }} sx={{ height: '100%', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           <Paper sx={{ p: 3, borderRadius: '20px', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 3 }}>
               <TextField
@@ -582,7 +630,7 @@ export default function BlogEditorPage() {
                 '& h1': { fontSize: '2rem', mb: 2 },
                 '& h2': { fontSize: '1.5rem', mb: 2 },
                 '& code': { bgcolor: 'action.hover', p: '2px 4px', borderRadius: '4px', fontFamily: 'monospace' },
-                '& pre': { bgcolor: 'action.hover', p: 2, borderRadius: '8px', mb: 2, '& code': { p: 0, bgcolor: 'transparent' } },
+                '& pre': { bgcolor: 'action.hover', p: 2, borderRadius: '8px', mb: 2, whiteSpace: 'pre-wrap', wordBreak: 'break-word', '& code': { p: 0, bgcolor: 'transparent', whiteSpace: 'pre-wrap' } },
                 '& img': { maxWidth: '100%', borderRadius: '8px' },
                 '& blockquote': { borderLeft: `4px solid ${theme.palette.primary.main}`, pl: 2, fontStyle: 'italic', color: 'text.secondary', mb: 2 },
                 '& table': { borderCollapse: 'collapse', width: '100%', mb: 2, '& th, & td': { border: `1px solid ${theme.palette.divider}`, p: 1, position: 'relative' }, '& th': { bgcolor: 'action.hover', fontWeight: 'bold' } },
@@ -594,7 +642,7 @@ export default function BlogEditorPage() {
         </Grid>
 
         {/* Right Side: Preview */}
-        <Grid size={{ xs: 12, md: 6 }} sx={{ height: '100%', display: { xs: 'none', md: 'flex' }, flexDirection: 'column' }}>
+        <Grid size={{ xs: 12, md: 6 }} sx={{ height: '100%', display: { xs: 'none', md: 'flex' }, flexDirection: 'column', minWidth: 0 }}>
           <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <PreviewIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
             <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>Live Preview</Typography>
@@ -647,7 +695,7 @@ export default function BlogEditorPage() {
                   '& h3': { fontSize: '1.5rem', fontWeight: 600, mt: 5, mb: 2, color: 'text.primary' },
                   '& img': { maxWidth: '100%', borderRadius: '16px', my: 6, boxShadow: 3 },
                   '& blockquote': { borderLeft: '4px solid #7c6af7', pl: 6, py: 1, my: 6, '& p': { fontStyle: 'italic', color: 'text.secondary', mb: 0 } },
-                  '& pre': { bgcolor: alpha(theme.palette.background.paper, 0.8), p: 4, borderRadius: '12px', mb: 6, overflowX: 'auto', border: `1px solid ${theme.palette.divider}` },
+                  '& pre': { bgcolor: alpha(theme.palette.background.paper, 0.8), p: 4, borderRadius: '12px', mb: 6, overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word', border: `1px solid ${theme.palette.divider}` },
                   '& code': { fontFamily: '"JetBrains Mono", monospace', fontSize: '0.9em' },
                   '& a': { color: theme.palette.primary.main, textDecoration: 'none' },
                   '& ul, & ol': { mb: 6, pl: 5, '& li': { mb: 1, color: 'text.secondary' } },

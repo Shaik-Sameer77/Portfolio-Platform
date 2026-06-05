@@ -26,6 +26,7 @@ import ResumePage from './pages/ResumePage';
 import ServicesPage from './pages/ServicesPage';
 import ProductsPage from './pages/ProductsPage';
 import CommentsPage from './pages/CommentsPage';
+import AppointmentsPage from './pages/AppointmentsPage';
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -138,6 +139,14 @@ function App() {
           <ProtectedRoute>
             <AdminLayout>
               <ProductsPage defaultOpenAdd={true} />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/appointments" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <AppointmentsPage />
             </AdminLayout>
           </ProtectedRoute>
         } />

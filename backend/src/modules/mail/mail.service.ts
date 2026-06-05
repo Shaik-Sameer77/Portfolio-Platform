@@ -147,4 +147,110 @@ export class MailService {
       throw error;
     }
   }
+
+  async sendBookingConfirmation(params: {
+    clientEmail: string;
+    clientName: string;
+    appointmentType: string;
+    scheduledAt: Date;
+    duration: number;
+    meetLink: string;
+    timezone: string;
+  }) {
+    const from = process.env.SMTP_FROM || '"Sameer Developer" <sameer.developer14@gmail.com>';
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+      dateStyle: 'full',
+      timeStyle: 'short',
+      timeZone: params.timezone,
+    }).format(params.scheduledAt);
+
+    const htmlContent = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #0f172a;">Booking Confirmed! 🎉</h2>
+        <p>Hi ${params.clientName},</p>
+        <p>Your <strong>${params.appointmentType}</strong> with Sameer is confirmed.</p>
+        
+        <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0;">
+          <p style="margin: 5px 0;"><strong>When:</strong> ${formattedDate} (${params.timezone})</p>
+          <p style="margin: 5px 0;"><strong>Duration:</strong> ${params.duration} minutes</p>
+          <p style="margin: 5px 0;"><strong>Where:</strong> Google Meet</p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${params.meetLink}" style="background-color: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Join Google Meet</a>
+        </div>
+
+        <p style="color: #64748b; font-size: 14px;">A calendar invitation has also been sent to this email address.</p>
+      </div>
+    `;
+
+    try {
+      await this.transporter.sendMail({
+        from,
+        to: params.clientEmail,
+        subject: `Booking Confirmed: ${params.appointmentType} with Sameer`,
+        html: htmlContent,
+      });
+      this.logger.log(`Booking confirmation sent to: ${params.clientEmail}`);
+    } catch (error) {
+      this.logger.error(`Failed to send booking confirmation to: ${params.clientEmail}`, error.stack);
+    }
+  }
+
+  async sendAdminBookingAlert(params: {
+    clientName: string;
+    clientEmail: string;
+    clientCompany?: string;
+    clientMessage?: string;
+    appointmentType: string;
+    scheduledAt: Date;
+    duration: number;
+    meetLink: string;
+  }) {
+    const from = process.env.SMTP_FROM || '"Portfolio System" <sameer.developer14@gmail.com>';
+    const to = process.env.SMTP_USER || 'sameer.developer14@gmail.com';
+    
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+      dateStyle: 'full',
+      timeStyle: 'short',
+      timeZone: 'Asia/Kolkata',
+    }).format(params.scheduledAt);
+
+    const htmlContent = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #0f172a;">🚨 New Booking: ${params.appointmentType}</h2>
+        
+        <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0;">
+          <p style="margin: 5px 0;"><strong>Client:</strong> ${params.clientName}</p>
+          <p style="margin: 5px 0;"><strong>Email:</strong> ${params.clientEmail}</p>
+          ${params.clientCompany ? `<p style="margin: 5px 0;"><strong>Company:</strong> ${params.clientCompany}</p>` : ''}
+          <p style="margin: 5px 0; margin-top: 15px;"><strong>When:</strong> ${formattedDate} (IST)</p>
+          <p style="margin: 5px 0;"><strong>Duration:</strong> ${params.duration} minutes</p>
+        </div>
+
+        ${params.clientMessage ? `
+        <div style="background-color: #fffbeb; padding: 15px; border-radius: 6px; border: 1px solid #fde68a;">
+          <p style="margin: 0; font-weight: bold;">Message from client:</p>
+          <p style="margin: 5px 0;">${params.clientMessage}</p>
+        </div>
+        ` : ''}
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${params.meetLink}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Google Meet Link</a>
+        </div>
+      </div>
+    `;
+
+    try {
+      await this.transporter.sendMail({
+        from,
+        to,
+        subject: `New Booking: ${params.clientName} - ${params.appointmentType}`,
+        html: htmlContent,
+      });
+      this.logger.log(`Admin booking alert sent to: ${to}`);
+    } catch (error) {
+      this.logger.error(`Failed to send admin booking alert to: ${to}`, error.stack);
+    }
+  }
 }

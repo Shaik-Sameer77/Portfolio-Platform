@@ -9,6 +9,7 @@ import profileReducer from './features/profileSlice';
 import themeReducer from './features/themeSlice';
 import techStackReducer from './features/techStackSlice';
 import productsReducer from './features/productsSlice';
+import appointmentReducer from './features/appointmentSlice';
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     theme: themeReducer,
     techStack: techStackReducer,
     products: productsReducer,
+    appointments: appointmentReducer,
   },
 });
 
