@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Res, Req, Get, UseGuards, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
@@ -31,12 +31,55 @@ export class AuthController {
   ) {
     const result = await this.authService.login(loginDto);
     
-    // Set HTTP-only cookie
     response.cookie('access_token', result.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days matching JWT expiration
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      path: '/',
+    });
+
+    response.cookie('refresh_token', result.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+
+    return result;
+  }
+
+  @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access token' })
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) response: Response) {
+    let refreshToken: string | null = null;
+    if (req && req.headers && req.headers.cookie) {
+      const rawCookies = req.headers.cookie.split(';');
+      for (const cookie of rawCookies) {
+        const [key, val] = cookie.trim().split('=');
+        if (key === 'refresh_token') {
+          refreshToken = val;
+          break;
+        }
+      }
+    }
+
+    const result = await this.authService.refreshTokens(refreshToken!);
+    
+    response.cookie('access_token', result.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+      path: '/',
+    });
+
+    response.cookie('refresh_token', result.refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });
 
@@ -44,9 +87,15 @@ export class AuthController {
   }
 
   @Post('logout')
-  @ApiOperation({ summary: 'Logout and clear HTTP-only cookie' })
+  @ApiOperation({ summary: 'Logout and clear HTTP-only cookies' })
   logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+    response.clearCookie('refresh_token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

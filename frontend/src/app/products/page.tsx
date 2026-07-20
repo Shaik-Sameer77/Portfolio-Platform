@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { ArrowUpRight } from "lucide-react";
 import { getProducts, type Product, ProductType } from "@/services/product-service";
+import { tools, ecommerce } from "@/data/mock";
 const softwareFilters = ["All", "Built by me", "Curated", "CLI", "Web tools"] as const;
 const ecommerceFilters = ["All", "Laptops", "Books", "Pendrives"] as const;
 
@@ -24,8 +25,40 @@ export default function Products() {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch products:", err);
-        setError("Could not load products. Please try again later.");
+        console.warn("Failed to fetch products, using mock data as fallback:", err);
+        const mockProducts: Product[] = [
+          ...tools.map((t, i) => ({
+            id: i + 1,
+            type: ProductType.SOFTWARE,
+            name: t.name,
+            slug: t.slug,
+            description: t.description,
+            longDescription: t.longDescription,
+            category: t.category,
+            images: t.images,
+            url: t.url,
+            techStack: t.techStack,
+            features: t.features,
+            liveUrl: t.liveUrl,
+            createdAt: "",
+            updatedAt: "",
+          })),
+          ...ecommerce.map((e, i) => ({
+            id: 100 + i,
+            type: ProductType.ECOMMERCE,
+            name: e.name,
+            slug: e.slug,
+            description: e.description,
+            longDescription: e.longDescription,
+            category: e.category,
+            images: e.images,
+            url: e.url,
+            price: e.price,
+            createdAt: "",
+            updatedAt: "",
+          })),
+        ];
+        setProducts(mockProducts);
         setLoading(false);
       });
   }, []);

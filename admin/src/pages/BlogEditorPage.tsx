@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import mermaid from 'mermaid';
+import DOMPurify from 'isomorphic-dompurify';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { Extension } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
@@ -688,7 +689,10 @@ export default function BlogEditorPage() {
 
               <Box 
                 className="preview-content"
-                dangerouslySetInnerHTML={{ __html: content }} 
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content, {
+                  ALLOWED_TAGS: ['p', 'h1','h2','h3','ul','ol','li','code','pre','strong','em','a','img','blockquote','br','span'],
+                  ALLOWED_ATTR: ['href','src','alt','class','style']
+                }) }} 
                 sx={{
                   '& p': { mb: 3, lineHeight: 1.8, fontSize: '1.125rem', color: 'text.secondary' },
                   '& h2': { fontSize: '2rem', fontWeight: 700, mt: 6, mb: 3, color: 'text.primary' },

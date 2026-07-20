@@ -8,6 +8,7 @@ import { profile } from "@/data/mock";
 import { AvailabilityBadge } from "@/components/AvailabilityBadge";
 import { toast } from "sonner";
 import { BookingCalendar } from "@/components/BookingCalendar";
+import { submitContactForm } from "@/services/contact-service";
 
 const Github = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 9 18v4"></path></svg>
@@ -24,6 +25,7 @@ export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", subject: subjects[0], message: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export default function Contact() {
     }
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs: Record<string, string> = {};
     if (!form.name.trim()) errs.name = "Required";
@@ -50,8 +52,17 @@ export default function Contact() {
     if (form.message.trim().length < 10) errs.message = "At least 10 characters";
     setErrors(errs);
     if (Object.keys(errs).length) return;
-    toast.success("Message sent — I'll get back to you within 48 hours.");
-    setForm({ name: "", email: "", subject: subjects[0], message: "" });
+    
+    setIsSubmitting(true);
+    try {
+      await submitContactForm(form);
+      toast.success("Message sent — I'll get back to you within 48 hours.");
+      setForm({ name: "", email: "", subject: subjects[0], message: "" });
+    } catch (error) {
+      toast.error("Failed to send message. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -165,8 +176,8 @@ export default function Contact() {
                 <Field label="Message" error={errors.message}>
                   <textarea rows={6} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="input resize-none" />
                 </Field>
-                <button type="submit" className="w-full rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-                  Send message
+                <button type="submit" disabled={isSubmitting} className="w-full rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed">
+                  {isSubmitting ? "Sending..." : "Send message"}
                 </button>
                 <p className="text-xs text-muted-foreground">Prefer email? Reach me directly at {profile.email}.</p>
               </motion.form>

@@ -18,6 +18,8 @@ import { CreateBlogDto } from './dto/create-blog.dto.js';
 import { UpdateBlogDto } from './dto/update-blog.dto.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../auth/guards/roles.guard.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
 
 @ApiTags('Blog')
 @Controller('blog')
@@ -25,7 +27,8 @@ export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new blog post (admin)' })
   create(@Body() dto: CreateBlogDto, @Request() req) {
@@ -51,7 +54,8 @@ export class BlogController {
   }
 
   @Post('categories')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new category (admin)' })
   createCategory(@Body('name') name: string) {
@@ -59,7 +63,8 @@ export class BlogController {
   }
 
   @Get('comments/admin')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all comments for admin moderation' })
   adminGetComments(@Request() req) {
@@ -114,7 +119,8 @@ export class BlogController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a blog post (admin)' })
   update(
@@ -125,7 +131,8 @@ export class BlogController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a blog post (admin)' })
   remove(@Param('id', ParseIntPipe) id: number) {

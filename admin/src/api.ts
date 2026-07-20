@@ -11,13 +11,8 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Request interceptor: add token and encrypt payload
+// Request interceptor: encrypt payload
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
   if (IS_ENCRYPTED && config.data && config.headers['Content-Type'] !== 'multipart/form-data') {
     config.data = { payload: encryptData(config.data) };
   }
@@ -31,21 +26,44 @@ api.interceptors.response.use((response) => {
     response.data = decryptData(response.data.result);
   }
   return response;
-}, (error) => {
+}, async (error) => {
   if (IS_ENCRYPTED && error.response?.data?.result && typeof error.response.data.result === 'string') {
     error.response.data = decryptData(error.response.data.result);
   }
   if (error.response?.status === 401) {
-    localStorage.removeItem('admin_token');
-    
+    const originalRequest = error.config;
+
+    if (!originalRequest._retry && originalRequest.url !== '/auth/refresh' && originalRequest.url !== '/auth/login' && originalRequest.url !== '/auth/status') {
+      originalRequest._retry = true;
+      try {
+        await api.post('/auth/refresh');
+        return api(originalRequest);
+      } catch (e) {
+        // Dynamic import to break circular dependency
+        import('./store').then(({ store }) => {
+          import('./features/authSlice').then(({ logout }) => {
+            store.dispatch(logout());
+          });
+        });
+        localStorage.clear(); // Clear any legacy data
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        return Promise.reject(e);
+      }
+    }
+
     // Dynamic import to break circular dependency
     import('./store').then(({ store }) => {
       import('./features/authSlice').then(({ logout }) => {
         store.dispatch(logout());
       });
     });
+    localStorage.clear(); // Clear any legacy data
     
-    window.location.href = '/login';
+    if (window.location.pathname !== '/login') {
+      window.location.href = '/login';
+    }
   }
   return Promise.reject(error);
 });

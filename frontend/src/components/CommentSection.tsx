@@ -284,25 +284,25 @@ export default function CommentSection({ blogId }: { blogId: number }) {
 
   const handlePost = async (content: string) => {
     if (!token) return;
-    const newComment = await postComment(blogId, token, content);
+    const newComment = await postComment(blogId, content);
     setComments((prev) => [{ ...newComment, replies: [] }, ...prev]);
   };
 
   const handleReply = async (parentId: number, content: string) => {
     if (!token) return;
-    await postComment(blogId, token, content, parentId);
+    await postComment(blogId, content, parentId);
     await loadComments(); // re-fetch to rebuild tree
   };
 
   const handleEdit = async (commentId: number, content: string) => {
     if (!token) return;
-    await editComment(commentId, token, content);
+    await editComment(commentId, content);
     await loadComments();
   };
 
   const handleDelete = async (commentId: number) => {
     if (!token) return;
-    await deleteComment(commentId, token);
+    await deleteComment(commentId);
     await loadComments();
   };
 

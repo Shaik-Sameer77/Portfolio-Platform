@@ -3,7 +3,8 @@
 import { useEffect, useState, use } from "react";
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getProductBySlug, type Product } from "@/services/product-service";
+import { getProductBySlug, type Product, ProductType } from "@/services/product-service";
+import { ecommerce } from "@/data/mock";
 
 import { useCartStore } from "@/store/useCartStore";
 import {
@@ -45,8 +46,26 @@ export default function ProductDetailPage({
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch product:", err);
-        setError("Failed to load product details.");
+        console.warn("Failed to fetch product, using mock data as fallback:", err);
+        const mock = ecommerce.find((e) => e.slug === slug);
+        if (mock) {
+          setProduct({
+            id: 100,
+            type: ProductType.ECOMMERCE,
+            name: mock.name,
+            slug: mock.slug,
+            description: mock.description,
+            longDescription: mock.longDescription,
+            category: mock.category,
+            images: mock.images,
+            url: mock.url,
+            price: mock.price,
+            createdAt: "",
+            updatedAt: "",
+          });
+        } else {
+          setError("Failed to load product details.");
+        }
         setLoading(false);
       });
   }, [slug]);

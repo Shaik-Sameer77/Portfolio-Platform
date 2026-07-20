@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import mermaid from "mermaid";
+import DOMPurify from "isomorphic-dompurify";
 
 interface BlogContentProps {
   html: string;
@@ -78,11 +79,16 @@ export default function BlogContent({ html, className }: BlogContentProps) {
     return () => clearTimeout(timeout);
   }, [html]);
 
+  const sanitizedHtml = DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p', 'h1','h2','h3','ul','ol','li','code','pre','strong','em','a','img','blockquote','br','span'],
+    ALLOWED_ATTR: ['href','src','alt','class','style']
+  });
+
   return (
     <div
       ref={ref}
       className={className}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />
   );
 }

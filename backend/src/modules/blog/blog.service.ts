@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ConflictException, ForbiddenException } 
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { CreateBlogDto } from './dto/create-blog.dto.js';
 import { UpdateBlogDto } from './dto/update-blog.dto.js';
+import DOMPurify from 'isomorphic-dompurify';
 
 @Injectable()
 export class BlogService {
@@ -29,6 +30,10 @@ export class BlogService {
     return this.prisma.blog.create({
       data: {
         ...restDto,
+        content: restDto.content ? DOMPurify.sanitize(restDto.content, {
+          ALLOWED_TAGS: ['p', 'h1','h2','h3','ul','ol','li','code','pre','strong','em','a','img','blockquote','br','span'],
+          ALLOWED_ATTR: ['href','src','alt','class','style']
+        }) : restDto.content,
         slug,
         authorId,
         categories: categoryIds?.length ? {
@@ -121,6 +126,12 @@ export class BlogService {
 
     const { categoryIds, ...restDto } = dto as any;
     const updateData: any = { ...restDto };
+    if (updateData.content) {
+      updateData.content = DOMPurify.sanitize(updateData.content, {
+        ALLOWED_TAGS: ['p', 'h1','h2','h3','ul','ol','li','code','pre','strong','em','a','img','blockquote','br','span'],
+        ALLOWED_ATTR: ['href','src','alt','class','style']
+      });
+    }
     if (dto.title && !dto.slug) {
       updateData.slug = this.generateSlug(dto.title);
     }

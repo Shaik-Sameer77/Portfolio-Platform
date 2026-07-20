@@ -17,8 +17,13 @@ export class AuthService implements OnModuleInit {
 
   async onModuleInit() {
     // Seed default admin user on startup
-    const adminEmail = 'sameer.developer14@gmail.com';
-    const adminPassword = '@Rajabali77';
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword) {
+      console.warn('[Auth] ADMIN_EMAIL or ADMIN_PASSWORD not provided in environment variables. Skipping default admin seed.');
+      return;
+    }
 
     const existingAdmin = await this.prisma.user.findUnique({
       where: { email: adminEmail },
@@ -145,8 +150,24 @@ export class AuthService implements OnModuleInit {
 
     const payload = { sub: user.id, email: user.email, role: user.role };
 
+    return this.generateTokens(user.id, payload, user);
+  }
+
+  async generateTokens(userId: number, payload: any, user: any) {
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, salt);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { hashedRefreshToken },
+    });
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      refresh_token: refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -154,5 +175,33 @@ export class AuthService implements OnModuleInit {
         role: user.role,
       },
     };
+  }
+
+  async refreshTokens(refreshToken: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token is required');
+    }
+
+    try {
+      const payload = this.jwtService.verify(refreshToken, { secret: process.env.JWT_SECRET || 'default_secret' });
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+      });
+
+      if (!user || !user.hashedRefreshToken) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const isRefreshTokenValid = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
+
+      if (!isRefreshTokenValid) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const newPayload = { sub: user.id, email: user.email, role: user.role };
+      return this.generateTokens(user.id, newPayload, user);
+    } catch (e) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
   }
 }

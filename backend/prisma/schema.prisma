@@ -211,6 +211,7 @@ model User {
   isVerified              Boolean   @default(false)
   verificationToken       String?   @unique
   verificationTokenExpires DateTime?
+  hashedRefreshToken      String?   @db.Text
   createdAt               DateTime  @default(now())
   blogs                   Blog[]
   comments                Comment[]

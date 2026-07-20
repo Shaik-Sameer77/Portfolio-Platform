@@ -3,7 +3,8 @@
 import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getProductBySlug, type Product } from "@/services/product-service";
+import { getProductBySlug, type Product, ProductType } from "@/services/product-service";
+import { tools } from "@/data/mock";
 
 import {
   ArrowLeft,
@@ -34,8 +35,28 @@ export default function SoftwareDetailPage({
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch product:", err);
-        setError("Failed to load product details.");
+        console.warn("Failed to fetch product, using mock data as fallback:", err);
+        const mock = tools.find((t) => t.slug === slug);
+        if (mock) {
+          setProduct({
+            id: 1,
+            type: ProductType.SOFTWARE,
+            name: mock.name,
+            slug: mock.slug,
+            description: mock.description,
+            longDescription: mock.longDescription,
+            category: mock.category,
+            images: mock.images,
+            url: mock.url,
+            techStack: mock.techStack,
+            features: mock.features,
+            liveUrl: mock.liveUrl,
+            createdAt: "",
+            updatedAt: "",
+          });
+        } else {
+          setError("Failed to load product details.");
+        }
         setLoading(false);
       });
   }, [slug]);

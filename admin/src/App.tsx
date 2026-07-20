@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getTheme } from './theme';
 import type { RootState } from './store';
 
@@ -27,6 +27,7 @@ import ServicesPage from './pages/ServicesPage';
 import ProductsPage from './pages/ProductsPage';
 import CommentsPage from './pages/CommentsPage';
 import AppointmentsPage from './pages/AppointmentsPage';
+import MessagesPage from './pages/MessagesPage';
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -37,6 +38,25 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   const mode = useSelector((state: RootState) => state.theme.mode);
   const theme = React.useMemo(() => getTheme(mode), [mode]);
+
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    // Check if the HTTP-only cookie is present/valid on mount
+    import('./api').then(({ default: api }) => {
+      api.get('/auth/status')
+        .then((res) => {
+          if (res.data && res.data.user) {
+            import('./features/authSlice').then(({ loginSuccess }) => {
+              dispatch(loginSuccess({ user: res.data.user }));
+            });
+          }
+        })
+        .catch(() => {
+          // The interceptor will handle the 401, attempt refresh, and logout if it fails
+        });
+    });
+  }, [dispatch]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -147,6 +167,14 @@ function App() {
           <ProtectedRoute>
             <AdminLayout>
               <AppointmentsPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/messages" element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <MessagesPage />
             </AdminLayout>
           </ProtectedRoute>
         } />

@@ -92,7 +92,7 @@ function VerifyEmailContent() {
         {/* Branding */}
         <p className="mt-6 text-center text-xs text-muted-foreground">
           sameer.dev ·{' '}
-          <span className="text-primary font-medium">sameer.developer14@gmail.com</span>
+          <span className="text-primary font-medium">admin@example.com</span>
         </p>
       </div>
     </div>

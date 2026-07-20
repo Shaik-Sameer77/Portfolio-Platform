@@ -109,7 +109,7 @@ const navItems: NavItemData[] = [
   { label: 'Appointments', icon: <CalendarIcon />, path: '/appointments' },
   { label: 'Users', icon: <UsersIcon />, path: '/users' },
   { label: 'File Manager', icon: <FileIcon />, path: '/files' },
-  { label: 'Chats', icon: <ChatIcon />, path: '/chats' },
+  { label: 'Messages', icon: <ChatIcon />, path: '/messages' },
   { label: 'Theme Setter', icon: <ThemeIcon />, path: '/theme-setter' },
   { label: 'Support Tickets', icon: <SupportIcon />, path: '/support' },
   {

@@ -1,8 +1,8 @@
 /**
  * comment-service.ts
- * Uses the shared `proxy` instance from proxy.ts which already handles
+ * Uses the shared `proxy` instance from proxy.ts which handles
  * AES encryption on requests and decryption on responses (ISENCRYPTED_PAYLOAD).
- * Auth tokens are passed as per-request Authorization headers.
+ * Auth is handled via HTTP-only cookies (withCredentials: true on proxy).
  */
 import proxy from './proxy';
 
@@ -32,12 +32,6 @@ export interface AuthUser {
   email: string;
   name: string | null;
   role: string;
-}
-
-// ─── Auth helpers ─────────────────────────────────────────────────────────────
-
-function authHeader(token: string) {
-  return { headers: { Authorization: `Bearer ${token}` } };
 }
 
 // ─── Auth API ─────────────────────────────────────────────────────────────────
@@ -82,31 +76,27 @@ export async function fetchComments(blogId: number): Promise<Comment[]> {
 
 export async function postComment(
   blogId: number,
-  token: string,
   content: string,
   parentId?: number,
 ): Promise<Comment> {
   const res = await proxy.post(
     `/blog/${blogId}/comments`,
     { content, parentId: parentId ?? null },
-    authHeader(token),
   );
   return res.data;
 }
 
 export async function editComment(
   commentId: number,
-  token: string,
   content: string,
 ): Promise<Comment> {
   const res = await proxy.patch(
     `/blog/comments/${commentId}`,
     { content },
-    authHeader(token),
   );
   return res.data;
 }
 
-export async function deleteComment(commentId: number, token: string): Promise<void> {
-  await proxy.delete(`/blog/comments/${commentId}`, authHeader(token));
+export async function deleteComment(commentId: number): Promise<void> {
+  await proxy.delete(`/blog/comments/${commentId}`);
 }

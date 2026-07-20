@@ -7,8 +7,16 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../auth/guards/roles.guard.js';
+import { Roles } from '../auth/decorators/roles.decorator.js';
+import { Public } from '../auth/decorators/public.decorator.js';
+import { Role } from '@prisma/client';
+
 import { PortfolioService } from './portfolio.service.js';
 import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { UpdateSocialLinksDto } from './dto/update-social-links.dto.js';
@@ -38,12 +46,18 @@ import { UpdateTechStackDto } from './dto/update-tech-stack.dto.js';
 
 @ApiTags('Portfolio')
 @Controller('portfolio')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
+@ApiBearerAuth()
 export class PortfolioController {
   constructor(private readonly portfolioService: PortfolioService) {}
 
   // ─── Profile ──────────────────────────────────────────────────────────────
 
   @Get('profile')
+
+
+  @Public()
   @ApiOperation({ summary: 'Get profile data (public)' })
   getProfile() {
     return this.portfolioService.getProfile();
@@ -58,6 +72,9 @@ export class PortfolioController {
   // ─── Social Links ─────────────────────────────────────────────────────────
 
   @Get('social-links')
+
+
+  @Public()
   @ApiOperation({ summary: 'Get social links (public)' })
   getSocialLinks() {
     return this.portfolioService.getSocialLinks();
@@ -72,6 +89,9 @@ export class PortfolioController {
   // ─── Stats ───────────────────────────────────────────────────────────────
 
   @Get('stats')
+
+
+  @Public()
   @ApiOperation({ summary: 'List all stats (public)' })
   getStats() {
     return this.portfolioService.getStats();
@@ -103,6 +123,9 @@ export class PortfolioController {
   // ─── Projects ─────────────────────────────────────────────────────────────
 
   @Get('projects')
+
+
+  @Public()
   @ApiOperation({ summary: 'List all projects (public)' })
   getProjects() {
     return this.portfolioService.getProjects();
@@ -132,6 +155,9 @@ export class PortfolioController {
   // ─── Experience ───────────────────────────────────────────────────────────
 
   @Get('experience')
+
+
+  @Public()
   @ApiOperation({ summary: 'List all experience (public)' })
   getExperience() {
     return this.portfolioService.getExperience();
@@ -161,6 +187,9 @@ export class PortfolioController {
   // ─── Education ────────────────────────────────────────────────────────────
 
   @Get('education')
+
+
+  @Public()
   @ApiOperation({ summary: 'List all education (public)' })
   getEducation() {
     return this.portfolioService.getEducation();
@@ -190,6 +219,9 @@ export class PortfolioController {
   // ─── Certifications ───────────────────────────────────────────────────────
 
   @Get('certifications')
+
+
+  @Public()
   @ApiOperation({ summary: 'List all certifications (public)' })
   getCertifications() {
     return this.portfolioService.getCertifications();
@@ -219,6 +251,9 @@ export class PortfolioController {
   // ─── Services ─────────────────────────────────────────────────────────────
 
   @Get('services')
+
+
+  @Public()
   @ApiOperation({ summary: 'List all services (public)' })
   getServices() {
     return this.portfolioService.getServices();
@@ -248,6 +283,9 @@ export class PortfolioController {
   // ─── Developer Tools ──────────────────────────────────────────────────────
 
   @Get('developer-tools')
+
+
+  @Public()
   @ApiOperation({ summary: 'List all developer tools (public)' })
   getDeveloperTools() {
     return this.portfolioService.getDeveloperTools();
@@ -277,6 +315,9 @@ export class PortfolioController {
   // ─── Uses Items ───────────────────────────────────────────────────────────
 
   @Get('uses-items')
+
+
+  @Public()
   @ApiOperation({ summary: 'List all uses items (public)' })
   getUsesItems() {
     return this.portfolioService.getUsesItems();
@@ -306,6 +347,9 @@ export class PortfolioController {
   // ─── Gallery Photos ───────────────────────────────────────────────────────
 
   @Get('gallery-photos')
+
+
+  @Public()
   @ApiOperation({ summary: 'List all gallery photos (public)' })
   getGalleryPhotos() {
     return this.portfolioService.getGalleryPhotos();
@@ -335,6 +379,9 @@ export class PortfolioController {
   // ─── Tech Stack ───────────────────────────────────────────────────────────
 
   @Get('tech-stack')
+
+
+  @Public()
   @ApiOperation({ summary: 'List all tech stack items (public)' })
   getTechStack() {
     return this.portfolioService.getTechStack();
@@ -364,6 +411,9 @@ export class PortfolioController {
   // ─── About Section ────────────────────────────────────────────────────────
 
   @Get('about-section')
+
+
+  @Public()
   @ApiOperation({ summary: 'Get about section data (public)' })
   getAboutSection() {
     return this.portfolioService.getAboutSection();

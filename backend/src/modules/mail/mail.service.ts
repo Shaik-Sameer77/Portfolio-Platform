@@ -1,16 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import nodemailer from 'nodemailer';
+import { PrismaService } from '../../prisma/prisma.service.js';
 
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
   private transporter: nodemailer.Transporter;
 
-  constructor() {
+  constructor(private prisma: PrismaService) {
     const host = process.env.SMTP_HOST || 'smtp.gmail.com';
     const port = Number(process.env.SMTP_PORT) || 587;
-    const user = process.env.SMTP_USER || 'sameer.developer14@gmail.com';
-    const pass = process.env.SMTP_PASS || 'kazcewzpneowsaqa';
+    const user = process.env.SMTP_USER || '';
+    const pass = process.env.SMTP_PASS || '';
 
     this.transporter = nodemailer.createTransport({
       host,
@@ -26,7 +27,7 @@ export class MailService {
   async sendVerificationEmail(email: string, name: string, token: string) {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const verificationUrl = `${frontendUrl}/verify-email?token=${token}`;
-    const from = process.env.SMTP_FROM || '"Sameer Developer" <sameer.developer14@gmail.com>';
+    const from = process.env.SMTP_FROM || '"Admin" <admin@example.com>';
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -157,7 +158,7 @@ export class MailService {
     meetLink: string;
     timezone: string;
   }) {
-    const from = process.env.SMTP_FROM || '"Sameer Developer" <sameer.developer14@gmail.com>';
+    const from = process.env.SMTP_FROM || '"Admin" <admin@example.com>';
     const formattedDate = new Intl.DateTimeFormat('en-US', {
       dateStyle: 'full',
       timeStyle: 'short',
@@ -207,8 +208,8 @@ export class MailService {
     duration: number;
     meetLink: string;
   }) {
-    const from = process.env.SMTP_FROM || '"Portfolio System" <sameer.developer14@gmail.com>';
-    const to = process.env.SMTP_USER || 'sameer.developer14@gmail.com';
+    const from = process.env.SMTP_FROM || '"Portfolio System" <admin@example.com>';
+    const to = process.env.SMTP_USER || 'admin@example.com';
     
     const formattedDate = new Intl.DateTimeFormat('en-US', {
       dateStyle: 'full',
@@ -252,5 +253,68 @@ export class MailService {
     } catch (error) {
       this.logger.error(`Failed to send admin booking alert to: ${to}`, error.stack);
     }
+  }
+
+  async saveContactMessage(data: { name: string; email: string; subject: string; message: string }) {
+    // Save to DB
+    const contact = await this.prisma.contact.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        subject: data.subject,
+        message: data.message,
+      },
+    });
+
+    // Send email notification to Admin
+    const from = process.env.SMTP_FROM || '"Portfolio System" <admin@example.com>';
+    const to = process.env.SMTP_USER || 'admin@example.com';
+    
+    const htmlContent = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #0f172a;">📩 New Contact Message</h2>
+        <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin: 20px 0;">
+          <p style="margin: 5px 0;"><strong>From:</strong> ${data.name} (${data.email})</p>
+          <p style="margin: 5px 0;"><strong>Subject:</strong> ${data.subject}</p>
+        </div>
+        <div style="background-color: #fffbeb; padding: 15px; border-radius: 6px; border: 1px solid #fde68a;">
+          <p style="margin: 0; font-weight: bold;">Message:</p>
+          <p style="margin: 5px 0; white-space: pre-wrap;">${data.message}</p>
+        </div>
+      </div>
+    `;
+
+    try {
+      await this.transporter.sendMail({
+        from,
+        to,
+        subject: `New Contact Message from ${data.name}`,
+        html: htmlContent,
+      });
+      this.logger.log(`Admin contact alert sent to: ${to}`);
+    } catch (error) {
+      this.logger.error(`Failed to send admin contact alert to: ${to}`, error.stack);
+    }
+
+    return contact;
+  }
+
+  async getContactMessages() {
+    return this.prisma.contact.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async markContactAsRead(id: number) {
+    return this.prisma.contact.update({
+      where: { id },
+      data: { read: true },
+    });
+  }
+
+  async deleteContactMessage(id: number) {
+    return this.prisma.contact.delete({
+      where: { id },
+    });
   }
 }

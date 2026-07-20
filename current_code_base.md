@@ -105,13 +105,18 @@ Structured, relational data is persisted in a serverless PostgreSQL database man
 ```prisma
 // Authentication & Profiles
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  role      Role      @default(USER)
-  createdAt DateTime  @default(now())
-  blogs     Blog[]
-  comments  Comment[]
+  id                      Int       @id @default(autoincrement())
+  email                   String    @unique
+  password                String
+  name                    String?
+  role                    Role      @default(USER)
+  isVerified              Boolean   @default(false)
+  verificationToken       String?   @unique
+  verificationTokenExpires DateTime?
+  hashedRefreshToken      String?
+  createdAt               DateTime  @default(now())
+  blogs                   Blog[]
+  comments                Comment[]
 }
 
 enum Role {
@@ -338,6 +343,62 @@ model Contact {
   createdAt DateTime @default(now())
 }
 
+// Appointment Booking
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum AppointmentType {
+  CONSULTATION
+  TECHNICAL
+  PROJECT_KICKOFF
+  QUICK_CHAT
+}
+
+model AvailabilitySlot {
+  id        Int      @id @default(autoincrement())
+  dayOfWeek Int      // 0=Sun, 1=Mon, ..., 6=Sat
+  startTime String   // e.g., "10:00"
+  endTime   String   // e.g., "14:00"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlockedDate {
+  id     Int      @id @default(autoincrement())
+  date   DateTime
+  reason String?
+}
+
+model Appointment {
+  id              Int               @id @default(autoincrement())
+  type            AppointmentType   @default(CONSULTATION)
+  status          AppointmentStatus @default(PENDING)
+  clientName      String
+  clientEmail     String
+  clientCompany   String?
+  clientMobile    String?
+  clientMessage   String?           @db.Text
+  scheduledAt     DateTime
+  duration        Int               @default(30)
+  timezone        String            @default("UTC")
+  meetingUrl      String?           // Google Meet link
+  calendarEventId String?           
+  adminNotes      String?           @db.Text
+  cancelledAt     DateTime?
+  cancelReason    String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([scheduledAt])
+  @@index([status])
+}
+
 model ApiLog {
   id           Int      @id @default(autoincrement())
   method       String
@@ -378,6 +439,7 @@ portfolio-platform/
 │   ├── src/
 │   │   ├── modules/
 │   │   │   ├── api-log/ # System telemetry and request logging
+│   │   │   ├── appointment/ # Meeting scheduling and Google Calendar integration
 │   │   │   ├── auth/    # Login, Cookie management, Custom Extractors
 │   │   │   ├── blog/    # Blogging engine
 │   │   │   ├── mail/    # Nodemailer email communications
@@ -410,7 +472,6 @@ portfolio-platform/
 - **`/blog` & `/blog/[slug]`**: Dynamic articles, interactive commenting streams, and tag sorting.
 - **`/products` & `/products/[slug]`**: Detailed displays of downloadable tools (`SOFTWARE`) and deliverables (`ECOMMERCE`).
 - **`/gallery`**: Interactive photo grid documenting personal hobbies to humanize the developer's brand.
-
 ### Admin Dashboard (React + Vite + Material UI)
 - **`/login`**: Centered, glassmorphic auth panel verifying credential inputs.
 - **`/dashboard`**: Unified central dashboard featuring system status and quick links.
@@ -422,32 +483,154 @@ portfolio-platform/
 
 ---
 
-## API Modules
+## 8. Feature System Designs & Workflows
 
-### `/auth/*` (Authentication Module)
-- `POST /auth/login`: Verifies user credentials, returns metadata, and sets an **HTTP-only cookie** containing the JWT.
-- `POST /auth/logout`: Clears the HTTP-only `access_token` cookie.
-- `GET /auth/status`: Verifies user authentication status via cookie inspection.
+### 8.1 Authentication & Security (Auth Module)
+Handles secure administration sessions using HTTP-Only Cookies to mitigate XSS vulnerabilities.
 
-### `/products/*` (Digital Products Module)
-- `GET /products`: Fetches all active products ordered by creation date (Public).
-- `GET /products/:slug`: Looks up a unique product by slug, returning a `404` if not found (Public).
-- `POST /products`: Publishes a new product (Admin Only).
-- `PATCH /products/:id`: Updates an existing product details (Admin Only).
-- `DELETE /products/:id`: Permanently deletes a product record (Admin Only).
+**Database Entities:**
+| Model | Fields | Relations | Description |
+| :--- | :--- | :--- | :--- |
+| `User` | `id`, `email`, `password`, `role`, `isVerified`, `verificationToken` | Has Many `Blog`, `Comment` | Central user identity. Only `role: ADMIN` can write to the platform. |
 
-### `/portfolio/*` (Resume Module)
-- Standard GET/POST/PATCH/DELETE routes mapping to `Profile`, `TechStack`, `Project`, `Experience`, `Education`, and `Certification` models.
+**Sequence Diagram:**
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant Client as Admin Dashboard
+    participant API as AuthController (NestJS)
+    participant Auth as AuthService
+    participant DB as Prisma (User)
 
-### `/blogs/*` (Blogging Module)
-- Modular CRUD controllers managing `Blog`, `Category`, and user-submitted `Comment` attachments.
+    Admin->>Client: Enters Email & Password
+    Client->>API: POST /auth/login { email, password }
+    API->>Auth: validateUser(email, password)
+    Auth->>DB: findUnique({ email })
+    DB-->>Auth: Returns User record + Hash
+    Auth->>Auth: bcrypt.compare(password, hash)
+    Auth-->>API: Returns access_token & refresh_token
+    API->>DB: update({ hashedRefreshToken: bcrypt.hash(refreshToken) })
+    API->>Client: HTTP 200 OK (Set-Cookie: access_token, refresh_token HttpOnly)
+    Client-->>Admin: Redirects to /dashboard
+```
 
-### `/mail/*` & `/upload/*` (Utility Modules)
-- `POST /mail/contact`: Handles public contact form submissions and forwards them via Nodemailer.
-- `POST /upload/image`: Ingests files via Multer and pipes them directly to Cloudinary for static asset hosting.
+### 8.2 Digital Products & Storefront (Product Module)
+Manages the marketplace for SaaS apps, CLI tools, and E-commerce deliverables.
 
-### `/api-log/*` (Observability Module)
-- Intercepts and records detailed telemetry (methods, latencies, status codes) for system health monitoring.
+**Database Entities:**
+| Model | Fields | Relations | Description |
+| :--- | :--- | :--- | :--- |
+| `Product` | `id`, `type`, `name`, `slug`, `price`, `images`, `features`, `techStack` | None | Unified schema for both `SOFTWARE` and `ECOMMERCE` enum types. `slug` is uniquely indexed for fast Next.js SSG lookups. |
+
+**Sequence Diagram:**
+```mermaid
+sequenceDiagram
+    actor Visitor
+    participant FE as Next.js Storefront
+    participant API as ProductController
+    participant DB as Prisma (Product)
+
+    Visitor->>FE: Clicks "Download CLI Tool"
+    FE->>API: GET /products/software/cli-tool
+    API->>DB: findUnique({ where: { slug: 'cli-tool' }})
+    
+    alt Product Found
+        DB-->>API: Product Record JSON
+        API-->>FE: HTTP 200 OK
+        FE-->>Visitor: Renders Product Detail Sheet
+    else Product Not Found
+        DB-->>API: null
+        API-->>FE: HTTP 404 NotFoundException
+        FE-->>Visitor: Redirects to generic Error Page
+    end
+```
+
+### 8.3 Blogging Engine & Comments (Blog Module)
+Full-featured CMS for publishing rich-text Markdown articles and moderating public discussions.
+
+**Database Entities:**
+| Model | Fields | Relations | Description |
+| :--- | :--- | :--- | :--- |
+| `Blog` | `id`, `title`, `slug`, `content`, `published`, `coverImage` | Belongs To `User` (Author), Has Many `Comment`, Has Many `Category` | The core article entity. `content` stores raw TipTap HTML. |
+| `Category` | `id`, `name`, `slug` | Has Many `Blog` | Folksonomy tagging system for grouping related posts. |
+| `Comment` | `id`, `content`, `blogId`, `userId`, `createdAt` | Belongs To `Blog`, Belongs To `User` | Public or authenticated user replies on articles. |
+
+**Sequence Diagram:**
+```mermaid
+sequenceDiagram
+    actor User
+    participant FE as Next.js Blog UI
+    participant API as CommentController
+    participant Auth as JwtAuthGuard
+    participant DB as Prisma (Comment)
+
+    User->>FE: Submits "Great post!"
+    FE->>API: POST /blogs/1/comments { content: "Great post!" } (Cookies Attached)
+    
+    API->>Auth: Verify access_token cookie
+    Auth-->>API: Valid session (Extracts userId: 5)
+    
+    API->>DB: create({ data: { content, blogId: 1, userId: 5 }})
+    DB-->>API: Created Comment record
+    API-->>FE: HTTP 201 Created
+    FE-->>User: Optimistically renders new comment in thread
+```
+
+### 8.4 Portfolio & Resume Syncing (Portfolio Module)
+Dynamic APIs feeding the career history, skills, and developer setups (`/uses`).
+
+**Database Entities:**
+| Model | Fields | Description |
+| :--- | :--- | :--- |
+| `Profile` | `id`, `name`, `title`, `bio`, `availableForWork` | Single-record configuration dictating global "Hire Me" status. |
+| `Project` | `id`, `title`, `techStack`, `githubUrl`, `images` | Deep-dive case studies showcased in the `/projects` grid. |
+| `Experience` | `id`, `company`, `role`, `bullets`, `current` | Interactive career timeline history. |
+
+### 8.5 Appointment Booking & Calendar (Appointment Module)
+Handles public scheduling of technical consultations and generates Google Meet links.
+
+**Database Entities:**
+| Model | Fields | Relations | Description |
+| :--- | :--- | :--- | :--- |
+| `Appointment` | `id`, `type`, `status`, `clientEmail`, `scheduledAt`, `meetingUrl` | None | The core booking instance. Statuses: `PENDING`, `CONFIRMED`. |
+| `AvailabilitySlot` | `dayOfWeek`, `startTime`, `endTime` | None | Base schedule blocks (e.g., Every Monday 10:00 to 14:00). |
+| `BlockedDate` | `date`, `reason` | None | OOO (Out of Office) overrides bypassing availability slots. |
+
+**Sequence Diagram:**
+```mermaid
+sequenceDiagram
+    actor Client
+    participant FE as Booking Calendar UI
+    participant API as AppointmentController
+    participant Mail as MailService
+    participant DB as Prisma
+
+    Client->>FE: Selects May 4th @ 2PM, Submits Form
+    FE->>API: POST /appointments { scheduledAt, email, name }
+    API->>DB: create({ status: PENDING })
+    DB-->>API: Inserted Record
+    
+    API->>Mail: sendBookingConfirmation(email, date, meetLink)
+    Mail-->>API: Async SMTP Success
+    
+    API-->>FE: HTTP 201 Created
+    FE-->>Client: Displays "Booking Confirmed" Success Screen
+```
+
+### 8.6 Media Ingestion & Mailing (Upload/Mail Modules)
+Stateless utility wrappers handling blob streams and SMTP dispatches.
+
+**Architecture Workflow:**
+1. **Cloudinary Uploads**: A `multipart/form-data` image stream hits `/upload/image`. Multer buffers it, and `streamifier` pipes it directly over the wire to Cloudinary's secure API. Cloudinary returns a CDN `url`, which is subsequently saved in the respective PostgreSQL entity (e.g., `Blog.coverImage`).
+2. **Nodemailer SMTP**: A wrapper executing fire-and-forget Promises to dispatch Google-authenticated HTML emails using environmental `SMTP_USER` flags.
+
+### 8.7 System Telemetry (ApiLog Module)
+Observability pattern that wraps the NestJS Express instance.
+
+**Database Entity:**
+| Model | Fields | Description |
+| :--- | :--- | :--- |
+| `ApiLog` | `method`, `url`, `statusCode`, `duration`, `ip` | Traps all inbound API requests and execution times for admin audit panels. |
 
 ---
 
@@ -487,20 +670,27 @@ portfolio-platform/
 
 ## Authentication & Security
 
-### Secure HTTP-Only Lax Cookies
+### Secure HTTP-Only Lax Cookies & Rotating Refresh Tokens
 To prevent XSS (Cross-Site Scripting) vectors and mitigate token theft, the project bypasses `localStorage` for JWT tokens.
-- **Storage**: The JWT `access_token` is generated inside `AuthService` and written to an HTTP-only cookie on the login response.
-- **Direct Header Extraction**: The backend features a custom cookie extractor in `jwt.strategy.ts` that manually parses Express cookie headers, ensuring compatibility with standard non-cookie fallback configurations.
+- **Storage**: The `access_token` (short-lived, 15m) and `refresh_token` (long-lived, 7d) are generated inside `AuthService` and written to HTTP-only cookies on the login response.
+- **Database Hashing**: The `refresh_token` is hashed via `bcrypt` before being stored in the PostgreSQL `User` record (`hashedRefreshToken`). If the database is breached, attackers cannot forge sessions because they do not possess the raw plaintext refresh tokens. Redis was considered but discarded to maintain a minimal infrastructure footprint.
 - **Cookie Security Settings**:
   - `httpOnly: true` (strictly blocked from JavaScript runtime).
   - `sameSite: 'lax'` (defends against Cross-Site Request Forgery).
   - `secure: process.env.NODE_ENV === 'production'` (forces SSL transmission in production).
 
-### Graceful 401 Interceptions
-When session tokens expire or are cleared:
-1. The Axios client detects a `401 Unauthorized` response code.
-2. An interceptor dynamically imports the Redux store (to avoid Vite circular dependencies) and triggers `store.dispatch(logout())`.
-3. Clearances occur across Redux and non-sensitive `localStorage` flags (`admin_logged_in`, `admin_user`), triggering automatic, graceful redirects to the `/login` route.
+### Graceful 401 Interceptions & Silent Refresh
+When an `access_token` expires:
+1. The Axios client (`proxy.ts` / `api.ts`) detects a `401 Unauthorized` response code.
+2. The original request is paused, and the interceptor triggers `POST /auth/refresh`, relying on the browser to send the `refresh_token` cookie.
+3. The backend validates the token against the `hashedRefreshToken` in the DB. If valid, new cookies are issued and the interceptor silently replays the paused request. The user experiences zero interruption.
+4. If the refresh fails (e.g., token expired or manually deleted), the interceptor calls an internal `_clearSession()` method in Zustand/Redux which wipes local UI state (avoiding a cascading backend logout loop) and redirects to `/login`.
+
+### Content Sanitization (XSS Prevention)
+All rich text content, such as blog posts, is strictly sanitized before being saved to the database (server-side) and before being rendered to the DOM (client-side) using `isomorphic-dompurify`. This eliminates the risk of Stored XSS vulnerabilities that could otherwise be exploited through `dangerouslySetInnerHTML`.
+
+### Secret Management
+Default, weak JWT secrets have been entirely purged from the codebase. The application enforces the presence of a strong cryptographic secret in the `.env` file and will halt execution (`throw new Error`) on startup if an insecure fallback is detected.
 
 ---
 
@@ -587,8 +777,14 @@ Development schema migrations can drift when manual database changes are introdu
 
 ## Interview Talking Points
 
-- **"How did you secure user sessions?"**
-  > "I moved away from storing JWTs in `localStorage` due to XSS vulnerabilities. Instead, the backend writes tokens into secure, HTTP-only Lax cookies. The client uses an Axios client with `withCredentials: true` to forward cookies automatically. If a token expires and returns a 401, a global Axios interceptor dynamically imports the Redux store to dispatch a logout action, redirecting the user to `/login` immediately without freezing the UI."
+- **"How did you secure user sessions and handle Token Expiration?"**
+  > "I moved away from storing JWTs in `localStorage` due to XSS vulnerabilities. Instead, the backend writes short-lived `access_token` (15m) and long-lived `refresh_token` (7d) into secure, HTTP-only cookies. When an access token expires, a global Axios interceptor catches the 401 response, pauses the request, and silently calls `/auth/refresh` using the refresh cookie. Once new cookies are issued, the original request is replayed. The user never notices."
+
+- **"Why store the Refresh Token in Postgres instead of Redis?"**
+  > "To keep the infrastructure simple and highly cohesive, I stored the refresh token directly on the `User` model. However, I explicitly **hash the refresh token with bcrypt** before saving it (`hashedRefreshToken`). If the database is compromised, the attacker only gets the hash—they cannot forge a valid session without the raw plaintext token."
+
+- **"Tell me about a tricky bug you solved during authentication hardening."**
+  > "I encountered a **Cascading Logout Bug** with the refresh interceptor. Initially, if a refresh failed, the interceptor would call the global `logout()` function. But `logout()` was making a backend API call to clear cookies. This wiped out the database tokens, creating an infinite loop on the next page mount when `/auth/status` failed. I solved this by decoupling the logout logic: explicit user logouts call the backend, but interceptor failures call a `_clearSession()` function that strictly clears local UI state."
 
 - **"Why did you choose a Modular Monolith model?"**
   > "A modular monolith provides outstanding developer velocity and simple deployment topology while keeping modules isolated. By using NestJS modules, I achieved strict separation of concerns. If I ever need to scale the products or blogs feature separately in the future, the code is already decoupled enough to be extracted into a separate service with minimal refactoring."
