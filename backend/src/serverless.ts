@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module.js';
 import { EncryptInterceptor } from './common/interceptors/encrypt.interceptor.js';
 import express, { Express } from 'express';
@@ -33,6 +34,18 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type,Accept,Authorization',
     credentials: true,
   });
+
+  const config = new DocumentBuilder()
+    .setTitle('Portfolio Platform API')
+    .setDescription(
+      'Backend-driven portfolio platform — serves all content to the public site and admin dashboard.',
+    )
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   await app.init();
   isReady = true;
