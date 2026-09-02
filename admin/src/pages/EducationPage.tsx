@@ -146,7 +146,7 @@ export default function EducationPage() {
                 <TableRow>
                   <TableCell>Institution</TableCell>
                   <TableCell>Degree</TableCell>
-                  <TableCell>Years</TableCell>
+                  <TableCell>Period (Start — End Year)</TableCell>
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -155,7 +155,7 @@ export default function EducationPage() {
                   <TableRow key={edu.id}>
                     <TableCell>{edu.institution}</TableCell>
                     <TableCell>{edu.degree}</TableCell>
-                    <TableCell>{edu.startYear} - {edu.endYear || 'Present'}</TableCell>
+                    <TableCell>{edu.startYear} — {edu.endYear || 'Present'}</TableCell>
                     <TableCell align="right">
                       <IconButton onClick={() => handleOpenEdu(edu)}><EditIcon fontSize="small" /></IconButton>
                       <IconButton color="error" onClick={() => dispatch(deleteEducation(edu.id))}><DeleteIcon fontSize="small" /></IconButton>
@@ -214,10 +214,10 @@ export default function EducationPage() {
               <TextField fullWidth label="Degree" value={eduForm.degree} onChange={(e) => setEduForm({ ...eduForm, degree: e.target.value })} />
             </Grid>
             <Grid size={{ xs: 6 }}>
-              <TextField fullWidth type="number" label="Start Year" value={eduForm.startYear} onChange={(e) => setEduForm({ ...eduForm, startYear: parseInt(e.target.value) || 0 })} />
+              <TextField fullWidth type="number" label="Start Year (e.g. 2019)" value={eduForm.startYear || ''} onChange={(e) => setEduForm({ ...eduForm, startYear: parseInt(e.target.value) || 0 })} />
             </Grid>
             <Grid size={{ xs: 6 }}>
-              <TextField fullWidth type="number" label="End Year (0 for Present)" value={eduForm.endYear} onChange={(e) => setEduForm({ ...eduForm, endYear: parseInt(e.target.value) || 0 })} />
+              <TextField fullWidth type="number" label="End Year (e.g. 2023, or 0 for Present)" value={eduForm.endYear || ''} onChange={(e) => setEduForm({ ...eduForm, endYear: parseInt(e.target.value) || 0 })} />
             </Grid>
           </Grid>
         </DialogContent>

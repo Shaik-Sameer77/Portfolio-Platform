@@ -29,14 +29,12 @@ export default function Education() {
     fetchData();
   }, []);
 
-  const activeEducation = eduData || mockEducation.map(e => ({
-    id: Math.random(),
+  const activeEducation = eduData || mockEducation.map((e, idx) => ({
+    id: idx + 1,
     institution: e.school,
     degree: e.degree,
-    startYear: 0,
-    endYear: 0,
-    // Just a hacky way to map mock date to UI since mock has strings like '2018 - 2022'
-    _mockDate: e.date 
+    startYear: e.startYear,
+    endYear: e.endYear,
   }));
 
   if (loading) {
@@ -58,7 +56,7 @@ export default function Education() {
                   <div className="text-sm text-muted-foreground">{e.degree}</div>
                 </div>
                 <div className="font-mono text-xs text-muted-foreground">
-                  {e._mockDate ? e._mockDate : (e.endYear ? `${e.startYear} — ${e.endYear}` : `${e.startYear} — Present`)}
+                  {e.endYear ? `${e.startYear} — ${e.endYear}` : `${e.startYear} — Present`}
                 </div>
               </div>
             ))}
