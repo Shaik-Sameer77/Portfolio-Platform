@@ -13,7 +13,13 @@ const api = axios.create({
 
 // Request interceptor: encrypt payload
 api.interceptors.request.use((config) => {
-  if (IS_ENCRYPTED && config.data && config.headers['Content-Type'] !== 'multipart/form-data') {
+  if (config.data instanceof FormData) {
+    // Remove the explicit Content-Type so the browser/Axios can automatically 
+    // set it along with the required boundary string for multipart uploads.
+    if (config.headers && config.headers['Content-Type']) {
+      delete config.headers['Content-Type'];
+    }
+  } else if (IS_ENCRYPTED && config.data) {
     config.data = { payload: encryptData(config.data) };
   }
   

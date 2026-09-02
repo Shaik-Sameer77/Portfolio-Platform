@@ -306,3 +306,26 @@ html:not(.splash-visited) header,
 html:not(.splash-visited) footer {
   display: none !important;
 }
+
+/* Custom scrollbar for Project Carousel when zoomed */
+.carousel-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.carousel-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 6px;
+}
+.carousel-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  border: 2px solid rgba(15, 23, 42, 0.6);
+}
+.carousel-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+.carousel-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.5) rgba(15, 23, 42, 0.6);
+}
+

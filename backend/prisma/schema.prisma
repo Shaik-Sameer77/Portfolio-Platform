@@ -113,6 +113,8 @@ model Service {
   currency    String   @default("USD")
   featured    Boolean  @default(false)
   order       Int      @default(0)
+
+  orders      Order[]
 }
 
 model DeveloperTool {
@@ -215,6 +217,7 @@ model User {
   createdAt               DateTime  @default(now())
   blogs                   Blog[]
   comments                Comment[]
+  orders                  Order[]
 }
 
 enum Role {
@@ -277,6 +280,8 @@ model Product {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
+  orders          Order[]
+
   @@index([slug])
 }
 
@@ -338,6 +343,69 @@ model Appointment {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
+  orders          Order[]
+
   @@index([scheduledAt])
   @@index([status])
 }
+
+// ─── Orders & Payments ────────────────────────────────────────────────────────
+
+enum PaymentGateway {
+  STRIPE
+  RAZORPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum OrderType {
+  PRODUCT
+  SERVICE
+  APPOINTMENT
+}
+
+model Order {
+  id              Int            @id @default(autoincrement())
+  orderNumber     String         @unique @default(cuid())
+  type            OrderType
+  
+  productId       Int?
+  serviceId       Int?
+  appointmentId   Int?
+  
+  customerName    String
+  customerEmail   String
+  userId          Int?
+  
+  amount          Float
+  currency        String         @default("USD")
+  
+  gateway         PaymentGateway
+  gatewayOrderId  String?
+  gatewayPaymentId String?
+  
+  status          PaymentStatus  @default(PENDING)
+  
+  metadata        Json?
+  paidAt          DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  product         Product?       @relation(fields: [productId], references: [id])
+  service         Service?       @relation(fields: [serviceId], references: [id])
+  appointment     Appointment?   @relation(fields: [appointmentId], references: [id])
+  user            User?          @relation(fields: [userId], references: [id])
+  
+  @@index([orderNumber])
+  @@index([customerEmail])
+  @@index([status])
+  @@index([gatewayOrderId])
+}
+

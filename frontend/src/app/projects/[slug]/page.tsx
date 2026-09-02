@@ -47,9 +47,12 @@ export default async function ProjectDetails({ params }: { params: Promise<{ slu
   const allProjects = await getProjects().catch(() => []);
   const more = allProjects.filter((p: any) => p.slug !== slug).slice(0, 3);
 
-  const projectImages = project.images && project.images.length > 0 
-    ? project.images 
-    : (project.imageUrl ? [project.imageUrl] : []);
+  const projectImages = Array.from(
+    new Set([
+      ...(project.imageUrl ? [project.imageUrl] : []),
+      ...(project.images || [])
+    ].filter((url): url is string => Boolean(url)))
+  );
 
   return (
     <div className="container-page pt-16 pb-24">

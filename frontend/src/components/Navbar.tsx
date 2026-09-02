@@ -14,6 +14,7 @@ import { LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { AuthModal } from "./AuthModal";
 import { toast } from "sonner";
+import PaymentGatewaySelector from "./PaymentGatewaySelector";
 
 const navLinks = [
   { label: "Blog", href: "/blog" },
@@ -42,6 +43,7 @@ export const Navbar = () => {
   const [mounted, setMounted] = useState(false);
   const [profileData, setProfileData] = useState<Profile | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   const { token, user, logout, openModal, initialize } = useAuthStore();
   
@@ -67,6 +69,10 @@ export const Navbar = () => {
     setMega(false);
     setDrawer(false);
   }, [pathname, setMega, setDrawer]);
+
+  useEffect(() => {
+    if (!cartOpen) setShowPayment(false);
+  }, [cartOpen]);
 
   const activeResumeUrl = profileData?.resumeUrl || profile.resumeUrl || "/resume.pdf";
 
@@ -445,9 +451,29 @@ export const Navbar = () => {
                       <span>Total</span>
                       <span>${totalPrice().toFixed(2)}</span>
                     </div>
-                    <button className="w-full rounded-xl bg-primary py-3.5 text-center text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-[0.98]">
-                      Checkout
-                    </button>
+                    {showPayment && cartItems.length > 0 && user ? (
+                      <PaymentGatewaySelector 
+                        type="PRODUCT" 
+                        itemSlug={cartItems[0].id} 
+                        amount={totalPrice()} 
+                        customerName={user.name || user.email.split("@")[0]} 
+                        customerEmail={user.email} 
+                      />
+                    ) : (
+                      <button 
+                        onClick={() => {
+                          if (!user) {
+                            setCartOpen(false);
+                            openModal("login");
+                            toast.error("Please sign in to checkout.");
+                            return;
+                          }
+                          setShowPayment(true);
+                        }}
+                        className="w-full rounded-xl bg-primary py-3.5 text-center text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-[0.98]">
+                        Checkout
+                      </button>
+                    )}
                   </div>
                 </>
               )}

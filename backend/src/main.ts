@@ -6,7 +6,9 @@ import { EncryptInterceptor } from './common/interceptors/encrypt.interceptor.js
 import morgan from 'morgan';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
 
   app.use(morgan('[:date[iso]] :method :url :status :res[content-length] - :response-time ms'));
   app.useGlobalInterceptors(new EncryptInterceptor());

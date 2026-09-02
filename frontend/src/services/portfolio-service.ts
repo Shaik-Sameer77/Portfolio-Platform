@@ -62,10 +62,13 @@ export interface Blog {
   categories?: Category[];
 }
 
+export const slugify = (text: string) => 
+  text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
 // Helper to map backend project to UI project shape if needed
 export const mapProjectToUI = (p: Project) => ({
   ...p,
-  slug: p.title.toLowerCase().replace(/ /g, '-'),
+  slug: slugify(p.title || ''),
   stack: p.techStack,
   github: p.githubUrl,
   live: p.liveUrl,
@@ -90,8 +93,18 @@ export const getProjects = async () => {
 };
 
 export const getProjectBySlug = async (slug: string) => {
-  const project = await ApiService.get<Project>(`/portfolio/projects/${slug}`);
-  return mapProjectToUI(project);
+  const projects = await getProjects();
+  const decodedSlug = decodeURIComponent(slug);
+  const normalizedTarget = slugify(decodedSlug);
+
+  const project = projects.find(p => 
+    p.slug === slug || 
+    p.slug === decodedSlug || 
+    slugify(p.title || '') === normalizedTarget
+  );
+  
+  if (!project) throw new Error('Project not found');
+  return project;
 };
 
 export const getBlogs = () => ApiService.get<Blog[]>('/blog');
