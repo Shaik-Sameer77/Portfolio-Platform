@@ -37,15 +37,16 @@
     "cloudinary": "^2.9.0",
     "crypto-js": "^4.2.0",
     "date-fns": "^4.4.0",
+    "express": "^5.1.0",
     "google-auth-library": "^10.6.2",
     "googleapis": "^173.0.0",
-    "isomorphic-dompurify": "^3.18.0",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.10",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.20.0",
     "razorpay": "^2.9.8",
+    "sanitize-html": "^2.16.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "streamifier": "^0.1.1",
@@ -70,6 +71,7 @@
     "@types/nodemailer": "^8.0.0",
     "@types/passport-jwt": "^4.0.1",
     "@types/pg": "^8.20.0",
+    "@types/sanitize-html": "^2.13.0",
     "@types/streamifier": "^0.1.2",
     "@types/supertest": "^7.0.0",
     "dotenv": "^17.4.2",
@@ -107,9 +109,5 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   },
-  "pnpm": {
-    "overrides": {
-      "@exodus/bytes": "1.14.0"
-    }
-  }
+  "pnpm": {}
 }
