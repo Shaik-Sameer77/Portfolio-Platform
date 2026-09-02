@@ -106,5 +106,10 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "pnpm": {
+    "overrides": {
+      "@exodus/bytes": "1.14.0"
+    }
   }
 }
