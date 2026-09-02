@@ -107,10 +107,8 @@ export class AuthController {
   }
 
   @Get('status')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Check auth status' })
-  status(@Req() req) {
-    return { user: req.user };
+  @ApiOperation({ summary: 'Check auth status (returns 200 OK with user: null if guest)' })
+  status(@Req() req: Request) {
+    return this.authService.getStatusFromRequest(req);
   }
 }

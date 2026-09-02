@@ -204,4 +204,48 @@ export class AuthService implements OnModuleInit {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
+
+  async getStatusFromRequest(req: any) {
+    let token: string | null = null;
+
+    if (req && req.headers && req.headers.cookie) {
+      const rawCookies = (req.headers.cookie as string).split(';');
+      for (const cookie of rawCookies) {
+        const [key, val] = cookie.trim().split('=');
+        if (key === 'access_token') {
+          token = val;
+          break;
+        }
+      }
+    }
+
+    if (!token && req && req.headers && req.headers.authorization) {
+      const authHeader = req.headers.authorization as string;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
+
+    if (!token) {
+      return { authenticated: false, user: null };
+    }
+
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET || 'default_secret',
+      });
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+        select: { id: true, email: true, name: true, role: true, isVerified: true },
+      });
+
+      if (!user) {
+        return { authenticated: false, user: null };
+      }
+
+      return { authenticated: true, user };
+    } catch {
+      return { authenticated: false, user: null };
+    }
+  }
 }
