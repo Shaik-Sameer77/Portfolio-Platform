@@ -109,5 +109,9 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   },
-  "pnpm": {}
+  "pnpm": {
+    "overrides": {
+      "htmlparser2": "9.1.0"
+    }
+  }
 }
