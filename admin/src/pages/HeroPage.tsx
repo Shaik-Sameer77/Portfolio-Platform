@@ -12,25 +12,28 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Timeline as StatsIcon,
-  Home as HeroIcon
+  Home as HeroIcon,
+  Link as LinkIcon
 } from '@mui/icons-material';
 import ImageUpload from '../components/ImageUpload';
 import type { AppDispatch, RootState } from '../store';
 import api from '../api';
 import { 
-  fetchProfile, updateProfile, createStat, deleteStat, 
-  type Profile
+  fetchProfile, updateProfile, updateSocialLinks, createStat, deleteStat, 
+  type Profile, type SocialLinks
 } from '../features/profileSlice';
 
 export default function HeroPage() {
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme();
-  const { profile, stats, loading, error } = useSelector((s: RootState) => s.profile);
+  const { profile, socialLinks, stats, loading, error } = useSelector((s: RootState) => s.profile);
   
   const [profileForm, setProfileForm] = useState<Profile>({});
+  const [socialForm, setSocialForm] = useState<SocialLinks>({});
   const [statForm, setStatForm] = useState({ label: '', value: '', order: 0 });
   const [statDialogOpen, setStatDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingSocial, setSavingSocial] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -41,7 +44,10 @@ export default function HeroPage() {
     if (profile) {
       setProfileForm(profile);
     }
-  }, [profile]);
+    if (socialLinks) {
+      setSocialForm(socialLinks);
+    }
+  }, [profile, socialLinks]);
 
   const handleProfileSave = async () => {
     setSaving(true);
@@ -74,6 +80,12 @@ export default function HeroPage() {
     setSaving(false);
   };
 
+  const handleSocialSave = async () => {
+    setSavingSocial(true);
+    await dispatch(updateSocialLinks(socialForm));
+    setSavingSocial(false);
+  };
+
   const handleStatSave = async () => {
     await dispatch(createStat(statForm));
     setStatDialogOpen(false);
@@ -97,99 +109,166 @@ export default function HeroPage() {
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700 }}>Hero Section</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 700 }}>Hero & Profile</Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-          Manage your landing page headlines, bio, and metrics
+          Manage landing page headlines, bio, metrics, and social links
         </Typography>
       </Box>
 
       {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
       <Grid container spacing={3}>
-        {/* Left Column: Hero Text */}
+        {/* Left Column: Hero Text & Social Links */}
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Card>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-                <HeroIcon color="secondary" />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Hero Content</Typography>
-              </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Card>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                  <HeroIcon color="secondary" />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>Hero Content</Typography>
+                </Box>
 
-              <Grid container spacing={3}>
-                <Grid size={12}>
-                  <TextField
-                    fullWidth
-                    label="Main Headline"
-                    placeholder="e.g. I build systems, not just websites."
-                    value={profileForm.headline || ''}
-                    onChange={(e) => setProfileForm({ ...profileForm, headline: e.target.value })}
-                  />
+                <Grid container spacing={3}>
+                  <Grid size={12}>
+                    <TextField
+                      fullWidth
+                      label="Main Headline"
+                      placeholder="e.g. I build systems, not just websites."
+                      value={profileForm.headline || ''}
+                      onChange={(e) => setProfileForm({ ...profileForm, headline: e.target.value })}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Headline Highlight (Optional)"
+                      placeholder="e.g. not just websites."
+                      value={profileForm.subHeadline || ''}
+                      onChange={(e) => setProfileForm({ ...profileForm, subHeadline: e.target.value })}
+                      helperText="Text that appears in a different color"
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <ImageUpload 
+                      label="Avatar Image"
+                      folder="hero"
+                      value={profileForm.avatarUrl}
+                      deferred={true}
+                      onUploadSuccess={(url) => setProfileForm({ ...profileForm, avatarUrl: url })}
+                      onFileSelect={(file, preview) => {
+                        setProfileForm({ ...profileForm, avatarUrl: preview });
+                        setAvatarFile(file);
+                      }}
+                    />
+                  </Grid>
+                  <Grid size={12}>
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={4}
+                      label="Hero Description"
+                      placeholder="Enter your specialized pitch for the hero section..."
+                      value={profileForm.heroDescription || ''}
+                      onChange={(e) => setProfileForm({ ...profileForm, heroDescription: e.target.value })}
+                    />
+                  </Grid>
+                  <Grid size={12}>
+                    <FormControlLabel
+                      control={
+                        <Switch 
+                          checked={profileForm.availableForWork || false}
+                          onChange={(e) => setProfileForm({ ...profileForm, availableForWork: e.target.checked })}
+                          color="secondary"
+                        />
+                      }
+                      label="Available for Work"
+                    />
+                  </Grid>
                 </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField
-                    fullWidth
-                    label="Headline Highlight (Optional)"
-                    placeholder="e.g. not just websites."
-                    value={profileForm.subHeadline || ''}
-                    onChange={(e) => setProfileForm({ ...profileForm, subHeadline: e.target.value })}
-                    helperText="Text that appears in a different color"
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <ImageUpload 
-                    label="Avatar Image"
-                    folder="hero"
-                    value={profileForm.avatarUrl}
-                    deferred={true}
-                    onUploadSuccess={(url) => setProfileForm({ ...profileForm, avatarUrl: url })}
-                    onFileSelect={(file, preview) => {
-                      setProfileForm({ ...profileForm, avatarUrl: preview });
-                      setAvatarFile(file);
+
+                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="contained"
+                    startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
+                    onClick={handleProfileSave}
+                    disabled={saving}
+                    sx={{ 
+                      background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark || '#0891b2'})`, 
+                      color: theme.palette.background.default,
+                      px: 4
                     }}
-                  />
-                </Grid>
-                <Grid size={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="Hero Description"
-                    placeholder="Enter your specialized pitch for the hero section..."
-                    value={profileForm.heroDescription || ''}
-                    onChange={(e) => setProfileForm({ ...profileForm, heroDescription: e.target.value })}
-                  />
-                </Grid>
-                <Grid size={12}>
-                  <FormControlLabel
-                    control={
-                      <Switch 
-                        checked={profileForm.availableForWork || false}
-                        onChange={(e) => setProfileForm({ ...profileForm, availableForWork: e.target.checked })}
-                        color="secondary"
-                      />
-                    }
-                    label="Available for Work"
-                  />
-                </Grid>
-              </Grid>
+                  >
+                    Save Hero Content
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
 
-              <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                  variant="contained"
-                  startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-                  onClick={handleProfileSave}
-                  disabled={saving}
-                  sx={{ 
-                    background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark || '#0891b2'})`, 
-                    color: theme.palette.background.default,
-                    px: 4
-                  }}
-                >
-                  Save Hero Content
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
+            {/* Social Links Card */}
+            <Card>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                  <LinkIcon color="secondary" />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>Social Links</Typography>
+                </Box>
+
+                <Grid container spacing={3}>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="GitHub URL"
+                      placeholder="https://github.com/username"
+                      value={socialForm.github || ''}
+                      onChange={(e) => setSocialForm({ ...socialForm, github: e.target.value })}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="LinkedIn URL"
+                      placeholder="https://linkedin.com/in/username"
+                      value={socialForm.linkedin || ''}
+                      onChange={(e) => setSocialForm({ ...socialForm, linkedin: e.target.value })}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Twitter / X URL"
+                      placeholder="https://twitter.com/username"
+                      value={socialForm.twitter || ''}
+                      onChange={(e) => setSocialForm({ ...socialForm, twitter: e.target.value })}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Contact Email"
+                      placeholder="name@example.com"
+                      value={socialForm.email || ''}
+                      onChange={(e) => setSocialForm({ ...socialForm, email: e.target.value })}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="contained"
+                    startIcon={savingSocial ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
+                    onClick={handleSocialSave}
+                    disabled={savingSocial}
+                    sx={{ 
+                      background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark || '#0891b2'})`, 
+                      color: theme.palette.background.default,
+                      px: 4
+                    }}
+                  >
+                    Save Social Links
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Box>
         </Grid>
 
         {/* Right Column: Stats Management */}

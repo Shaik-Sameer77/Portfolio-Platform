@@ -9,6 +9,7 @@ import { AvailabilityBadge } from "@/components/AvailabilityBadge";
 import { toast } from "sonner";
 import { BookingCalendar } from "@/components/BookingCalendar";
 import { submitContactForm } from "@/services/contact-service";
+import { getSocialLinks, type SocialLinks } from "@/services/portfolio-service";
 
 const Github = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 9 18v4"></path></svg>
@@ -26,7 +27,18 @@ export default function Contact() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [socials, setSocials] = useState<SocialLinks | null>(null);
   const selectRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    getSocialLinks()
+      .then((data) => setSocials(data))
+      .catch((err) => console.warn("Failed to fetch social links on Contact page:", err));
+  }, []);
+
+  const github = socials?.github || profile.github;
+  const linkedin = socials?.linkedin || profile.linkedin;
+  const email = socials?.email || profile.email;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -71,15 +83,21 @@ export default function Contact() {
       <div className="container-page pb-24 grid gap-10 lg:grid-cols-2">
         <div>
           <div className="space-y-4 text-sm">
-            <a href={`mailto:${profile.email}`} className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 hover:border-primary/40">
-              <Mail className="h-4 w-4 text-primary" /> {profile.email}
-            </a>
-            <a href={profile.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 hover:border-primary/40">
-              <Linkedin className="h-4 w-4 text-primary" /> LinkedIn
-            </a>
-            <a href={profile.github} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 hover:border-primary/40">
-              <Github className="h-4 w-4 text-primary" /> github.com/Shaik-Sameer77
-            </a>
+            {email && (
+              <a href={`mailto:${email}`} className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 hover:border-primary/40">
+                <Mail className="h-4 w-4 text-primary" /> {email}
+              </a>
+            )}
+            {linkedin && (
+              <a href={linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 hover:border-primary/40">
+                <Linkedin className="h-4 w-4 text-primary" /> LinkedIn
+              </a>
+            )}
+            {github && (
+              <a href={github} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 hover:border-primary/40">
+                <Github className="h-4 w-4 text-primary" /> {github.replace(/^https?:\/\//, '')}
+              </a>
+            )}
             <div className="flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3 text-muted-foreground">
               <Clock className="h-4 w-4 text-primary" /> Response time: within 48 hours
             </div>
@@ -100,7 +118,7 @@ export default function Contact() {
                 activeTab === "book" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Book a Call
+              Book Appointment
             </button>
             <button
               onClick={() => setActiveTab("message")}
@@ -114,61 +132,58 @@ export default function Contact() {
 
           <AnimatePresence mode="wait">
             {activeTab === "book" ? (
-              <motion.div key="book" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+              <motion.div key="book" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
                 <BookingCalendar />
               </motion.div>
             ) : (
-              <motion.form key="message" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} onSubmit={onSubmit} className="space-y-4 rounded-xl border border-border bg-surface p-6">
-                <Field label="Name" error={errors.name}>
+              <motion.form key="message" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} onSubmit={onSubmit} className="space-y-4 rounded-xl border border-border bg-surface p-6">
+                <Field label="Your name" error={errors.name}>
                   <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input" />
                 </Field>
-                <Field label="Email" error={errors.email}>
+                <Field label="Email address" error={errors.email}>
                   <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="input" />
                 </Field>
                 <Field label="Subject">
-                  <div ref={selectRef} className="relative w-full" onKeyDown={handleKeyDown}>
+                  <div className="relative" ref={selectRef}>
                     <button
                       type="button"
                       onClick={() => setIsOpen(!isOpen)}
-                      className={`input flex items-center justify-between text-left transition-all duration-200 ${
-                        isOpen ? "border-primary ring-1 ring-primary/20" : ""
-                      }`}
+                      onKeyDown={handleKeyDown}
+                      aria-haspopup="listbox"
+                      aria-expanded={isOpen}
+                      className="input flex w-full items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-primary/50"
                     >
                       <span>{form.subject}</span>
-                      <ChevronDown
-                        className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-                          isOpen ? "rotate-180 text-primary" : ""
-                        }`}
-                      />
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
                     </button>
 
                     <AnimatePresence>
                       {isOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                          transition={{ duration: 0.15, ease: "easeOut" }}
-                          className="absolute left-0 right-0 mt-2 rounded-lg border border-border bg-surface-2 p-1 shadow-2xl z-50"
+                        <motion.ul
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{ duration: 0.15 }}
+                          role="listbox"
+                          className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-border bg-popover py-1 shadow-lg focus:outline-none text-popover-foreground"
                         >
-                          {subjects.map((s) => (
-                            <button
-                              key={s}
-                              type="button"
+                          {subjects.map((sub) => (
+                            <li
+                              key={sub}
+                              role="option"
+                              aria-selected={form.subject === sub}
                               onClick={() => {
-                                setForm({ ...form, subject: s });
+                                setForm({ ...form, subject: sub });
                                 setIsOpen(false);
                               }}
-                              className={`w-full rounded-md px-3.5 py-2 text-left text-sm transition-all duration-150 ${
-                                form.subject === s
-                                  ? "bg-primary text-primary-foreground font-medium"
-                                  : "text-foreground hover:bg-surface"
+                              className={`cursor-pointer px-4 py-2.5 text-sm transition-colors ${
+                                form.subject === sub ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted"
                               }`}
                             >
-                              {s}
-                            </button>
+                              {sub}
+                            </li>
                           ))}
-                        </motion.div>
+                        </motion.ul>
                       )}
                     </AnimatePresence>
                   </div>
@@ -179,7 +194,7 @@ export default function Contact() {
                 <button type="submit" disabled={isSubmitting} className="w-full rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed">
                   {isSubmitting ? "Sending..." : "Send message"}
                 </button>
-                <p className="text-xs text-muted-foreground">Prefer email? Reach me directly at {profile.email}.</p>
+                {email && <p className="text-xs text-muted-foreground">Prefer email? Reach me directly at {email}.</p>}
               </motion.form>
             )}
           </AnimatePresence>

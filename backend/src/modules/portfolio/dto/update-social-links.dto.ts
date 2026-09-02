@@ -7,7 +7,7 @@ export class UpdateSocialLinksDto {
   @IsString()
   github?: string;
 
-  @ApiPropertyOptional({ example: 'https://linkedin.com/in/shaik-sameer' })
+  @ApiPropertyOptional({ example: 'https://www.linkedin.com/in/sameer-shaik-7a96881b7' })
   @IsOptional()
   @IsString()
   linkedin?: string;

@@ -173,3 +173,14 @@ export interface Service {
 }
 
 export const getServices = () => ApiService.get<Service[]>('/portfolio/services');
+
+export interface SocialLinks {
+  id?: number;
+  github?: string;
+  linkedin?: string;
+  twitter?: string;
+  email?: string;
+}
+
+export const getSocialLinks = () => ApiService.get<SocialLinks>('/portfolio/social-links');
+

@@ -13,7 +13,8 @@ const Github = ({ className }: { className?: string }) => (
 const Linkedin = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg>
 );
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getSocialLinks, type SocialLinks } from "@/services/portfolio-service";
 
 type Item = { href: string; title: string; subtitle: string; Icon: React.ComponentType<{ className?: string }>; external?: boolean };
 
@@ -27,11 +28,6 @@ const col2: Item[] = [
   { href: "/projects", title: "Projects", subtitle: "Featured builds", Icon: Rocket },
   { href: "/stack", title: "Tech stack", subtitle: "Languages, frameworks", Icon: Zap },
   { href: "/uses", title: "Uses", subtitle: "My setup and tools", Icon: Box },
-];
-const col3: Item[] = [
-  { href: "/resume.pdf", title: "Resume", subtitle: "Download PDF", Icon: Download, external: true },
-  { href: "https://github.com/Shaik-Sameer77", title: "GitHub", subtitle: "github.com/Shaik-Sameer77", Icon: Github, external: true },
-  { href: "https://linkedin.com/in/shaik-sameer", title: "LinkedIn", subtitle: "Connect with me", Icon: Linkedin, external: true },
 ];
 
 const Row = ({ item, muted = false, onSelect }: { item: Item; muted?: boolean; onSelect: () => void }) => {
@@ -75,11 +71,21 @@ const Row = ({ item, muted = false, onSelect }: { item: Item; muted?: boolean; o
 
 export const NavMegaMenu = ({ onClose, resumeUrl }: { onClose: () => void; resumeUrl?: string }) => {
   const ref = useRef<HTMLDivElement>(null);
-  
+  const [socials, setSocials] = useState<SocialLinks | null>(null);
+
+  useEffect(() => {
+    getSocialLinks()
+      .then((data) => setSocials(data))
+      .catch((err) => console.warn("Failed to fetch social links in NavMegaMenu:", err));
+  }, []);
+
+  const githubUrl = socials?.github || "https://github.com/Shaik-Sameer77";
+  const linkedinUrl = socials?.linkedin || "https://linkedin.com/in/shaik-sameer";
+
   const dynamicCol3 = [
     { href: resumeUrl || "", title: "Resume", subtitle: "Download PDF", Icon: Download, external: true },
-    { href: "https://github.com/Shaik-Sameer77", title: "GitHub", subtitle: "github.com/Shaik-Sameer77", Icon: Github, external: true },
-    { href: "https://linkedin.com/in/shaik-sameer", title: "LinkedIn", subtitle: "Connect with me", Icon: Linkedin, external: true },
+    { href: githubUrl, title: "GitHub", subtitle: githubUrl.replace(/^https?:\/\//, ''), Icon: Github, external: true },
+    { href: linkedinUrl, title: "LinkedIn", subtitle: "Connect with me", Icon: Linkedin, external: true },
   ];
 
   useEffect(() => {

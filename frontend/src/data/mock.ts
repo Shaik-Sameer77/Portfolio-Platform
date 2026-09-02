@@ -142,7 +142,7 @@ export const experience: Experience[] = [
 ];
 
 export const education = [
-  { school: "JNTU Hyderabad", degree: "B.Tech, Computer Science", startYear: 2019, endYear: 2023 },
+  { school: "JNTU Hyderabad", degree: "B.Tech, Computer Science", date: "2019 — 2023" },
 ];
 
 export const certifications = [
