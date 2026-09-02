@@ -4,10 +4,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 import { PrismaService } from '../../../prisma/prisma.service.js';
 
-const cookieExtractor = (req: Request) => {
+const cookieExtractor = (req: any) => {
   let token: string | null = null;
   if (req && req.headers && req.headers.cookie) {
-    const rawCookies = req.headers.cookie.split(';');
+    const rawCookies = (req.headers.cookie as string).split(';');
     for (const cookie of rawCookies) {
       const [key, val] = cookie.trim().split('=');
       if (key === 'access_token') {
