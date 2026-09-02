@@ -31,20 +31,22 @@ export class AuthController {
   ) {
     const result = await this.authService.login(loginDto);
     
-    response.cookie('access_token', result.access_token, {
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      secure: isProd,
+      sameSite: isProd ? ('none' as const) : ('lax' as const),
       path: '/',
+    };
+
+    response.cookie('access_token', result.access_token, {
+      ...cookieOptions,
+      maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
     response.cookie('refresh_token', result.refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      ...cookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/',
     });
 
     return result;
@@ -67,20 +69,22 @@ export class AuthController {
 
     const result = await this.authService.refreshTokens(refreshToken!);
     
-    response.cookie('access_token', result.access_token, {
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 15 * 60 * 1000,
+      secure: isProd,
+      sameSite: isProd ? ('none' as const) : ('lax' as const),
       path: '/',
+    };
+
+    response.cookie('access_token', result.access_token, {
+      ...cookieOptions,
+      maxAge: 15 * 60 * 1000,
     });
 
     response.cookie('refresh_token', result.refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      ...cookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
     });
 
     return result;
@@ -89,18 +93,16 @@ export class AuthController {
   @Post('logout')
   @ApiOperation({ summary: 'Logout and clear HTTP-only cookies' })
   logout(@Res({ passthrough: true }) response: Response) {
-    response.clearCookie('access_token', {
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProd,
+      sameSite: isProd ? ('none' as const) : ('lax' as const),
       path: '/',
-    });
-    response.clearCookie('refresh_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
+    };
+
+    response.clearCookie('access_token', cookieOptions);
+    response.clearCookie('refresh_token', cookieOptions);
     return { success: true };
   }
 
