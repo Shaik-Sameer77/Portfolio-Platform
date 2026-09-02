@@ -66,6 +66,9 @@ export const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    if (pathname !== "/") {
+      document.documentElement.classList.add("splash-visited");
+    }
     setMega(false);
     setDrawer(false);
   }, [pathname, setMega, setDrawer]);

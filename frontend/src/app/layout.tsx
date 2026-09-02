@@ -41,7 +41,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                if (sessionStorage.getItem('sameer_portfolio_visited') === 'true') {
+                if (sessionStorage.getItem('sameer_portfolio_visited') === 'true' || window.location.pathname !== '/') {
                   document.documentElement.classList.add('splash-visited');
                 }
               } catch (e) {}
