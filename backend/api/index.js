@@ -1,15 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from '../src/app.module.js';
-import { EncryptInterceptor } from '../src/common/interceptors/encrypt.interceptor.js';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 
 const server = express();
-let isInitialized = false;
+let bootstrapPromise = null;
 
 async function bootstrap() {
+  // Dynamic import from pre-compiled dist/ to avoid @vercel/node TS compilation
+  const { AppModule } = await import('../dist/app.module.js');
+  const { EncryptInterceptor } = await import('../dist/common/interceptors/encrypt.interceptor.js');
+
   const app = await NestFactory.create(
     AppModule,
     new ExpressAdapter(server),
@@ -26,15 +27,6 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('Portfolio Platform API')
-    .setDescription(
-      'Backend-driven portfolio platform — serves all content to the public site and admin dashboard.',
-    )
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -42,16 +34,13 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
-
   await app.init();
-  isInitialized = true;
 }
 
-export default async function handler(req: any, res: any) {
-  if (!isInitialized) {
-    await bootstrap();
+export default async function handler(req, res) {
+  if (!bootstrapPromise) {
+    bootstrapPromise = bootstrap();
   }
+  await bootstrapPromise;
   server(req, res);
 }
