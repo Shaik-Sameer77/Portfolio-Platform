@@ -1,15 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import express from 'express';
+import { AppModule } from './app.module.js';
+import { EncryptInterceptor } from './common/interceptors/encrypt.interceptor.js';
+import express, { Express } from 'express';
 
-const server = express();
-let bootstrapPromise = null;
+const server: Express = express();
+let isReady = false;
 
 async function bootstrap() {
-  // Dynamic import from pre-compiled dist/ to avoid @vercel/node TS compilation
-  const { AppModule } = await import('../dist/app.module.js');
-  const { EncryptInterceptor } = await import('../dist/common/interceptors/encrypt.interceptor.js');
+  if (isReady) return;
 
   const app = await NestFactory.create(
     AppModule,
@@ -35,12 +35,10 @@ async function bootstrap() {
   });
 
   await app.init();
+  isReady = true;
 }
 
-export default async function handler(req, res) {
-  if (!bootstrapPromise) {
-    bootstrapPromise = bootstrap();
-  }
-  await bootstrapPromise;
-  server(req, res);
+export async function createServer(): Promise<Express> {
+  await bootstrap();
+  return server;
 }
