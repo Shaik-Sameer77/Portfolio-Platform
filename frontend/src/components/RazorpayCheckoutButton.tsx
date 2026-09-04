@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import proxy from '@/services/proxy';
+import { getErrorMessage } from '@/utils/error';
 
 interface Props {
   type: 'PRODUCT' | 'SERVICE' | 'APPOINTMENT';
@@ -101,8 +102,7 @@ export default function RazorpayCheckoutButton({
       razorpay.open();
     } catch (error: any) {
       console.error('Razorpay checkout error:', error);
-      const message = error.response?.data?.message || 'Failed to initiate Razorpay checkout.';
-      alert(message);
+      alert(getErrorMessage(error, 'Failed to initiate Razorpay checkout.'));
       setIsLoading(false);
     }
   };

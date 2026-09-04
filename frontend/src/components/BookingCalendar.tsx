@@ -6,6 +6,7 @@ import { bookingService } from "@/services/booking-service";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/store/useAuthStore";
+import { getErrorMessage } from "@/utils/error";
 
 const APPOINTMENT_TYPES = [
   { id: "CONSULTATION", label: "Consultation", duration: 30, desc: "Free intro call to discuss your project." },
@@ -30,12 +31,23 @@ export function BookingCalendar() {
   const [submitting, setSubmitting] = useState(false);
 
   // Auth
-  const { token, openModal } = useAuthStore();
+  const { user, token, openModal } = useAuthStore();
   
+  // Auto-fill logged in user info
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        name: prev.name || user.name || "",
+        email: prev.email || user.email || "",
+      }));
+    }
+  }, [user]);
+
   // Success
   const [meetLink, setMeetLink] = useState("");
 
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
   // Generate calendar days
   const getDaysInMonth = (date: Date) => {
@@ -79,17 +91,37 @@ export function BookingCalendar() {
 
   const handleBook = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedSlot) return;
-    
+    if (!selectedSlot) {
+      toast.error("Please select a date and time slot.");
+      return;
+    }
+
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const mobile = form.mobile.trim();
+
+    if (!name) {
+      toast.error("Please enter your name.");
+      return;
+    }
+    if (!email || !email.includes("@")) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (!mobile) {
+      toast.error("Please enter your mobile number.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const result = await bookingService.createAppointment({
         appointmentType: type.id,
-        clientName: form.name,
-        clientEmail: form.email,
-        clientMobile: form.mobile,
-        clientCompany: form.company,
-        clientMessage: form.message,
+        clientName: name,
+        clientEmail: email,
+        clientMobile: mobile,
+        clientCompany: form.company.trim() || undefined,
+        clientMessage: form.message.trim() || undefined,
         scheduledAt: selectedSlot,
         duration: type.duration,
         timezone,
@@ -98,7 +130,7 @@ export function BookingCalendar() {
       setMeetLink(result.meetingUrl || "");
       setStep(4);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to book appointment");
+      toast.error(getErrorMessage(err, "Failed to book appointment"));
     } finally {
       setSubmitting(false);
     }

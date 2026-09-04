@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import proxy from '@/services/proxy';
+import { getErrorMessage } from '@/utils/error';
 
 interface Props {
   type: 'PRODUCT' | 'SERVICE' | 'APPOINTMENT';
@@ -37,8 +38,7 @@ export default function StripeCheckoutButton({ type, itemId, itemSlug, customerN
       }
     } catch (error: any) {
       console.error('Stripe checkout error:', error);
-      const message = error.response?.data?.message || 'Failed to initiate Stripe checkout. Please try again.';
-      alert(message);
+      alert(getErrorMessage(error, 'Failed to initiate Stripe checkout. Please try again.'));
       setIsLoading(false);
     }
   };
