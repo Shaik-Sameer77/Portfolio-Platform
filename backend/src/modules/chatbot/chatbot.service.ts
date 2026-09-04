@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service.js';
-import Groq from 'groq-sdk';
+import { Groq } from 'groq-sdk';
 import { Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
