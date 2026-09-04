@@ -5,7 +5,12 @@ import { useAuthStore } from '@/store/useAuthStore';
 const IS_ENCRYPTED = process.env.NEXT_PUBLIC_ISENCRYPTED_PAYLOAD !== 'false';
 
 const proxy = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8001',
+  baseURL:
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://portfolio-platform-243j.vercel.app'
+      : 'http://localhost:8001'),
   headers: {
     'Content-Type': 'application/json',
   },

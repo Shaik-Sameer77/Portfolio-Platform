@@ -11,7 +11,12 @@ const SUGGESTIONS = [
   "How can I contact or hire him?",
 ];
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://portfolio-platform-243j.vercel.app'
+    : 'http://localhost:8001');
 
 interface Message {
   role: 'user' | 'assistant';
