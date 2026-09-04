@@ -12,6 +12,7 @@ import { ProductModule } from './modules/product/product.module.js';
 import { MailModule } from './modules/mail/mail.module.js';
 import { AppointmentModule } from './modules/appointment/appointment.module.js';
 import { PaymentModule } from './modules/payment/payment.module.js';
+import { ChatbotModule } from './modules/chatbot/chatbot.module.js';
 import { DecryptMiddleware } from './common/middleware/decrypt.middleware.js';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
 
@@ -27,6 +28,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js
     MailModule,
     AppointmentModule,
     PaymentModule,
+    ChatbotModule,
   ],
   controllers: [AppController],
 

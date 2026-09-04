@@ -409,3 +409,14 @@ model Order {
   @@index([gatewayOrderId])
 }
 
+model ChatMessage {
+  id               Int      @id @default(autoincrement())
+  sessionId        String
+  userMessage      String   @db.Text
+  assistantMessage String   @db.Text
+  createdAt        DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([createdAt])
+}
+

@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 };
 
 import { CustomCursor } from "@/components/CustomCursor";
+import Chatbot from "@/components/Chatbot";
 
 export default function RootLayout({
   children,
@@ -57,6 +58,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <Chatbot />
           <Toaster theme="system" position="bottom-right" />
         </ThemeProvider>
       </body>

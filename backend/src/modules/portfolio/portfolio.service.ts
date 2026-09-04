@@ -27,12 +27,19 @@ import { CreateTechStackDto } from './dto/create-tech-stack.dto.js';
 import { UpdateTechStackDto } from './dto/update-tech-stack.dto.js';
 
 
+import { ChatbotService } from '../chatbot/chatbot.service.js';
+
 @Injectable()
 export class PortfolioService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly blogService: BlogService,
+    private readonly chatbotService: ChatbotService,
   ) {}
+
+  private onDataChanged() {
+    this.chatbotService.invalidateCache();
+  }
 
   // ─── Profile (single-row upsert) ──────────────────────────────────────────
 
@@ -47,6 +54,7 @@ export class PortfolioService {
   }
 
   async updateProfile(dto: UpdateProfileDto) {
+    this.onDataChanged();
     const existing = await this.prisma.profile.findFirst();
 
     if (existing) {
@@ -113,16 +121,19 @@ export class PortfolioService {
   }
 
   async createProject(dto: CreateProjectDto) {
+    this.onDataChanged();
     return this.prisma.project.create({ data: dto });
   }
 
   async updateProject(id: number, dto: UpdateProjectDto) {
+    this.onDataChanged();
     const project = await this.prisma.project.findUnique({ where: { id } });
     if (!project) throw new NotFoundException(`Project #${id} not found`);
     return this.prisma.project.update({ where: { id }, data: dto });
   }
 
   async deleteProject(id: number) {
+    this.onDataChanged();
     const project = await this.prisma.project.findUnique({ where: { id } });
     if (!project) throw new NotFoundException(`Project #${id} not found`);
     return this.prisma.project.delete({ where: { id } });
@@ -137,16 +148,19 @@ export class PortfolioService {
   }
 
   async createExperience(dto: CreateExperienceDto) {
+    this.onDataChanged();
     return this.prisma.experience.create({ data: dto });
   }
 
   async updateExperience(id: number, dto: UpdateExperienceDto) {
+    this.onDataChanged();
     const existing = await this.prisma.experience.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException(`Experience #${id} not found`);
     return this.prisma.experience.update({ where: { id }, data: dto });
   }
 
   async deleteExperience(id: number) {
+    this.onDataChanged();
     const existing = await this.prisma.experience.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException(`Experience #${id} not found`);
     return this.prisma.experience.delete({ where: { id } });
