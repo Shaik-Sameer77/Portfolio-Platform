@@ -36,15 +36,26 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
+  const rawAllowedOrigins = process.env.ALLOWED_ORIGINS || '';
+  const allowedOrigins = rawAllowedOrigins
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+
   app.enableCors({
-    origin: [
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'http://127.0.0.1:5173',
-      'http://127.0.0.1:5174',
-      'http://localhost:3000',
-      'http://localhost:3001',
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like server-to-server, curl, Postman)
+      if (!origin) return callback(null, true);
+
+      const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      const isVercel = /\.vercel\.app$/.test(origin);
+      const isExplicitlyAllowed = allowedOrigins.includes(origin);
+
+      if (isLocalhost || isVercel || isExplicitlyAllowed) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Accept,Authorization',
     credentials: true,
