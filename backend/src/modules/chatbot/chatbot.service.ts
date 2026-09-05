@@ -206,7 +206,7 @@ ${aboutStr}
           groqMessages.push({ role: 'user', content: message });
 
           const stream = await groq.chat.completions.create({
-            model: 'qwen/qwen3.8-27b',
+            model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
             messages: groqMessages,
             stream: true,
           });
@@ -228,7 +228,7 @@ ${aboutStr}
       if (!streamed) {
         // Fallback response with live DB knowledge
         const profile = await this.prisma.profile.findFirst();
-        const fallbackText = `I am ${profile?.name || "Sameer"}'s AI Assistant. ${profile?.bio || "I build high-performance web applications with Next.js, NestJS, and TypeScript."}\n\nFor full interactive AI answers, please double check your GROQ_API_KEY in backend/.env!`;
+        const fallbackText = `I am ${profile?.name || "Sameer"}'s AI Assistant. ${profile?.bio || "I build high-performance web applications with Next.js, NestJS, and TypeScript."}\n\nFeel free to ask me about Sameer's projects, technical skills, or contact info!`;
         fullAssistantResponse = fallbackText;
         const safeText = fallbackText.replace(/\r/g, '').replace(/\n/g, '\\n');
         res.write(`data: ${safeText}\n\n`);
