@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Box, Typography, Tabs, Tab, Paper, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Chip, IconButton, Button, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, Select, MenuItem, FormControl, InputLabel, Grid
 } from '@mui/material';
-import { VideoCall, CheckCircle, Cancel, Edit, Delete } from '@mui/icons-material';
+import { VideoCall, Cancel, Delete } from '@mui/icons-material';
 import type { RootState, AppDispatch } from '../store';
 import {
   fetchAppointments, updateAppointmentStatus, fetchSlots, createSlot, deleteSlot,
@@ -16,7 +16,7 @@ const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fri
 
 export default function AppointmentsPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const { items, slots, blockedDates, loading } = useSelector((state: RootState) => state.appointments);
+  const { items, slots, blockedDates } = useSelector((state: RootState) => state.appointments);
   
   const [tab, setTab] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);

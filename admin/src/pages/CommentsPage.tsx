@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -116,10 +116,10 @@ function ReplyDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3 } }}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
       <DialogTitle sx={{ pb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box>
-          <Typography variant="h6" fontWeight={700}>Reply as Admin</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>Reply as Admin</Typography>
           {comment && (
             <Typography variant="caption" color="text.secondary">
               Replying to <strong>{comment.user.name || comment.user.email.split('@')[0]}</strong> on &ldquo;{comment.blog.title}&rdquo;
@@ -131,7 +131,7 @@ function ReplyDialog({
 
       {comment && (
         <Box sx={{ mx: 3, mb: 2, p: 2, borderRadius: 2, bgcolor: 'action.hover', borderLeft: '3px solid', borderColor: 'primary.main' }}>
-          <Typography variant="caption" color="text.secondary" display="block" mb={0.5}>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
             Original comment:
           </Typography>
           <Typography variant="body2" color="text.primary">{comment.content}</Typography>
@@ -196,7 +196,7 @@ function DeleteDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
       <DialogTitle>Delete Comment?</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary">
@@ -299,10 +299,10 @@ export default function CommentsPage() {
       {/* Page header */}
       <Box sx={{ mb: 4, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="h4" fontWeight={800} letterSpacing="-0.03em">
+          <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: "-0.03em" }}>
             Comment Moderation
           </Typography>
-          <Typography variant="body2" color="text.secondary" mt={0.5}>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
             Review, reply, and remove reader comments across all blog posts.
           </Typography>
         </Box>
@@ -347,7 +347,7 @@ export default function CommentsPage() {
               <CommentIcon sx={{ color: stat.color, fontSize: 22 }} />
             </Box>
             <Box>
-              <Typography variant="h5" fontWeight={800} lineHeight={1}>{loading ? '—' : stat.value}</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 800, lineHeight: 1 }}>{loading ? '—' : stat.value}</Typography>
               <Typography variant="caption" color="text.secondary">{stat.label}</Typography>
             </Box>
           </Paper>
@@ -365,8 +365,10 @@ export default function CommentsPage() {
           placeholder="Search comments or users…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          InputProps={{
-            startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
+          slotProps={{
+            input: {
+              startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
+            },
           }}
           sx={{ flex: 1, minWidth: 220 }}
         />
@@ -449,7 +451,7 @@ export default function CommentsPage() {
                           {getInitials(comment.user.name, comment.user.email)}
                         </Avatar>
                         <Box>
-                          <Typography variant="caption" fontWeight={600} display="block" noWrap>
+                          <Typography variant="caption" noWrap sx={{ fontWeight: 600, display: 'block' }}>
                             {comment.user.name || comment.user.email.split('@')[0]}
                           </Typography>
                           <Typography variant="caption" color="text.secondary" noWrap sx={{ fontSize: '0.7rem' }}>
@@ -482,8 +484,8 @@ export default function CommentsPage() {
                         <Typography
                           variant="caption"
                           color="primary"
-                          fontWeight={600}
                           sx={{
+                            fontWeight: 600,
                             maxWidth: 160,
                             display: 'block',
                             overflow: 'hidden',
@@ -519,7 +521,7 @@ export default function CommentsPage() {
 
                     {/* Actions */}
                     <TableCell align="right">
-                      <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                      <Stack direction="row" spacing={0.5} sx={{ justifyContent: 'flex-end' }}>
                         <Tooltip title="Reply as Admin">
                           <IconButton
                             size="small"

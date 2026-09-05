@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -89,7 +89,7 @@ export default function MessagesPage() {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" fontWeight="bold">Contact Messages</Typography>
+        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Contact Messages</Typography>
         <Button startIcon={<RefreshIcon />} onClick={fetchMessages} variant="outlined">
           Refresh
         </Button>
