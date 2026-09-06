@@ -28,9 +28,16 @@ async function bootstrap() {
     }),
   );
 
+  const rawAllowedOrigins = process.env.ALLOWED_ORIGINS || '';
+  const envAllowedOrigins = rawAllowedOrigins
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+
   const allowedOrigins = [
     process.env.FRONTEND_URL,
     process.env.ADMIN_URL,
+    ...envAllowedOrigins,
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
@@ -38,7 +45,18 @@ async function bootstrap() {
   ].filter(Boolean) as string[];
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      const isVercel = /\.vercel\.app$/.test(origin);
+      const isExplicitlyAllowed = allowedOrigins.includes(origin);
+
+      if (isLocalhost || isVercel || isExplicitlyAllowed) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Accept,Authorization',
     credentials: true,
