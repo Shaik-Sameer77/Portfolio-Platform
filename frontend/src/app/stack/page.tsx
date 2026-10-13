@@ -33,7 +33,6 @@ const fallbackStack = {
   ],
   Tools: [
     { name: "Git", slug: "git" },
-    { name: "VS Code", slug: "visualstudiocode" },
     { name: "Postman", slug: "postman" },
     { name: "Linear", slug: "linear" }
   ]
@@ -91,7 +90,7 @@ export default function Stack() {
           sortedDynamicCategories.map(([category, items]) => (
             <section key={category}>
               <h2 className="mb-4 text-sm uppercase tracking-wider text-muted-foreground">{category}</h2>
-              <div className="grid gap-3.5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+              <div className="grid gap-2.5 sm:gap-3.5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
                 {[...items].sort((a, b) => (a.order || 0) - (b.order || 0)).map((item) => {
 
                   const imageSrc = item.iconUrl || `https://cdn.simpleicons.org/${item.slug}`;
@@ -106,10 +105,10 @@ export default function Stack() {
                         '--brand-color': brandColor,
                         '--brand-glow': glowColor
                       } as React.CSSProperties}
-                      className="group flex items-center gap-3.5 rounded-xl border border-border/80 bg-surface/50 p-3.5 transition-all duration-300 hover:border-[var(--brand-color)] hover:bg-surface hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[var(--brand-glow)]"
+                      className="group flex min-w-0 items-center gap-2 sm:gap-3.5 rounded-xl border border-border/80 bg-surface/50 p-2.5 sm:p-3.5 transition-all duration-300 hover:border-[var(--brand-color)] hover:bg-surface hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[var(--brand-glow)]"
                     >
                       <div 
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background/50 border border-border p-1.5 grayscale group-hover:grayscale-0 group-hover:border-[var(--brand-color)] group-hover:bg-background transition-all duration-300"
+                        className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg bg-background/50 border border-border p-1 sm:p-1.5 grayscale-0 md:grayscale md:group-hover:grayscale-0 group-hover:border-[var(--brand-color)] group-hover:bg-background transition-all duration-300"
                         style={customColor ? { borderColor: `${customColor}33` } : {}}
                       >
                         <img
@@ -121,7 +120,9 @@ export default function Stack() {
                           }}
                         />
                       </div>
-                      <span className="text-sm font-medium text-foreground group-hover:text-[var(--brand-color)] transition-colors duration-300">{item.name}</span>
+                      <span className="min-w-0 text-xs sm:text-sm font-medium leading-snug text-foreground group-hover:text-[var(--brand-color)] transition-colors duration-300 break-words">
+                        {item.name}
+                      </span>
                     </div>
                   );
                 })}
@@ -132,13 +133,13 @@ export default function Stack() {
           Object.entries(fallbackStack).map(([category, items]) => (
             <section key={category}>
               <h2 className="mb-4 text-sm uppercase tracking-wider text-muted-foreground">{category}</h2>
-              <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+              <div className="grid gap-2.5 sm:gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
                 {items.map((item) => (
                   <div 
                     key={item.slug} 
-                    className="group flex items-center gap-3.5 rounded-xl border border-border/80 bg-surface/50 p-3.5 transition-all duration-300 hover:border-primary/40 hover:bg-surface hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/5"
+                    className="group flex min-w-0 items-center gap-2 sm:gap-3.5 rounded-xl border border-border/80 bg-surface/50 p-2.5 sm:p-3.5 transition-all duration-300 hover:border-primary/40 hover:bg-surface hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/5"
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background/50 border border-border p-1.5 grayscale group-hover:grayscale-0 group-hover:border-primary/20 group-hover:bg-background transition-all duration-300">
+                    <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg bg-background/50 border border-border p-1 sm:p-1.5 grayscale-0 md:grayscale md:group-hover:grayscale-0 group-hover:border-primary/20 group-hover:bg-background transition-all duration-300">
                       <img
                         src={`https://cdn.simpleicons.org/${item.slug}`}
                         alt={item.name}
@@ -148,7 +149,9 @@ export default function Stack() {
                         }}
                       />
                     </div>
-                    <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-300">{item.name}</span>
+                    <span className="min-w-0 text-xs sm:text-sm font-medium leading-snug text-foreground group-hover:text-primary transition-colors duration-300 break-words">
+                      {item.name}
+                    </span>
                   </div>
                 ))}
               </div>

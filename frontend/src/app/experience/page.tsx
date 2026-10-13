@@ -2,7 +2,14 @@
 import { useEffect, useRef, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { experience as mockExperience, stack } from "@/data/mock";
-import { getExperience, type Experience as ApiExperience } from "@/services/portfolio-service";
+import { 
+  getExperience, 
+  getStats, 
+  getTechStack, 
+  type Experience as ApiExperience, 
+  type Stat, 
+  type TechStackItem 
+} from "@/services/portfolio-service";
 import { DevLoader } from "@/components/DevLoader";
 
 /* ─── Animated counter ──────────────────────────────────────────── */
@@ -35,13 +42,18 @@ function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: stri
   return <span ref={ref}>{display}{suffix}</span>;
 }
 
-/* ─── Career stats ──────────────────────────────────────────────── */
-const careerStats = [
-  { label: "Years building", value: 3, suffix: "+" },
-  { label: "Companies", value: 3, suffix: "" },
-  { label: "Roles held", value: 3, suffix: "" },
-  { label: "Technologies", value: 20, suffix: "+" },
-];
+function parseStatValue(val: string | number): { value: number; suffix: string } {
+  if (typeof val === 'number') return { value: val, suffix: '' };
+  const str = String(val).trim();
+  const match = str.match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
+  if (match) {
+    return {
+      value: parseFloat(match[1]) || 0,
+      suffix: match[2] || '',
+    };
+  }
+  return { value: 0, suffix: str };
+}
 
 /* ─── Skills by domain (derived from mock stack) ────────────────── */
 const domainColors: Record<string, string> = {
@@ -55,22 +67,28 @@ const domainColors: Record<string, string> = {
 /* ─── Page ───────────────────────────────────────────────────────── */
 export default function Experience() {
   const [experienceData, setExperienceData] = useState<ApiExperience[] | null>(null);
+  const [statsData, setStatsData] = useState<Stat[]>([]);
+  const [techStackData, setTechStackData] = useState<TechStackItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchExp = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getExperience();
-        if (data && data.length > 0) {
-          setExperienceData(data);
-        }
+        const [exp, stats, tech] = await Promise.all([
+          getExperience().catch(() => null),
+          getStats().catch(() => []),
+          getTechStack().catch(() => [])
+        ]);
+        if (exp && exp.length > 0) setExperienceData(exp);
+        if (stats && stats.length > 0) setStatsData(stats);
+        if (tech && tech.length > 0) setTechStackData(tech);
       } catch (err) {
         console.warn("Failed to fetch experience data, using mock fallback", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchExp();
+    fetchData();
   }, []);
 
   const activeExperience = experienceData || mockExperience.map(e => ({
@@ -84,6 +102,68 @@ export default function Experience() {
     stack: e.stack,
     order: 0
   }));
+
+  // 1. Years building: Look for API stat first (e.g. 'years building' -> '4+'), otherwise derive from start dates
+  const yearStat = statsData.find(s => s.label?.toLowerCase().includes('year'));
+  let yearsBuilding = { value: 4, suffix: '+' };
+  if (yearStat) {
+    yearsBuilding = parseStatValue(yearStat.value);
+  } else if (activeExperience.length > 0) {
+    const years = activeExperience
+      .map(e => {
+        const m = e.startDate?.match(/\b(20\d\d)\b/);
+        return m ? parseInt(m[1]) : null;
+      })
+      .filter((y): y is number => y !== null);
+    if (years.length > 0) {
+      const earliest = Math.min(...years);
+      const diff = Math.max(1, new Date().getFullYear() - earliest);
+      yearsBuilding = { value: diff, suffix: '+' };
+    }
+  }
+
+  // 2. Companies: Look for API stat or count unique companies from activeExperience
+  const companyStat = statsData.find(s => s.label?.toLowerCase().includes('compan'));
+  const uniqueCompaniesCount = new Set(
+    activeExperience.map(e => e.company?.trim().toLowerCase()).filter(Boolean)
+  ).size;
+  const companiesStat = companyStat 
+    ? parseStatValue(companyStat.value) 
+    : { value: uniqueCompaniesCount || 3, suffix: '' };
+
+  // 3. Roles held: Look for API stat or count roles from activeExperience
+  const roleStat = statsData.find(s => s.label?.toLowerCase().includes('role'));
+  const rolesStat = roleStat 
+    ? parseStatValue(roleStat.value) 
+    : { value: activeExperience.length || 3, suffix: '' };
+
+  // 4. Technologies: Look for API stat or count unique technologies across stack
+  const techStat = statsData.find(s => s.label?.toLowerCase().includes('tech'));
+  const allExpTechs = new Set(activeExperience.flatMap(e => e.stack || []).map(s => s.trim().toLowerCase()).filter(Boolean));
+  const techCount = Math.max(
+    techStackData.length,
+    allExpTechs.size,
+    20
+  );
+  const technologiesStat = techStat 
+    ? parseStatValue(techStat.value) 
+    : { value: techCount, suffix: '+' };
+
+  const dynamicCareerStats = [
+    { label: "Years building", ...yearsBuilding },
+    { label: "Companies", ...companiesStat },
+    { label: "Roles held", ...rolesStat },
+    { label: "Technologies", ...technologiesStat },
+  ];
+
+  const activeStack = techStackData.length > 0
+    ? techStackData.reduce((acc, t) => {
+        const cat = t.category || "Tools";
+        if (!acc[cat]) acc[cat] = [];
+        if (!acc[cat].includes(t.name)) acc[cat].push(t.name);
+        return acc;
+      }, {} as Record<string, string[]>)
+    : stack;
 
   if (loading) {
     return <DevLoader fullScreen={false} />;
@@ -152,7 +232,7 @@ export default function Experience() {
                 Career at a glance
               </p>
               <div className="grid grid-cols-2 gap-3">
-                {careerStats.map((s) => (
+                {dynamicCareerStats.map((s) => (
                   <div
                     key={s.label}
                     className="flex flex-col items-center rounded-xl border border-border bg-background p-3 text-center"
@@ -174,7 +254,7 @@ export default function Experience() {
                 Skills by domain
               </p>
               <div className="space-y-3.5">
-                {(Object.entries(stack) as [string, string[]][]).map(([domain, techs]) => (
+                {(Object.entries(activeStack) as [string, string[]][]).map(([domain, techs]) => (
                   <div key={domain}>
                     <p className="mb-1.5 text-[11px] font-medium text-muted-foreground">{domain}</p>
                     <div className="flex flex-wrap gap-1.5">

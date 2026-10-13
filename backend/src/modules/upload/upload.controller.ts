@@ -41,7 +41,10 @@ export class UploadController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|webp)' }),
+          new FileTypeValidator({
+            fileType: /(image\/(jpeg|png|webp|gif)|.(png|jpeg|jpg|webp))/,
+            fallbackToMimetype: true,
+          }),
         ],
       }),
     )
@@ -76,7 +79,10 @@ export class UploadController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
-          new FileTypeValidator({ fileType: '.(pdf|doc|docx)' }),
+          new FileTypeValidator({
+            fileType: /(application\/(pdf|msword|vnd\.openxmlformats-officedocument\.wordprocessingml\.document)|.(pdf|doc|docx))/,
+            fallbackToMimetype: true,
+          }),
         ],
       }),
     )

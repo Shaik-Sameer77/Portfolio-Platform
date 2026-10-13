@@ -56,7 +56,7 @@ export const TechMarquee = () => {
                 '--brand-color': brandColor,
                 '--brand-glow': glowColor
               } as React.CSSProperties}
-              className="group flex items-center gap-3 grayscale transition-all hover:grayscale-0 cursor-pointer"
+              className="group flex items-center gap-3 grayscale-0 md:grayscale md:hover:grayscale-0 transition-all cursor-pointer"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface p-2 shadow-sm ring-1 ring-border group-hover:ring-[var(--brand-color)] group-hover:shadow-lg group-hover:shadow-[var(--brand-glow)] transition-all">
                 <img
@@ -69,7 +69,7 @@ export const TechMarquee = () => {
                   }}
                 />
               </div>
-              <span className="text-sm font-semibold tracking-wide text-muted-foreground group-hover:text-[var(--brand-color)] transition-colors">
+              <span className="text-sm font-semibold tracking-wide text-foreground md:text-muted-foreground md:group-hover:text-[var(--brand-color)] transition-colors">
                 {tech.name}
               </span>
             </div>

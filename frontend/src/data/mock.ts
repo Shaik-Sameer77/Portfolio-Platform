@@ -156,7 +156,7 @@ export const stack = {
   Backend: ["NestJS", "Node.js", "Prisma", "REST APIs", "Kafka"],
   Databases: ["PostgreSQL", "MongoDB", "Redis"],
   DevOps: ["Docker", "GitHub Actions", "Railway", "Vercel"],
-  Tools: ["Git", "VS Code", "Postman", "Linear"],
+  Tools: ["Git", "Postman", "Linear"],
 };
 
 export const uses = [

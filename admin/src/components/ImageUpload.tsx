@@ -38,7 +38,6 @@ export default function ImageUpload({ onUploadSuccess, onFileSelect, folder, lab
     if (deferred || onFileSelect) {
       const previewUrl = URL.createObjectURL(file);
       onFileSelect?.(file, previewUrl);
-      onUploadSuccess?.(previewUrl);
       setLoading(false);
       return;
     }

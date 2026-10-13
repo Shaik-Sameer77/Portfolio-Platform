@@ -99,10 +99,18 @@ export default function EducationPage() {
         const uploadRes = await api.post('/upload/image', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
-        imageUrl = uploadRes.data.url;
-      } catch (err) {
+        imageUrl = uploadRes.data?.url || uploadRes.data;
+      } catch (err: any) {
         console.error('Failed to upload certification image', err);
+        setCertSaving(false);
+        alert('Failed to upload image: ' + (err.response?.data?.message || err.message || 'Upload error'));
+        return;
       }
+    }
+
+    // Safety guard: Never persist a client-side blob URL to the database
+    if (imageUrl && imageUrl.startsWith('blob:')) {
+      imageUrl = '';
     }
 
     const payload = { ...certForm, imageUrl };
@@ -114,6 +122,8 @@ export default function EducationPage() {
     }
     setCertSaving(false);
     setCertOpen(false);
+    setCertFile(null);
+    dispatch(fetchCertifications());
   };
 
   return (

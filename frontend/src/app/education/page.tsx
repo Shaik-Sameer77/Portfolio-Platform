@@ -69,20 +69,28 @@ export default function Education() {
           <div>
             <h2 className="mb-6 font-display text-2xl font-semibold">Certifications</h2>
             <div className="grid gap-4 md:grid-cols-2">
-              {(certData.length > 0 ? certData : mockCertifications.map((c, idx) => ({ id: idx, ...c, order: idx }))).map((c: any) => (
+              {(certData.length > 0 ? certData : mockCertifications.map((c, idx) => ({ id: idx, ...c, order: idx }))).map((c: any, idx: number) => (
                 <div key={c.id} className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-6">
                   <div>
                     <div className="font-display text-lg font-semibold">{c.name}</div>
                     <div className="text-sm text-muted-foreground">{c.issuer}</div>
                   </div>
-                  {c.imageUrl && (
+                  {c.imageUrl && !c.imageUrl.startsWith('blob:') && (
                     <div className="mt-2 relative w-full h-40 overflow-hidden rounded-lg border border-border">
-                      <Image src={c.imageUrl} alt={c.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                      <Image
+                        src={c.imageUrl}
+                        alt={c.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover"
+                        priority={idx === 0}
+                        unoptimized={c.imageUrl.includes('cloudinary')}
+                      />
                     </div>
                   )}
                   <div className="mt-auto pt-4 flex items-center justify-between">
                     <div className="font-mono text-xs text-muted-foreground">{c.date || "No date"}</div>
-                    {c.imageUrl && (
+                    {c.imageUrl && !c.imageUrl.startsWith('blob:') && (
                       <a href={c.imageUrl} target="_blank" rel="noreferrer" className="text-xs font-medium text-primary hover:underline">
                         View Full Image →
                       </a>

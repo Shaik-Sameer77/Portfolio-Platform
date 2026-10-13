@@ -47,17 +47,18 @@ async function bootstrap() {
       // Allow requests with no origin (like server-to-server, curl, Postman)
       if (!origin) return callback(null, true);
 
-      const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      const isLocalNetwork = /^https?:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin);
       const isVercel = /\.vercel\.app$/.test(origin);
       const isExplicitlyAllowed = allowedOrigins.includes(origin);
 
-      if (isLocalhost || isVercel || isExplicitlyAllowed) {
+      if (isLocalhost || isLocalNetwork || isVercel || isExplicitlyAllowed || process.env.NODE_ENV !== 'production') {
         return callback(null, true);
       }
       return callback(new Error(`Origin ${origin} not allowed by CORS`));
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type,Accept,Authorization',
+    allowedHeaders: 'Content-Type,Accept,Authorization,X-Requested-With',
     credentials: true,
   });
 

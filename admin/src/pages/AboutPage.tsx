@@ -46,14 +46,22 @@ export default function AboutPage() {
         const uploadRes = await api.post('/upload/image', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
-        imageUrl = uploadRes.data.url;
-      } catch (err) {
+        imageUrl = uploadRes.data?.url || uploadRes.data;
+      } catch (err: any) {
         console.error('Failed to upload about image', err);
+        setSaving(false);
+        alert('Failed to upload image: ' + (err.response?.data?.message || err.message || 'Upload error'));
+        return;
       }
+    }
+
+    if (imageUrl && imageUrl.startsWith('blob:')) {
+      imageUrl = '';
     }
 
     await dispatch(updateAboutSection({ ...aboutForm, imageUrl }));
     setSaving(false);
+    setAboutFile(null);
   };
 
   if (loading && !about.title) {

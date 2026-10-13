@@ -34,7 +34,7 @@ export const Footer = () => {
 
   return (
     <footer className="border-t border-border mt-24">
-      <div className="container-page py-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      <div className="container-page py-10 pb-20 md:pb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="text-sm font-semibold">{profile.handle}</div>
           <div className="text-xs text-muted-foreground mt-1">© {new Date().getFullYear()} {profile.name}. Built from scratch.</div>

@@ -50,7 +50,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20">
+      <body
+        className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20"
+        suppressHydrationWarning
+      >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <CustomCursor />
           <Navbar />

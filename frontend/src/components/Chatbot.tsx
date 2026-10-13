@@ -37,6 +37,81 @@ export default function Chatbot() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const [bottomOffset, setBottomOffset] = useState(24);
+  const [isReady, setIsReady] = useState(false);
+
+  // Do not show the AI bot button on initial load while splash screen is displaying
+  useEffect(() => {
+    const checkSplash = () => {
+      if (typeof window === 'undefined') return false;
+      const isVisited =
+        document.documentElement.classList.contains('splash-visited') ||
+        window.location.pathname !== '/' ||
+        sessionStorage.getItem('sameer_portfolio_visited') === 'true';
+
+      if (isVisited) {
+        setIsReady(true);
+        return true;
+      }
+      return false;
+    };
+
+    if (checkSplash()) return;
+
+    const observer = new MutationObserver(() => {
+      if (checkSplash()) {
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Keep floating button and widget strictly above the footer dividing line
+  useEffect(() => {
+    const updatePosition = () => {
+      const footer = document.querySelector('footer');
+      if (!footer) {
+        setBottomOffset(24);
+        return;
+      }
+      const footerRect = footer.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+
+      // Ensure footer is actually rendered and visible in DOM (not display: none, not collapsed)
+      const isFooterRendered = footerRect.height > 0 && footer.offsetParent !== null;
+
+      if (isFooterRendered && footerRect.top > 0 && footerRect.top < windowHeight) {
+        const visibleFooterHeight = windowHeight - footerRect.top;
+        // Never allow offset to push button off screen
+        const safeOffset = Math.min(visibleFooterHeight + 20, windowHeight - 90);
+        setBottomOffset(Math.max(24, safeOffset));
+      } else {
+        setBottomOffset(24);
+      }
+    };
+
+    updatePosition();
+    window.addEventListener('scroll', updatePosition, { passive: true });
+    window.addEventListener('resize', updatePosition);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && document.body) {
+      resizeObserver = new ResizeObserver(() => updatePosition());
+      resizeObserver.observe(document.body);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition);
+      window.removeEventListener('resize', updatePosition);
+      if (resizeObserver) resizeObserver.disconnect();
+    };
+  }, []);
 
   // Initialize session ID from sessionStorage
   useEffect(() => {
@@ -155,13 +230,17 @@ export default function Chatbot() {
     }
   };
 
+  if (!isReady) return null;
+
   return (
     <>
       {/* Open Floating Button */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-zinc-950/90 text-white border border-purple-500/30 rounded-full shadow-[0_0_25px_rgba(124,58,237,0.35)] hover:shadow-[0_0_35px_rgba(124,58,237,0.55)] hover:border-purple-500/60 backdrop-blur-xl transition-all duration-300 group cursor-pointer"
+          data-chatbot-widget
+          style={{ bottom: `${bottomOffset}px` }}
+          className="fixed right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-zinc-950/90 text-white border border-purple-500/30 rounded-full shadow-[0_0_25px_rgba(124,58,237,0.35)] hover:shadow-[0_0_35px_rgba(124,58,237,0.55)] hover:border-purple-500/60 backdrop-blur-xl transition-[bottom,border-color,box-shadow,transform] duration-200 group cursor-pointer"
         >
           <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-600 to-violet-400 flex items-center justify-center text-white shadow-md shadow-purple-500/40 group-hover:scale-110 transition-transform">
             <Sparkles size={13} />
@@ -176,7 +255,16 @@ export default function Chatbot() {
 
       {/* Floating Chat Widget Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-[92vw] sm:w-[410px] h-[560px] flex flex-col border border-white/10 bg-zinc-950/95 backdrop-blur-2xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] overflow-hidden font-sans text-sm animate-in fade-in slide-in-from-bottom-4 duration-200">
+        <div
+          data-chatbot-widget
+          style={{
+            bottom: `${Math.min(
+              bottomOffset,
+              Math.max(24, (typeof window !== 'undefined' ? window.innerHeight : 800) - 580)
+            )}px`,
+          }}
+          className="fixed right-6 z-50 w-[92vw] sm:w-[410px] h-[560px] max-h-[calc(100vh-80px)] flex flex-col border border-white/10 bg-zinc-950/95 backdrop-blur-2xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] overflow-hidden font-sans text-sm animate-in fade-in slide-in-from-bottom-4 duration-200 transition-[bottom] duration-200"
+        >
           {/* Header Bar */}
           <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/10 bg-white/[0.03]">
             <div className="flex items-center gap-3">
