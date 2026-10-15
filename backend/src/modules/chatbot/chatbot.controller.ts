@@ -22,4 +22,12 @@ export class ChatbotController {
   ) {
     return this.chatbotService.streamChat(dto.message, dto.sessionId, res);
   }
+
+  @Public()
+  @Post('refresh')
+  @ApiOperation({ summary: 'Invalidate chatbot prompt cache to sync latest data' })
+  refreshCache() {
+    this.chatbotService.invalidateCache();
+    return { success: true, message: 'Chatbot prompt cache invalidated successfully' };
+  }
 }

@@ -7,7 +7,7 @@ import ReactMarkdown from 'react-markdown';
 const SUGGESTIONS = [
   "What is Sameer's experience?",
   "Show me his featured projects",
-  "What tech stack does he use?",
+  "Can I book an appointment?",
   "How can I contact or hire him?",
 ];
 
@@ -29,7 +29,7 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hey there! 👋 I'm Sameer's AI Assistant. Ask me anything about his projects, skills, experience, or how to get in touch.",
+      content: "Hey there! 👋 I'm Sameer's AI Assistant. Ask me anything about his projects, skills, experience, booking an appointment, or how to get in touch.",
     },
   ]);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -316,7 +316,17 @@ export default function Chatbot() {
                           ol: ({ node, ...props }) => <ol className="list-decimal list-outside ml-4 space-y-1 my-1.5 text-zinc-200" {...props} />,
                           li: ({ node, ...props }) => <li className="pl-0.5" {...props} />,
                           p: ({ node, ...props }) => <p className="mb-2 last:mb-0 leading-relaxed" {...props} />,
-                          a: ({ node, ...props }) => <a className="text-purple-400 underline hover:text-purple-300" target="_blank" rel="noopener noreferrer" {...props} />,
+                          a: ({ node, ...props }) => {
+                            const isExternal = props.href?.startsWith('http://') || props.href?.startsWith('https://');
+                            return (
+                              <a
+                                className="text-purple-400 underline hover:text-purple-300 transition-colors font-medium"
+                                target={isExternal ? "_blank" : undefined}
+                                rel={isExternal ? "noopener noreferrer" : undefined}
+                                {...props}
+                              />
+                            );
+                          },
                           code: ({ node, ...props }) => <code className="bg-white/10 px-1 py-0.5 rounded text-purple-300 font-mono text-[11px]" {...props} />
                         }}
                       >
@@ -362,7 +372,7 @@ export default function Chatbot() {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about Sameer's background..."
+                placeholder="Ask about Sameer, projects, booking an appointment..."
                 disabled={isStreaming}
                 className="flex-1 bg-transparent border-0 outline-none text-xs text-white placeholder:text-zinc-500 font-sans"
               />
